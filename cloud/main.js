@@ -84,8 +84,8 @@ Parse.Cloud.define("addBraintreeCreditCard", function (request, response) {
                     response.error("User not found");
                 }
             },
-            error: function () {
-                response.error("Error Occured");
+            error: function (error) {
+                response.error("Error: " + error.code + " " + error.message);
             }
         });
     }
