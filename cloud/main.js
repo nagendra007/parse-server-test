@@ -29,7 +29,7 @@ Parse.Cloud.define("braintreepay", function (request, response) {
 });
 
 Parse.Cloud.define("addBraintreeCreditCard", function (request, response) {
-    if (request.params.nonce != null && request.params.nonce != "") {
+    if (request.params.CardholderName != null && request.params.CardholderName != "" && request.params.Number != null && request.params.Number != "" && request.params.CVV != null && request.params.CVV != "" && request.params.ExpirationMonth != null && request.params.ExpirationMonth != "" && request.params.ExpirationYear != null && request.params.ExpirationYear != "") {//if (request.params.nonce != null && request.params.nonce != "" ) {
         var user = new Parse.User();
         user.id = request.params.userid;
         var query = new Parse.Query("userDetails");
@@ -53,29 +53,58 @@ Parse.Cloud.define("addBraintreeCreditCard", function (request, response) {
                     //    response.success( res=result,err=err );
                     //});
                     gateway.customer.create({
-                        firstName: request.params.firstName,//results[0].firstName,
-                        lastName: request.params.lastName,// results[0].lastName,
+                        firstName: results[0].firstName,//results[0].firstName,
+                        lastName: results[0].lastName,// results[0].lastName,
                         email: results[0].email,
                         //paymentMethodNonce: request.params.nonce,
                         CreditCard: {
-                            CardholderName: "my test",
-                            Number: "4111111111111111",
-                            CVV: "123",
+                            CardholderName: request.params.CardholderName, //"my test",
+                            Number: request.params.Number,//"4111111111111111",
+                            CVV: request.params.CVV,//"123",
                             //ExpirationDate: "11/2022",
-                            ExpirationMonth: "11",
-                            ExpirationYear:"2022",
+                            ExpirationMonth: request.params.ExpirationMonth,//"11",
+                            ExpirationYear: request.params.ExpirationYear,//"2022",
                             Options: {
                                 MakeDefault: true,
                                 VerifyCard: true
                             }
                         }
                     }, function (err, result) {
+                        if (result.success == true)
+                        {
+                            var BTcustomerid = result.customer.id;
+                            var BTcardid = result.customer.creditCards[0].token;
+                            var cardtype = result.customer.creditCards[0].cardType;
+                            var maskedNumber = result.customer.creditCards[0].maskedNumber;
+
+                            var UserCreditCardInfo = Parse.Object.extend("userCreditCardInfo");
+                            var userCreditCardInfo = new UserCreditCardInfo();
+                            userCreditCardInfo.set("user", user);
+                            userCreditCardInfo.set("BTcustomerid", BTcustomerid);
+                            userCreditCardInfo.set("BTcardid", BTcardid);
+                            userCreditCardInfo.set("cardtype", cardtype);
+                            userCreditCardInfo.set("maskedNumber", maskedNumber);
+                            userCreditCardInfo.set("ExpirationMonth", request.params.ExpirationMonth);
+                            userCreditCardInfo.set("ExpirationYear", request.params.ExpirationYear);
+                            userCreditCardInfo.save(null, {
+                                success: function (userCreditCardInfo) {
+                                    response.success(userCreditCardInfo);
+                                },
+                                error: function (error) {
+                                    response.error("error in adding card in collection");
+                                }
+                            });
+                            
+                        }
+                        else {
+                            response.error("error in adding card");
+                        }
                         // result.success;
                         // true
 
                         // result.customer.id;
                         // e.g. 494019
-                        response.success(res = result, err = err);
+                        
                     });
 
                     //response.success(results);
