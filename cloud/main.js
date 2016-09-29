@@ -13,23 +13,49 @@ Parse.Cloud.define('hello', function(req, res) {
 });
 
 Parse.Cloud.define("braintreepay", function (request, response) {
-   
+    if (request.params.userid != null && request.params.userid != "" && request.params.BTcustomerid != null && request.params.BTcustomerid != "" && request.params.BTcardid != null && request.params.BTcardid != "" && request.params.amount != null && request.params.amount != "") {
+        var user = new Parse.User();
+        user.id = request.params.userid;
+        var query = new Parse.Query("userDetails");
+        query.include('user');
+        query.equalTo("user", user);
+        query.find({
+            success: function (results) {
+                if (results.length > 0) {
 
-    gateway.transaction.sale({
-        amount: "4.00",
-        paymentMethodNonce: request.params.nonce,
-        //CustomerId : balcustomerid,
-       // PaymentMethodToken : cardid,
-        options: {
-            submitForSettlement: true
-        }
-    }, function (err, result) {
-        response.success("Purchase made!");
-    });
+                    gateway.transaction.sale({
+                        amount: request.params.amount,
+                        //paymentMethodNonce: request.params.nonce,
+                        CustomerId: request.params.BTcustomerid,// balcustomerid,
+                        PaymentMethodToken: request.params.BTcardid,
+                        options: {
+                            submitForSettlement: true
+                        }
+                    }, function (err, result) {
+                        if (result.success == true) {
+                            response.success(result);
+                        }
+                        else {
+                            response.error(err);
+                        }
+                    });
+                }
+                else {
+                    response.error("User not found");
+                }
+            },
+            error: function (error) {
+                response.error("Error: " + error.code + " " + error.message);
+            }
+        });
+    }
+    else {
+        response.error("all Params are required");
+    }
 });
 
 Parse.Cloud.define("addBraintreeCreditCard", function (request, response) {
-    if (request.params.CardholderName != null && request.params.CardholderName != "" && request.params.Number != null && request.params.Number != "" && request.params.CVV != null && request.params.CVV != "" && request.params.ExpirationMonth != null && request.params.ExpirationMonth != "" && request.params.ExpirationYear != null && request.params.ExpirationYear != "") {//if (request.params.nonce != null && request.params.nonce != "" ) {
+    if (request.params.userid != null && request.params.userid != "" && request.params.CardholderName != null && request.params.CardholderName != "" && request.params.Number != null && request.params.Number != "" && request.params.CVV != null && request.params.CVV != "" && request.params.ExpirationMonth != null && request.params.ExpirationMonth != "" && request.params.ExpirationYear != null && request.params.ExpirationYear != "") {//if (request.params.nonce != null && request.params.nonce != "" ) {
         var user = new Parse.User();
         user.id = request.params.userid;
         var query = new Parse.Query("userDetails");
@@ -119,7 +145,7 @@ Parse.Cloud.define("addBraintreeCreditCard", function (request, response) {
         });
     }
     else {
-        response.error("provide nonce");
+        response.error("all Params are required");
     }
 });
 
