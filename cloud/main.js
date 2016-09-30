@@ -197,16 +197,15 @@ Parse.Cloud.define("pay", function(request, response) {
 
 
 Parse.Cloud.define("search", function (request, response) {
-    if ( request.params.latitude != null && request.params.latitude != "" && request.params.longitude != null && request.params.longitude != "" && request.params.miles != null && request.params.miles != "" && request.params.categoryId != null && request.params.categoryId != "" && request.params.subcategoryId != null && request.params.subcategoryId != "") {
+    if (request.params.latitude != null && request.params.latitude != "" && request.params.longitude != null && request.params.longitude != "" && request.params.miles != null && request.params.miles != "" && request.params.categoryId != null && request.params.categoryId != "" && request.params.subcategoryId != null && request.params.subcategoryId != "") {
 
-        var point = new Parse.GeoPoint(request.params.latitude,request.params.longitude);
+        var point = new Parse.GeoPoint(request.params.latitude, request.params.longitude);
         var UserDetails = Parse.Object.extend("userDetails");
         var userDetails = new UserDetails();
         var query = new Parse.Query(UserDetails);
 
         query.withinMiles("location", point, request.params.miles);
-        if(request.params.userid != null && request.params.userid != "")
-        {
+        if (request.params.userid != null && request.params.userid != "") {
             var user = new Parse.User();
             user.id = request.params.userid;
             query.notEqualTo("user", user);
@@ -224,11 +223,11 @@ Parse.Cloud.define("search", function (request, response) {
 
 
                     var ToolCategory = Parse.Object.extend("toolCategory");
-                    var toolcategory=new ToolCategory();
-                    toolcategory.id=request.params.categoryId;
+                    var toolcategory = new ToolCategory();
+                    toolcategory.id = request.params.categoryId;
                     var ToolSubCategory = Parse.Object.extend("toolSubCategory");
-                    var toolSubCategory=new ToolSubCategory();
-                    toolSubCategory.id=request.params.subcategoryId;
+                    var toolSubCategory = new ToolSubCategory();
+                    toolSubCategory.id = request.params.subcategoryId;
 
 
                     query.equalTo("categoryId", toolcategory);
@@ -240,25 +239,24 @@ Parse.Cloud.define("search", function (request, response) {
                         success: function (toolForRent) {
                             response.success(toolForRent);
                         },
-                        error:function (error){
+                        error: function (error) {
                             response.error("error occured :" + errro.message);
                         }
                     });
 
                 }
-                else{
+                else {
                     response.error("no users available in given radius");
                 }
             },
-            error: function(errro)
-            {
+            error: function (errro) {
                 response.error("error occured :" + errro.message);
             }
         });
     }
-    else{
+    else {
         response.error("all Params are required");
     }
-}
+});
 
 
