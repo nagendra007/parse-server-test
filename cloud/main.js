@@ -13,7 +13,7 @@ Parse.Cloud.define('hello', function(req, res) {
 });
 
 Parse.Cloud.define("braintreepay", function (request, response) {
-    if (request.params.userid != null && request.params.userid != "" && request.params.BTcustomerid != null && request.params.BTcustomerid != "" && request.params.BTcardid != null && request.params.BTcardid != "" && request.params.amount != null && request.params.amount != "") {
+    if (request.params.userid != null && request.params.userid != "" && request.params.BTcustomerid != null && request.params.BTcustomerid != "" && request.params.BTcardid != null && request.params.BTcardid != "" && request.params.amount != null && request.params.amount != "" && request.params.toolTakenForRentID != null && request.params.toolTakenForRentID != "") {
         var user = new Parse.User();
         user.id = request.params.userid;
         var query = new Parse.Query("userDetails");
@@ -33,7 +33,25 @@ Parse.Cloud.define("braintreepay", function (request, response) {
                         }
                     }, function (err, result) {
                         if (result.success == true) {
-                            response.success(result);
+
+                            //var ToolTakenForRent = Parse.Object.extend("toolTakenForRent");
+                            //var toolTakenForRent = new ToolTakenForRent();
+                            //toolTakenForRent.id = request.params.toolTakenForRentID;
+
+                            var UserPayment = Parse.Object.extend("userPayment");
+                            var userPayment = new UserPayment();
+                            userPayment.set("user", user);
+                            userPayment.set("txnId", result.transaction.id);
+                            userPayment.set("amount", result.transaction.amount);
+                            userPayment.save(null, {
+                                success: function (userPayment) {
+                                    response.success(userPayment);
+                                },
+                                error: function (error) {
+                                    response.error("error in adding card in collection");
+                                }
+                            });
+                           
                         }
                         else {
                             response.error(err);
@@ -176,5 +194,71 @@ Parse.Cloud.define("pay", function(request, response) {
     }
     });
 });
+
+
+Parse.Cloud.define("search", function (request, response) {
+    if ( request.params.latitude != null && request.params.latitude != "" && request.params.longitude != null && request.params.longitude != "" && request.params.miles != null && request.params.miles != "" && request.params.categoryId != null && request.params.categoryId != "" && request.params.subcategoryId != null && request.params.subcategoryId != "") {
+
+        var point = new Parse.GeoPoint(request.params.latitude,request.params.longitude);
+        var UserDetails = Parse.Object.extend("userDetails");
+        var userDetails = new UserDetails();
+        var query = new Parse.Query(UserDetails);
+
+        query.withinMiles("location", point, request.params.miles);
+        if(request.params.userid != null && request.params.userid != "")
+        {
+            var user = new Parse.User();
+            user.id = request.params.userid;
+            query.notEqualTo("user", user);
+        }
+        query.find({
+            success: function (userDetails) {
+                if (userDetails.length > 0) {
+                    var myusers = [];
+                    for (var j = 0; j < userDetails.length; j++) {
+                        myusers.push(userDetails[j].get("user"));
+                    }
+                    var ToolForRent = Parse.Object.extend("toolForRent");
+                    var query = new Parse.Query(ToolForRent);
+                    query.equalTo("isAvailable", "1");
+
+
+                    var ToolCategory = Parse.Object.extend("toolCategory");
+                    var toolcategory=new ToolCategory();
+                    toolcategory.id=request.params.categoryId;
+                    var ToolSubCategory = Parse.Object.extend("toolSubCategory");
+                    var toolSubCategory=new ToolSubCategory();
+                    toolSubCategory.id=request.params.subcategoryId;
+
+
+                    query.equalTo("categoryId", toolcategory);
+                    query.equalTo("subCategoryId", toolSubCategory);
+                    query.containedIn("user", myusers);
+                    query.include("categoryId");
+                    query.include("subCategoryId");
+                    query.find({
+                        success: function (toolForRent) {
+                            response.success(toolForRent);
+                        },
+                        error:function (error){
+                            response.error("error occured :" + errro.message);
+                        }
+                    });
+
+                }
+                else{
+                    response.error("no users available in given radius");
+                }
+            },
+            error: function(errro)
+            {
+                response.error("error occured :" + errro.message);
+            }
+        });
+    }
+    else{
+        response.error("all Params are required");
+    }
+}
 
 
