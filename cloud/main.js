@@ -206,11 +206,11 @@ Parse.Cloud.define("search", function (request, response) {
         var query = new Parse.Query(UserDetails);
 
         query.withinMiles("location", point, request.params.miles);
-        //if (request.params.userid != null && request.params.userid != "") {
-        //    var user = new Parse.User();
-        //    user.id = request.params.userid;
-        //    query.notEqualTo("user", user);
-        //}
+        if (request.params.userid != null && request.params.userid != "") {
+            var user = new Parse.User();
+            user.id = request.params.userid;
+            query.notEqualTo("user", user);
+        }
         query.find({
             success: function (userDetails) {
                 if (userDetails.length > 0) {
@@ -223,16 +223,16 @@ Parse.Cloud.define("search", function (request, response) {
                     query.equalTo("isAvailable", "1");
 
 
-                    //var ToolCategory = Parse.Object.extend("toolCategory");
-                    //var toolcategory = new ToolCategory();
-                    //toolcategory.id = request.params.categoryId;
-                    //var ToolSubCategory = Parse.Object.extend("toolSubCategory");
-                    //var toolSubCategory = new ToolSubCategory();
-                    //toolSubCategory.id = request.params.subcategoryId;
+                    var ToolCategory = Parse.Object.extend("toolCategory");
+                    var toolcategory = new ToolCategory();
+                    toolcategory.id = request.params.categoryId;
+                    var ToolSubCategory = Parse.Object.extend("toolSubCategory");
+                    var toolSubCategory = new ToolSubCategory();
+                    toolSubCategory.id = request.params.subcategoryId;
 
 
-                    //query.equalTo("categoryId", toolcategory);
-                    //query.equalTo("subCategoryId", toolSubCategory);
+                    query.equalTo("categoryId", toolcategory);
+                    query.equalTo("subCategoryId", toolSubCategory);
                     query.containedIn("user", myusers);
                     query.include("categoryId");
                     query.include("subCategoryId");
