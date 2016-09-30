@@ -205,7 +205,7 @@ Parse.Cloud.define("search", function (request, response) {
         var userDetails = new UserDetails();
         var query = new Parse.Query(UserDetails);
 
-        query.withinMiles("location", point, 100);
+        query.withinMiles("location", point, request.params.miles);
         //if (request.params.userid != null && request.params.userid != "") {
         //    var user = new Parse.User();
         //    user.id = request.params.userid;
