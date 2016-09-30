@@ -199,12 +199,13 @@ Parse.Cloud.define("pay", function(request, response) {
 Parse.Cloud.define("search", function (request, response) {
     if (request.params.latitude != null && request.params.latitude != "" && request.params.longitude != null && request.params.longitude != "" && request.params.miles != null && request.params.miles != "" && request.params.categoryId != null && request.params.categoryId != "" && request.params.subcategoryId != null && request.params.subcategoryId != "") {
 
-        var point = new Parse.GeoPoint(request.params.latitude, request.params.longitude);
+       // var point = new Parse.GeoPoint(request.params.latitude, request.params.longitude);
+        var point = new Parse.GeoPoint(18.2403, 73.1305);
         var UserDetails = Parse.Object.extend("userDetails");
         var userDetails = new UserDetails();
         var query = new Parse.Query(UserDetails);
 
-        query.withinMiles("location", point, request.params.miles);
+        query.withinMiles("location", point, 100);
         //if (request.params.userid != null && request.params.userid != "") {
         //    var user = new Parse.User();
         //    user.id = request.params.userid;
