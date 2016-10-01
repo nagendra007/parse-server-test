@@ -563,18 +563,18 @@ Parse.Cloud.define("feedback", function (request, response) {
         query.find({
             success: function (result) {
                 if (result.length > 0) {
-                    if (request.params.userid != null && $("#ddlMyRentedTools").val() != "" && $("#txtCommnet").val() != "") {
+                    if (request.params.toolTakenForRentID != null && request.params.toolTakenForRentID != "" && request.params.comment != null && request.params.comment && request.params.rating != null && request.params.rating) {
                         var ToolTakenForRent = Parse.Object.extend("toolTakenForRent");
                         var toolTakenForRent = new ToolTakenForRent();
-                        toolTakenForRent.id = $("#ddlMyRentedTools").val();
+                        toolTakenForRent.id = request.params.toolTakenForRentID;
 
                         var UserFeedBack = Parse.Object.extend("userFeedBack");
                         var userFeedBack = new UserFeedBack();
 
                         userFeedBack.set("user", user);
                         userFeedBack.set("toolTakenForRentId", toolTakenForRent);
-                        userFeedBack.set("comment", $("#txtCommnet").val());
-                        userFeedBack.set("rating", $("#ddlrating").val());
+                        userFeedBack.set("comment", request.params.comment);
+                        userFeedBack.set("rating", request.params.rating);
                         userFeedBack.save(null, {
                             success: function (userFeedBack) {
 
