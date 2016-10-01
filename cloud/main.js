@@ -187,6 +187,7 @@ Parse.Cloud.define("addUpdateUserdetails", function (request, response) {
                     query.equalTo("user", user);
                     query.find().then(function (userDetailss) {
                         var point = new Parse.GeoPoint(19.2403, 73.1305);
+                        var myid = "";
                         if (userDetailss.length > 0) {
                             //response.success(userDetailss[0].id);
                             //var myid = "";
@@ -241,6 +242,7 @@ Parse.Cloud.define("addUpdateUserdetails", function (request, response) {
                         else {
                             //var UserDetailstest = Parse.Object.extend("userDetails");
                             var userDetailstest = new UserDetails();
+                            userDetailstest.id = myid;
                             if (request.params.email != null && request.params.email != "") {
                                 userDetailstest.set("email", request.params.email);
                             }
