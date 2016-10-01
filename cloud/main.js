@@ -320,14 +320,21 @@ Parse.Cloud.define("addUpdateUserdetails", function (request, response) {
                                 //    userDetails1.set("state", request.params.state);
                                 //}
                                 //userDetails1.set("location", point);
-                                userDetails1.save({
-                                    success: function (userDetails1) {
-                                        response.sucess("user detail updated sucess");
-                                    },
-                                    error: function (error) {
-                                        response.error("user detail error occured");
-                                    }
+                                userDetails1.save().then(function (userDetails1) {
+                                    response.sucess("user detail updated sucess");
+                                },
+                                function (error) {
+                                    response.error("user detail error occured");
                                 });
+                                
+                                //,{
+                                //    success: function (userDetails1) {
+                                //        response.sucess("user detail updated sucess");
+                                //    },
+                                //    error: function (error) {
+                                //        response.error("user detail error occured");
+                                //    }
+                                //});
                             }
                             else {
                                 response.error("no user details ");
