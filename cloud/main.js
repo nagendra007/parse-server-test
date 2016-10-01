@@ -228,18 +228,28 @@ Parse.Cloud.define("addUpdateUserdetailsold", function (request, response) {
 
 Parse.Cloud.define("addUpdateUserdetails", function (request, response) {
     if (request.params.userid != null && request.params.userid != "") {
+        var user = new Parse.User();
+        user.id = request.params.userid;
 
         var UserDetails = Parse.Object.extend("userDetails");
-        var userDetails = new UserDetails();
-        userDetails.id = "qaL257aApp";// userDetails[0].id;
-        userDetails.set("address", "365345 ave");
-        userDetails.save({
-            success: function (results) {
-                response.success(results);
-            },
-            error: function (error) {
-                response.error("Error: " + error.code + " " + error.message);
-            }
+        //var userDetails1 = new UserDetails();
+        var query = new Parse.Query(UserDetails);
+        query.equalTo("user", user);
+        query.find().then(function (userDetails) {
+
+
+            var UserDetails = Parse.Object.extend("userDetails");
+            var userDetails = new UserDetails();
+            userDetails.id = "qaL257aApp";// userDetails[0].id;
+            userDetails.set("address", "365345 ave");
+            userDetails.save({
+                success: function (results) {
+                    response.success(results);
+                },
+                error: function (error) {
+                    response.error("Error: " + error.code + " " + error.message);
+                }
+            });
         });
         //response.success("Data saved");
 
