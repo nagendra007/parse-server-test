@@ -167,7 +167,41 @@ Parse.Cloud.define("addBraintreeCreditCard", function (request, response) {
     }
 });
 
+Parse.Cloud.define("getCreditCardList", function (request, response) {
+    if (request.params.userid != null && request.params.userid != "") {
 
+        var query = new Parse.Query(Parse.User);
+        query.equalTo("objectId", request.params.userid);
+        query.find({
+            success: function (result) {
+                if (result.length > 0) {
+
+                    var user = new Parse.User();
+                    user.id = request.params.userid;
+
+                    var UserCreditCardInfo = Parse.Object.extend("userCreditCardInfo");
+                    
+                    var query = new Parse.Query(UserCreditCardInfo);
+                    query.equalTo("user", user);
+                    query.find({
+                        success: function (userCreditCardInfo) {
+                            response.success(userCreditCardInfo);
+                        },
+                        error: function (error) {
+                            response.error("error occured");
+                        }
+                    });
+                }
+            },
+            error: function (error) {
+                response.error("Error: " + error.code + " " + error.message);
+            }
+        });
+    }
+    else {
+        response.error("userid missing in request");
+    }
+});
 
 
 Parse.Cloud.define("addUpdateUserdetailsTest", function (request, response) {
