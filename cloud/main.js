@@ -235,16 +235,16 @@ Parse.Cloud.define("addUpdateUserdetails", function (request, response) {
         //var userDetails1 = new UserDetails();
         var query = new Parse.Query(UserDetails);
         query.equalTo("user", user);
-        query.find().then(function (userDetails) {
+        query.find().then(function (userDetailss) {
 
-            if (userDetails.length > 0) {
+            if (userDetailss.length > 0) {
                 //response.success(userDetails[0].id);
 
-                var UserDetails = Parse.Object.extend("userDetails");
-                var userDetails = new UserDetails();
-                userDetails.id = userDetails[0].id;// "qaL257aApp";// 
-                userDetails.set("address", "365345 ave");
-                userDetails.save({
+                var UserDetails1 = Parse.Object.extend("userDetails");
+                var userDetails2 = new UserDetails1();
+                userDetails2.id = userDetailss[0].id;// "qaL257aApp";// 
+                userDetails2.set("address", "365345 ave");
+                userDetails2.save({
                     success: function (results) {
                         response.success(results);
                     },
