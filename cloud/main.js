@@ -183,19 +183,49 @@ Parse.Cloud.define("addUpdateUserdetailsold", function (request, response) {
                     var query = new Parse.Query(UserDetails);
                     query.equalTo("user", user);
                     query.find().then(function (userDetails) {
-                        //success: function (userDetails) {
-                        //response.success(userDetails);
-                        //var point = new Parse.GeoPoint(19.2403, 73.1305);
+                        var point = new Parse.GeoPoint(19.2403, 73.1305);
                         if (userDetails.length > 0) {
                             var UserDetails1 = Parse.Object.extend("userDetails");
                             var userDetails1 = new UserDetails();
                             userDetails1.id = userDetails[0].id;
+                            //if (request.params.email != null && request.params.email != "") {
+                            //    userDetails1.set("email", "");
+                            //}
                             if (request.params.firstName != null && request.params.firstName != "") {
                                 userDetails1.set("firstName", request.params.firstName);
                             }
-                            else {
-                                userDetails1.set("firstName", "");
+                            if (request.params.lastName != null && request.params.lastName != "") {
+                                userDetails1.set("lastName", "");
                             }
+                            if (request.params.dob != null && request.params.dob != "") {
+                                userDetails1.set("dob", request.params.dob);
+                            }
+                            if (request.params.gender != null && request.params.gender != "") {
+                                userDetails1.set("gender", request.params.gender);
+                            }
+                            if (request.params.imageURL != null && request.params.imageURL != "") {
+                                userDetails.set("imageURL", request.params.imageURL);
+                            }
+                            if (request.params.phoneNo != null && request.params.phoneNo != "") {
+                                userDetails1.set("phoneNo", request.params.phoneNo);
+                            }
+                            if (request.params.altPhoneNo != null && request.params.altPhoneNo != "") {
+                                userDetails1.set("altPhoneNo", request.params.altPhoneNo);
+                            }
+                            if (request.params.address != null && request.params.address != "") {
+                                userDetails1.set("address", request.params.address);
+                            }
+                            if (request.params.city != null && request.params.city != "") {
+                                userDetails1.set("city", request.params.city);
+                            }
+                            if (request.params.zipCode != null && request.params.zipCode != "") {
+                                userDetails1.set("zipCode", request.params.zipCode);
+                            }
+                            if (request.params.state != null && request.params.state != "") {
+                                userDetails1.set("state", request.params.state);
+                            }
+                            userDetails1.set("location", point);
+
                             userDetails1.save().then(function (userDetails1) {
                                 response.sucess("user detail updated sucess");
                             },
@@ -228,41 +258,86 @@ Parse.Cloud.define("addUpdateUserdetailsold", function (request, response) {
 
 Parse.Cloud.define("addUpdateUserdetails", function (request, response) {
     if (request.params.userid != null && request.params.userid != "") {
-        var user = new Parse.User();
-        user.id = request.params.userid;
+        var query = new Parse.Query(Parse.User);
+        query.equalTo("objectId", request.params.userid);
+        query.find({
+            success: function (result) {
+                if (result.length > 0) {
 
-        var UserDetails = Parse.Object.extend("userDetails");
-        //var userDetails1 = new UserDetails();
-        var query = new Parse.Query(UserDetails);
-        query.equalTo("user", user);
-        query.find().then(function (userDetailss) {
+                    var user = new Parse.User();
+                    user.id = request.params.userid;
 
-            if (userDetailss.length > 0) {
-                //response.success(userDetailss[0].id);
-                var myid = "";
-                myid = userDetailss[0].id;
-                var UserDetails1 = Parse.Object.extend("userDetails");
-                var userDetails2 = new UserDetails1();
-                userDetails2.id = myid;//"snlWbSHB1P";  //   userDetailss[0].id;//
-                userDetails2.set("address", "3653451 ave");
-                userDetails2.save({
-                    success: function (results) {
-                        response.success(results);
-                    },
-                    error: function (error) {
-                        response.error("Error: " + error.code + " " + error.message);
-                    }
-                });
-            }
-            else {
-                response.error("user not found");
+                    var UserDetails = Parse.Object.extend("userDetails");
+                    //var userDetails1 = new UserDetails();
+                    var query = new Parse.Query(UserDetails);
+                    query.equalTo("user", user);
+                    query.find().then(function (userDetailss) {
+
+                        if (userDetailss.length > 0) {
+                            //response.success(userDetailss[0].id);
+                            var myid = "";
+                            myid = userDetailss[0].id;
+                            var UserDetails1 = Parse.Object.extend("userDetails");
+                            var userDetails2 = new UserDetails1();
+                            userDetails2.id = myid;//"snlWbSHB1P";  //   userDetailss[0].id;//
+
+                            if (request.params.firstName != null && request.params.firstName != "") {
+                                userDetails1.set("firstName", request.params.firstName);
+                            }
+                            if (request.params.lastName != null && request.params.lastName != "") {
+                                userDetails1.set("lastName", "");
+                            }
+                            if (request.params.dob != null && request.params.dob != "") {
+                                userDetails1.set("dob", request.params.dob);
+                            }
+                            if (request.params.gender != null && request.params.gender != "") {
+                                userDetails1.set("gender", request.params.gender);
+                            }
+                            if (request.params.imageURL != null && request.params.imageURL != "") {
+                                userDetails.set("imageURL", request.params.imageURL);
+                            }
+                            if (request.params.phoneNo != null && request.params.phoneNo != "") {
+                                userDetails1.set("phoneNo", request.params.phoneNo);
+                            }
+                            if (request.params.altPhoneNo != null && request.params.altPhoneNo != "") {
+                                userDetails1.set("altPhoneNo", request.params.altPhoneNo);
+                            }
+                            if (request.params.address != null && request.params.address != "") {
+                                userDetails1.set("address", request.params.address);
+                            }
+                            if (request.params.city != null && request.params.city != "") {
+                                userDetails1.set("city", request.params.city);
+                            }
+                            if (request.params.zipCode != null && request.params.zipCode != "") {
+                                userDetails1.set("zipCode", request.params.zipCode);
+                            }
+                            if (request.params.state != null && request.params.state != "") {
+                                userDetails1.set("state", request.params.state);
+                            }
+
+                            userDetails2.save({
+                                success: function (results) {
+                                    response.success(results);
+                                },
+                                error: function (error) {
+                                    response.error("Error: " + error.code + " " + error.message);
+                                }
+                            });
+                        }
+                        else {
+                            response.error("user not found");
+                        }
+                    });
+                    //response.success("Data saved");
+                }
+                else {
+                    response.error("user not found");
+                }
             }
         });
-        //response.success("Data saved");
-
     }
     else {
-        response.error("please userid");
+        response.error("please provide userid");
     }
 });
 
