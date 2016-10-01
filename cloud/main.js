@@ -367,11 +367,13 @@ Parse.Cloud.define("addUpdateUserdetailsNew", function (request, response) {
         userDetailstest.set("location", point);
         userDetailstest.set("user", user);
 
-        userDetailstest.save().then(function (object) {
-            response.success(object);
-        },
-        function (error) {
-            response.error("Error: " + error.code + " " + error.message);
+        userDetailstest.save({
+            success: function (results) {
+                response.success(results);
+            },
+            error: function (error) {
+                response.error("Error: " + error.code + " " + error.message);
+            }
         });
 
 
