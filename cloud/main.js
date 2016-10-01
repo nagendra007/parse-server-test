@@ -190,55 +190,55 @@ Parse.Cloud.define("addUpdateUserdetails", function (request, response) {
                         var myid = "";
                         if (userDetailss.length > 0) {
                             //response.success(userDetailss[0].id);
-                            //var myid = "";
-                            //myid = userDetailss[0].id;
-                            ////var UserDetails1 = Parse.Object.extend("userDetails");
-                            //var userDetails2 = new UserDetails();
-                            //userDetails2.id = myid;//"snlWbSHB1P";  //   userDetailss[0].id;//
+                            var myid = "";
+                            myid = userDetailss[0].id;
+                            //var UserDetails1 = Parse.Object.extend("userDetails");
+                            var userDetails2 = new UserDetails();
+                            userDetails2.id = myid;//"snlWbSHB1P";  //   userDetailss[0].id;//
 
-                            //if (request.params.firstName != null && request.params.firstName != "") {
-                            //    userDetails2.set("firstName", request.params.firstName);
-                            //}
-                            //if (request.params.lastName != null && request.params.lastName != "") {
-                            //    userDetails2.set("lastName", "");
-                            //}
-                            //if (request.params.dob != null && request.params.dob != "") {
-                            //    userDetails2.set("dob", request.params.dob);
-                            //}
-                            //if (request.params.gender != null && request.params.gender != "") {
-                            //    userDetails2.set("gender", request.params.gender);
-                            //}
-                            //if (request.params.imageURL != null && request.params.imageURL != "") {
-                            //    userDetails2.set("imageURL", request.params.imageURL);
-                            //}
-                            //if (request.params.phoneNo != null && request.params.phoneNo != "") {
-                            //    userDetails2.set("phoneNo", request.params.phoneNo);
-                            //}
-                            //if (request.params.altPhoneNo != null && request.params.altPhoneNo != "") {
-                            //    userDetails2.set("altPhoneNo", request.params.altPhoneNo);
-                            //}
-                            //if (request.params.address != null && request.params.address != "") {
-                            //    userDetails2.set("address", request.params.address);
-                            //}
-                            //if (request.params.city != null && request.params.city != "") {
-                            //    userDetails2.set("city", request.params.city);
-                            //}
-                            //if (request.params.zipCode != null && request.params.zipCode != "") {
-                            //    userDetails2.set("zipCode", request.params.zipCode);
-                            //}
-                            //if (request.params.state != null && request.params.state != "") {
-                            //    userDetails2.set("state", request.params.state);
-                            //}
-                            //userDetails2.set("location", point);
-                            //userDetails2.save({
-                            //    success: function (results) {
-                            //        response.success(results);
-                            //    },
-                            //    error: function (error) {
-                            //        response.error("Error: " + error.code + " " + error.message);
-                            //    }
-                            //});
-                            response.success("already have");
+                            if (request.params.firstName != null && request.params.firstName != "") {
+                                userDetails2.set("firstName", request.params.firstName);
+                            }
+                            if (request.params.lastName != null && request.params.lastName != "") {
+                                userDetails2.set("lastName", "");
+                            }
+                            if (request.params.dob != null && request.params.dob != "") {
+                                userDetails2.set("dob", request.params.dob);
+                            }
+                            if (request.params.gender != null && request.params.gender != "") {
+                                userDetails2.set("gender", request.params.gender);
+                            }
+                            if (request.params.imageURL != null && request.params.imageURL != "") {
+                                userDetails2.set("imageURL", request.params.imageURL);
+                            }
+                            if (request.params.phoneNo != null && request.params.phoneNo != "") {
+                                userDetails2.set("phoneNo", request.params.phoneNo);
+                            }
+                            if (request.params.altPhoneNo != null && request.params.altPhoneNo != "") {
+                                userDetails2.set("altPhoneNo", request.params.altPhoneNo);
+                            }
+                            if (request.params.address != null && request.params.address != "") {
+                                userDetails2.set("address", request.params.address);
+                            }
+                            if (request.params.city != null && request.params.city != "") {
+                                userDetails2.set("city", request.params.city);
+                            }
+                            if (request.params.zipCode != null && request.params.zipCode != "") {
+                                userDetails2.set("zipCode", request.params.zipCode);
+                            }
+                            if (request.params.state != null && request.params.state != "") {
+                                userDetails2.set("state", request.params.state);
+                            }
+                            userDetails2.set("location", point);
+                            userDetails2.save({
+                                success: function (results) {
+                                    response.success(results);
+                                },
+                                error: function (error) {
+                                    response.error("Error: " + error.code + " " + error.message);
+                                }
+                            });
+                            //response.success("already have");
                         }
                         else {
                             //var UserDetailstest = Parse.Object.extend("userDetails");
