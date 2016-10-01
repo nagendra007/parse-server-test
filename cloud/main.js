@@ -300,7 +300,7 @@ Parse.Cloud.define("addUpdateUserdetails", function (request, response) {
                                 response.error("Error: " + error.code + " " + error.message);
                             });
 
-                            //response.success("Data saved");
+                            response.success("Data saved");
                         }
                     });
                     //response.success("Data saved");
