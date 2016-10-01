@@ -192,6 +192,9 @@ Parse.Cloud.define("getCreditCardList", function (request, response) {
                         }
                     });
                 }
+                else {
+                    response.error("user not found");
+                }
             },
             error: function (error) {
                 response.error("Error: " + error.code + " " + error.message);
