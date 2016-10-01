@@ -230,10 +230,10 @@ Parse.Cloud.define("addUpdateUserdetails", function (request, response) {
     if (request.params.userid != null && request.params.userid != "") {
 
         var UserDetails = Parse.Object.extend("userDetails");
-        var userDetails1 = new UserDetails();
-        userDetails1.id = "qaL257aApp";// userDetails[0].id;
-        userDetails1.set("address", "365345 ave");
-        serDetails1.save({
+        var userDetails = new UserDetails();
+        userDetails.id = "qaL257aApp";// userDetails[0].id;
+        userDetails.set("address", "365345 ave");
+        userDetails.save({
             success: function (results) {
                 response.success(results);
             },
