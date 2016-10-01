@@ -295,7 +295,7 @@ Parse.Cloud.define("addUpdateUserdetails", function (request, response) {
                                 }
                             });
 
-                            //response.success("Data saved");
+                            response.success("Data saved");
                         }
                     });
                     //response.success("Data saved");
