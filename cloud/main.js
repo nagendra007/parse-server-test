@@ -238,7 +238,7 @@ Parse.Cloud.define("addUpdateUserdetails", function (request, response) {
         query.find().then(function (userDetails) {
 
             if (userDetails.length > 0) {
-                response.success(userDetails[0].id);
+                //response.success(userDetails[0].id);
 
                 var UserDetails = Parse.Object.extend("userDetails");
                 var userDetails = new UserDetails();
