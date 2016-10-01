@@ -206,6 +206,41 @@ Parse.Cloud.define("getCreditCardList", function (request, response) {
     }
 });
 
+Parse.Cloud.define("setPrimaryCreditCard", function (request, response) {
+    if (request.params.userid != null && request.params.userid != "" && request.params.userCreditCardid != null && request.params.userCreditCardid != "") {
+        var query = new Parse.Query(Parse.User);
+        query.equalTo("objectId", request.params.userid);
+        query.find({
+            success: function (result) {
+                if (result.length > 0) {
+
+                    var user = new Parse.User();
+                    user.id = request.params.userid;
+
+                    var UserCreditCardInfo = Parse.Object.extend("userCreditCardInfo");
+
+                    var query = new Parse.Query(UserCreditCardInfo);
+                    query.equalTo("user", user);
+                    query.equalTo("objectId", request.params.userCreditCardid);
+                    query.find().then(function (userCreditCardInfo) {
+                        response.success(userCreditCardInfo);
+                    }, function (error) {
+                        response.error("error occured");
+                    });
+                }
+                else {
+                    response.error("user not found");
+                }
+            },
+            error: function (error) {
+                response.error("Error: " + error.code + " " + error.message);
+            }
+        });
+    }
+    else {
+        response.error("please pass request params");
+    }
+});
 
 Parse.Cloud.define("addUpdateUserdetailsTest", function (request, response) {
     if (request.params.userid != null && request.params.userid != "") {
