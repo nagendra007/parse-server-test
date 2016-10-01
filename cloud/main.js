@@ -230,14 +230,21 @@ Parse.Cloud.define("addUpdateUserdetails", function (request, response) {
                                 userDetails2.set("state", request.params.state);
                             }
                             userDetails2.set("location", point);
-                            userDetails2.save({
-                                success: function (results) {
-                                    response.success(results);
-                                },
-                                error: function (error) {
-                                    response.error("Error: " + error.code + " " + error.message);
-                                }
+                            //userDetails2.save({
+                            //    success: function (results) {
+                            //        response.success(results);
+                            //    },
+                            //    error: function (error) {
+                            //        response.error("Error: " + error.code + " " + error.message);
+                            //    }
+                            //});
+                            userDetails2.save().then(function (object) {
+                                response.success(object);
+                            },
+                            function (error) {
+                                response.error("Error: " + error.code + " " + error.message);
                             });
+
                             //response.success("already have");
                         }
                         else {
@@ -287,7 +294,7 @@ Parse.Cloud.define("addUpdateUserdetails", function (request, response) {
                             userDetailstest.set("user", user);
 
                             userDetailstest.save().then(function (object) {
-                                response.error(object);
+                                response.success(object);
                             },
                             function (error) {
                                 response.error("Error: " + error.code + " " + error.message);
