@@ -238,8 +238,8 @@ Parse.Cloud.define("addUpdateUserdetails", function (request, response) {
                             //        response.error("Error: " + error.code + " " + error.message);
                             //    }
                             //});
-                            userDetails2.save().then(function (object) {
-                                response.success(object);
+                            userDetails2.save().then(function (results) {
+                                response.success(results);
                             },
                             function (error) {
                                 response.error("Error: " + error.code + " " + error.message);
