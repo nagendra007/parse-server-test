@@ -294,7 +294,7 @@ Parse.Cloud.define("addUpdateUserdetails", function (request, response) {
                             userDetailstest.set("user", user);
 
                             userDetailstest.save().then(function (object) {
-                               return response.success(object);
+                               response.success(object);
                             },
                             function (error) {
                                 response.error("Error: " + error.code + " " + error.message);
@@ -310,6 +310,71 @@ Parse.Cloud.define("addUpdateUserdetails", function (request, response) {
                 }
             }
         });
+    }
+    else {
+        response.error("please provide userid");
+    }
+});
+
+Parse.Cloud.define("addUpdateUserdetailsNew", function (request, response) {
+    if (request.params.userid != null && request.params.userid != "") {
+        var point = new Parse.GeoPoint(19.2403, 73.1305);
+        var myid = "";
+        var user = new Parse.User();
+        user.id = request.params.userid;
+        var UserDetails = Parse.Object.extend("userDetails");
+        var userDetailstest = new UserDetails();
+        userDetailstest.id = myid;
+        if (request.params.email != null && request.params.email != "") {
+            userDetailstest.set("email", request.params.email);
+        }
+        if (request.params.firstName != null && request.params.firstName != "") {
+            userDetailstest.set("firstName", request.params.firstName);
+        }
+        if (request.params.lastName != null && request.params.lastName != "") {
+            userDetailstest.set("lastName", request.params.lastName);
+        }
+        if (request.params.dob != null && request.params.dob != "") {
+            userDetailstest.set("dob", request.params.dob);
+        }
+        if (request.params.gender != null && request.params.gender != "") {
+            userDetailstest.set("gender", request.params.gender);
+        }
+        if (request.params.imageURL != null && request.params.imageURL != "") {
+            userDetailstest.set("imageURL", request.params.imageURL);
+        }
+        //userDetails.set("imageName", parseFile);
+        userDetailstest.set("isVerified", "1");
+        userDetailstest.set("scanDocId", "");
+        if (request.params.phoneNo != null && request.params.phoneNo != "") {
+            userDetailstest.set("phoneNo", request.params.phoneNo);
+        }
+        if (request.params.altPhoneNo != null && request.params.altPhoneNo != "") {
+            userDetailstest.set("altPhoneNo", request.params.altPhoneNo);
+        }
+        if (request.params.address != null && request.params.address != "") {
+            userDetailstest.set("address", request.params.address);
+        }
+        if (request.params.city != null && request.params.city != "") {
+            userDetailstest.set("city", request.params.city);
+        }
+        if (request.params.zipCode != null && request.params.zipCode != "") {
+            userDetailstest.set("zipCode", request.params.zipCode);
+        }
+        if (request.params.state != null && request.params.state != "") {
+            userDetailstest.set("state", request.params.state);
+        }
+        userDetailstest.set("location", point);
+        userDetailstest.set("user", user);
+
+        userDetailstest.save().then(function (object) {
+            response.success(object);
+        },
+        function (error) {
+            response.error("Error: " + error.code + " " + error.message);
+        });
+
+
     }
     else {
         response.error("please provide userid");
