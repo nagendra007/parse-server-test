@@ -259,13 +259,15 @@ Parse.Cloud.define("getuserdetails", function (request, response) {
 
 Parse.Cloud.define("addUpdateUserdetails", function (request, response) {
     if (request.params.userid != null && request.params.userid != "") {//if (request.params.nonce != null && request.params.nonce != "" ) {
-        var user = new Parse.User();
-        user.id = request.params.userid;
+        
+
         var query = new Parse.Query(Parse.User);
         query.equalTo("objectId", request.params.userid);  // find all the women
         query.find({
             success: function (result) {
                 if (result.length > 0) {
+                    var user = new Parse.User();
+                    user.id = request.params.userid;
 
                     var UserDetails = Parse.Object.extend("userDetails");
                     var userDetails1 = new UserDetails();
@@ -369,12 +371,19 @@ Parse.Cloud.define("addUpdateUserdetails", function (request, response) {
                                     }
                                 });
                             }
+                        },
+                        error: function (error) {
+                            response.error("user detail error occured");
                         }
+
                     });
                 }
                 else {
                     response.error("user not found");
                 }
+            },
+            error: function (error) {
+                response.error("error occured");
             }
         });
     }
