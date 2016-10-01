@@ -273,111 +273,112 @@ Parse.Cloud.define("addUpdateUserdetails", function (request, response) {
                     query.equalTo("user", user);
                     query.find({
                         success: function (userDetails) {
+                            response.success(userDetails);
                             var point = new Parse.GeoPoint(19.2403, 73.1305);
-                            if (userDetails.length > 0) {
-                                var UserDetails1 = Parse.Object.extend("userDetails");
-                                var userDetails1 = new UserDetails();
+                            //if (userDetails.length > 0) {
+                            //    var UserDetails1 = Parse.Object.extend("userDetails");
+                            //    var userDetails1 = new UserDetails();
 
-                                userDetails1.id = userDetails[0].id;
-                                //if (request.params.email != null && request.params.email != "") {
-                                //    userDetails1.set("email", "");
-                                //}
-                                if (request.params.firstName != null && request.params.firstName != "") {
-                                    userDetails1.set("firstName", request.params.firstName);
-                                }
-                                //if (request.params.lastName != null && request.params.lastName != "") {
-                                //    userDetails1.set("lastName", "");
-                                //}
-                                //if (request.params.dob != null && request.params.dob != "") {
-                                //    userDetails1.set("dob", request.params.dob);
-                                //}
-                                //if (request.params.gender != null && request.params.gender != "") {
-                                //    userDetails1.set("gender", request.params.gender);
-                                //}
-                                //if (request.params.imageURL != null && request.params.imageURL != "") {
-                                //    userDetails.set("imageURL", request.params.imageURL);
-                                //}
-                                //if (request.params.phoneNo != null && request.params.phoneNo != "") {
-                                //    userDetails1.set("phoneNo", request.params.phoneNo);
-                                //}
-                                //if (request.params.altPhoneNo != null && request.params.altPhoneNo != "") {
-                                //    userDetails1.set("altPhoneNo", request.params.altPhoneNo);
-                                //}
-                                //if (request.params.address != null && request.params.address != "") {
-                                //    userDetails1.set("address", request.params.address);
-                                //}
-                                //if (request.params.city != null && request.params.city != "") {
-                                //    userDetails1.set("city", request.params.city);
-                                //}
-                                //if (request.params.zipCode != null && request.params.zipCode != "") {
-                                //    userDetails1.set("zipCode", request.params.zipCode);
-                                //}
-                                //if (request.params.state != null && request.params.state != "") {
-                                //    userDetails1.set("state", request.params.state);
-                                //}
-                                //userDetails1.set("location", point);
-                                userDetails1.save({
-                                    success: function (userDetails1) {
-                                        response.sucess("user detail updated sucess");
-                                    },
-                                    error: function (error) {
-                                        response.error("user detail error occured");
-                                    }
-                                });
-                            }
-                            else {
-                                var UserDetails = Parse.Object.extend("userDetails");
-                                var userDetails = new UserDetails();
-                                if (request.params.email != null && request.params.email != "") {
-                                    userDetails.set("email", request.params.email);
-                                }
-                                if (request.params.firstName != null && request.params.firstName != "") {
-                                    userDetails.set("firstName", request.params.firstName);
-                                }
-                                if (request.params.lastName != null && request.params.lastName != "") {
-                                    userDetails.set("lastName", request.params.lastName);
-                                }
-                                if (request.params.dob != null && request.params.dob != "") {
-                                    userDetails.set("dob", request.params.dob);
-                                }
-                                if (request.params.gender != null && request.params.gender != "") {
-                                    userDetails.set("gender", request.params.gender);
-                                }
-                                if (request.params.imageURL != null && request.params.imageURL != "") {
-                                    userDetails.set("imageURL", request.params.imageURL);
-                                }
-                                //userDetails.set("imageName", parseFile);
-                                userDetails.set("isVerified", "1");
-                                userDetails.set("scanDocId", "");
-                                if (request.params.phoneNo != null && request.params.phoneNo != "") {
-                                    userDetails.set("phoneNo", request.params.phoneNo);
-                                }
-                                if (request.params.altPhoneNo != null && request.params.altPhoneNo != "") {
-                                    userDetails.set("altPhoneNo", request.params.altPhoneNo);
-                                }
-                                if (request.params.address != null && request.params.address != "") {
-                                    userDetails.set("address", request.params.address);
-                                }
-                                if (request.params.city != null && request.params.city != "") {
-                                    userDetails.set("city", request.params.city);
-                                }
-                                if (request.params.zipCode != null && request.params.zipCode != "") {
-                                    userDetails.set("zipCode", request.params.zipCode);
-                                }
-                                if (request.params.state != null && request.params.state != "") {
-                                    userDetails.set("state", request.params.state);
-                                }
-                                userDetails.set("location", point);
-                                userDetails.set("user", user);
-                                userDetails.save(null, {
-                                    success: function (userDetails) {
-                                        response.sucess("user detail updated sucess");
-                                    },
-                                    error: function (error) {
-                                        response.error("user detail error occured");
-                                    }
-                                });
-                            }
+                            //    userDetails1.id = userDetails[0].id;
+                            //    //if (request.params.email != null && request.params.email != "") {
+                            //    //    userDetails1.set("email", "");
+                            //    //}
+                            //    if (request.params.firstName != null && request.params.firstName != "") {
+                            //        userDetails1.set("firstName", request.params.firstName);
+                            //    }
+                            //    //if (request.params.lastName != null && request.params.lastName != "") {
+                            //    //    userDetails1.set("lastName", "");
+                            //    //}
+                            //    //if (request.params.dob != null && request.params.dob != "") {
+                            //    //    userDetails1.set("dob", request.params.dob);
+                            //    //}
+                            //    //if (request.params.gender != null && request.params.gender != "") {
+                            //    //    userDetails1.set("gender", request.params.gender);
+                            //    //}
+                            //    //if (request.params.imageURL != null && request.params.imageURL != "") {
+                            //    //    userDetails.set("imageURL", request.params.imageURL);
+                            //    //}
+                            //    //if (request.params.phoneNo != null && request.params.phoneNo != "") {
+                            //    //    userDetails1.set("phoneNo", request.params.phoneNo);
+                            //    //}
+                            //    //if (request.params.altPhoneNo != null && request.params.altPhoneNo != "") {
+                            //    //    userDetails1.set("altPhoneNo", request.params.altPhoneNo);
+                            //    //}
+                            //    //if (request.params.address != null && request.params.address != "") {
+                            //    //    userDetails1.set("address", request.params.address);
+                            //    //}
+                            //    //if (request.params.city != null && request.params.city != "") {
+                            //    //    userDetails1.set("city", request.params.city);
+                            //    //}
+                            //    //if (request.params.zipCode != null && request.params.zipCode != "") {
+                            //    //    userDetails1.set("zipCode", request.params.zipCode);
+                            //    //}
+                            //    //if (request.params.state != null && request.params.state != "") {
+                            //    //    userDetails1.set("state", request.params.state);
+                            //    //}
+                            //    //userDetails1.set("location", point);
+                            //    userDetails1.save({
+                            //        success: function (userDetails1) {
+                            //            response.sucess("user detail updated sucess");
+                            //        },
+                            //        error: function (error) {
+                            //            response.error("user detail error occured");
+                            //        }
+                            //    });
+                            //}
+                            //else {
+                            //    var UserDetails = Parse.Object.extend("userDetails");
+                            //    var userDetails = new UserDetails();
+                            //    if (request.params.email != null && request.params.email != "") {
+                            //        userDetails.set("email", request.params.email);
+                            //    }
+                            //    if (request.params.firstName != null && request.params.firstName != "") {
+                            //        userDetails.set("firstName", request.params.firstName);
+                            //    }
+                            //    if (request.params.lastName != null && request.params.lastName != "") {
+                            //        userDetails.set("lastName", request.params.lastName);
+                            //    }
+                            //    if (request.params.dob != null && request.params.dob != "") {
+                            //        userDetails.set("dob", request.params.dob);
+                            //    }
+                            //    if (request.params.gender != null && request.params.gender != "") {
+                            //        userDetails.set("gender", request.params.gender);
+                            //    }
+                            //    if (request.params.imageURL != null && request.params.imageURL != "") {
+                            //        userDetails.set("imageURL", request.params.imageURL);
+                            //    }
+                            //    //userDetails.set("imageName", parseFile);
+                            //    userDetails.set("isVerified", "1");
+                            //    userDetails.set("scanDocId", "");
+                            //    if (request.params.phoneNo != null && request.params.phoneNo != "") {
+                            //        userDetails.set("phoneNo", request.params.phoneNo);
+                            //    }
+                            //    if (request.params.altPhoneNo != null && request.params.altPhoneNo != "") {
+                            //        userDetails.set("altPhoneNo", request.params.altPhoneNo);
+                            //    }
+                            //    if (request.params.address != null && request.params.address != "") {
+                            //        userDetails.set("address", request.params.address);
+                            //    }
+                            //    if (request.params.city != null && request.params.city != "") {
+                            //        userDetails.set("city", request.params.city);
+                            //    }
+                            //    if (request.params.zipCode != null && request.params.zipCode != "") {
+                            //        userDetails.set("zipCode", request.params.zipCode);
+                            //    }
+                            //    if (request.params.state != null && request.params.state != "") {
+                            //        userDetails.set("state", request.params.state);
+                            //    }
+                            //    userDetails.set("location", point);
+                            //    userDetails.set("user", user);
+                            //    userDetails.save(null, {
+                            //        success: function (userDetails) {
+                            //            response.sucess("user detail updated sucess");
+                            //        },
+                            //        error: function (error) {
+                            //            response.error("user detail error occured");
+                            //        }
+                            //    });
+                            //}
                         },
                         error: function (error) {
                             response.error("user detail error occured");
