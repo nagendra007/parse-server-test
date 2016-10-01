@@ -318,6 +318,9 @@ Parse.Cloud.define("addUpdateUserdetails", function (request, response) {
                                 userDetails1.save(null, {
                                     success: function (userDetails1) {
                                         response.sucess("user detail updated sucess");
+                                    },
+                                    error: function (error) {
+                                        response.error("user detail error occured");
                                     }
                                 });
                             }
@@ -368,6 +371,9 @@ Parse.Cloud.define("addUpdateUserdetails", function (request, response) {
                                 userDetails.save(null, {
                                     success: function (userDetails) {
                                         response.sucess("user detail updated sucess");
+                                    },
+                                    error: function (error) {
+                                        response.error("user detail error occured");
                                     }
                                 });
                             }
