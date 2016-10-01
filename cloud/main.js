@@ -191,8 +191,8 @@ Parse.Cloud.define("addUpdateUserdetails", function (request, response) {
                             //response.success(userDetailss[0].id);
                             var myid = "";
                             myid = userDetailss[0].id;
-                            var UserDetails1 = Parse.Object.extend("userDetails");
-                            var userDetails2 = new UserDetails1();
+                            //var UserDetails1 = Parse.Object.extend("userDetails");
+                            var userDetails2 = new UserDetails();
                             userDetails2.id = myid;//"snlWbSHB1P";  //   userDetailss[0].id;//
 
                             if (request.params.firstName != null && request.params.firstName != "") {
@@ -239,8 +239,8 @@ Parse.Cloud.define("addUpdateUserdetails", function (request, response) {
                             });
                         }
                         else {
-                            var UserDetailstest = Parse.Object.extend("userDetails");
-                            var userDetailstest = new UserDetailstest();
+                            //var UserDetailstest = Parse.Object.extend("userDetails");
+                            var userDetailstest = new UserDetails();
                             if (request.params.email != null && request.params.email != "") {
                                 userDetailstest.set("email", request.params.email);
                             }
