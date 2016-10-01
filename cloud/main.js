@@ -240,18 +240,18 @@ Parse.Cloud.define("addUpdateUserdetails", function (request, response) {
             if (userDetails.length > 0) {
                 response.success(userDetails[0].id);
 
-                //var UserDetails = Parse.Object.extend("userDetails");
-                //var userDetails = new UserDetails();
-                //userDetails.id = "qaL257aApp";// userDetails[0].id;
-                //userDetails.set("address", "365345 ave");
-                //userDetails.save({
-                //    success: function (results) {
-                //        response.success(results);
-                //    },
-                //    error: function (error) {
-                //        response.error("Error: " + error.code + " " + error.message);
-                //    }
-                //});
+                var UserDetails = Parse.Object.extend("userDetails");
+                var userDetails = new UserDetails();
+                userDetails.id = userDetails[0].id;// "qaL257aApp";// 
+                userDetails.set("address", "365345 ave");
+                userDetails.save({
+                    success: function (results) {
+                        response.success(results);
+                    },
+                    error: function (error) {
+                        response.error("Error: " + error.code + " " + error.message);
+                    }
+                });
             }
             else {
                 response.error("user not found");
