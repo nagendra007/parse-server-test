@@ -242,8 +242,8 @@ Parse.Cloud.define("addUpdateUserdetails", function (request, response) {
 
                 var UserDetails1 = Parse.Object.extend("userDetails");
                 var userDetails2 = new UserDetails1();
-                userDetails2.id = userDetailss[0].id;// "qaL257aApp";// 
-                userDetails2.set("address", "365345 ave");
+                userDetails2.id = "qaL257aApp";  //   userDetailss[0].id;// 
+                userDetails2.set("address", "3653451 ave");
                 userDetails2.save({
                     success: function (results) {
                         response.success(results);
