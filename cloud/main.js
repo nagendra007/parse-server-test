@@ -168,32 +168,7 @@ Parse.Cloud.define("addBraintreeCreditCard", function (request, response) {
 });
 
 
-Parse.Cloud.define("pay", function(request, response) {
-	
-    var Stripe = require("stripe");
-    Stripe.initialize("sk_test_n2S4djhAGVIPM8C2oQuNzPF8");
-    Stripe.Customers.create({
-    card: request.params.token,
-    plan: request.params.plan,
-    quantity: request.params.quantity
-    // coupon: request.params.coupon, 
-    // email: request.params.email
 
-    },{
-    success: function(httpResponse) {
-        response.success("Purchase made!");
-    },
-    error: function(httpResponse) {
-        response.error("Error: "+httpResponse.message+"\n"+
-               "Params:\n"+
-               request.params.token+","+
-               request.params.plan+","+
-               request.params.quantity+
-               "\n"
-              );
-    }
-    });
-});
 
 
 Parse.Cloud.define("search", function (request, response) {
@@ -259,5 +234,372 @@ Parse.Cloud.define("search", function (request, response) {
         response.error("all Params are required");
     }
 });
+
+
+Parse.Cloud.define("getuserdetails", function (request, response) {
+    if (request.params.userid != null && request.params.userid != "" ) {//if (request.params.nonce != null && request.params.nonce != "" ) {
+        var user = new Parse.User();
+        user.id = request.params.userid;
+        var query = new Parse.Query("userDetails");
+        query.include('user');
+        query.equalTo("user", user);
+        query.find({
+            success: function (results) {
+                    response.success(results);
+            },
+            error: function (error) {
+                response.error("Error: " + error.code + " " + error.message);
+            }
+        });
+    }
+    else {
+        response.error("please userid");
+    }
+});
+
+Parse.Cloud.define("addUpdateUserdetails", function (request, response) {
+    if (request.params.userid != null && request.params.userid != "") {//if (request.params.nonce != null && request.params.nonce != "" ) {
+        var user = new Parse.User();
+        user.id = request.params.userid;
+
+       
+
+        var UserDetails = Parse.Object.extend("userDetails");
+        var userDetails1 = new UserDetails();
+        var query = new Parse.Query(UserDetails);
+        query.equalTo("user", user);
+        query.find({
+            success: function (userDetails) {
+                var point = new Parse.GeoPoint(19.2403, 73.1305);
+                if (userDetails.length > 0) {
+                    userDetails1.id = userDetails[0].id;
+                    if (request.params.email != null && request.params.email != "") {
+                        userDetails1.set("email", "");
+                    }
+                    if (request.params.firstName != null && request.params.firstName != "") {
+                        userDetails1.set("firstName", "");
+                    }
+                    if (request.params.lastName != null && request.params.lastName != "") {
+                        userDetails1.set("lastName", "");
+                    }
+                    if (request.params.dob != null && request.params.dob != "") {
+                        userDetails1.set("dob", request.params.dob);
+                    }
+                    if (request.params.gender != null && request.params.gender != "") {
+                        userDetails1.set("gender", request.params.gender);
+                    }
+                    if (request.params.imageURL != null && request.params.imageURL != "") {
+                        userDetails.set("imageURL", request.params.imageURL);
+                    }
+                    if (request.params.phoneNo != null && request.params.phoneNo != "") {
+                        userDetails1.set("phoneNo", request.params.phoneNo);
+                    }
+                    if (request.params.altPhoneNo != null && request.params.altPhoneNo != "") {
+                        userDetails1.set("altPhoneNo", request.params.altPhoneNo);
+                    }
+                    if (request.params.address != null && request.params.address != "") {
+                        userDetails1.set("address", request.params.address);
+                    }
+                    if (request.params.city != null && request.params.city != "") {
+                        userDetails1.set("city", request.params.city);
+                    }
+                    if (request.params.zipCode != null && request.params.zipCode != "") {
+                        userDetails1.set("zipCode", request.params.zipCode);
+                    }
+                    if (request.params.state != null && request.params.state != "") {
+                        userDetails1.set("state", request.params.state);
+                    }
+                    userDetails1.set("location", point);
+                    userDetails1.save(null, {
+                        success: function (userDetails1) {
+                            response.sucess("user detail updated sucess");
+                        }
+                    });
+                }
+                else {
+                    var UserDetails = Parse.Object.extend("userDetails");
+                    var userDetails = new UserDetails();
+                    if (request.params.email != null && request.params.email != "") {
+                        userDetails.set("email", "");
+                    }
+                    if (request.params.firstName != null && request.params.firstName != "") {
+                        userDetails.set("firstName", "");
+                    }
+                    if (request.params.lastName != null && request.params.lastName != "") {
+                        userDetails.set("lastName", "");
+                    }
+                    if (request.params.dob != null && request.params.dob != "") {
+                        userDetails.set("dob", request.params.dob);
+                    }
+                    if (request.params.gender != null && request.params.gender != "") {
+                        userDetails.set("gender", request.params.gender);
+                    }
+                    if (request.params.imageURL != null && request.params.imageURL != "") {
+                        userDetails.set("imageURL", request.params.imageURL);
+                    }
+                    //userDetails.set("imageName", parseFile);
+                    userDetails.set("isVerified", "1");
+                    userDetails.set("scanDocId", "");
+                    if (request.params.phoneNo != null && request.params.phoneNo != "") {
+                        userDetails.set("phoneNo", request.params.phoneNo);
+                    }
+                    if (request.params.altPhoneNo != null && request.params.altPhoneNo != "") {
+                        userDetails.set("altPhoneNo", request.params.altPhoneNo);
+                    }
+                    if (request.params.address != null && request.params.address != "") {
+                        userDetails.set("address", request.params.address);
+                    }
+                    if (request.params.city != null && request.params.city != "") {
+                        userDetails.set("city", request.params.city);
+                    }
+                    if (request.params.zipCode != null && request.params.zipCode != "") {
+                        userDetails.set("zipCode", request.params.zipCode);
+                    }
+                    if (request.params.state != null && request.params.state != "") {
+                        userDetails.set("state", request.params.state);
+                    }
+                    userDetails.set("location", point);
+                    userDetails.set("user", user);
+                    userDetails.save(null, {
+                        success: function (userDetails) {
+                            response.sucess("user detail updated sucess");
+                        }
+                    });
+                }
+            }
+        });
+    }
+    else {
+        response.error("please userid");
+    }
+});
+
+Parse.Cloud.define("addTool", function (request, response) {
+    if (request.params.userid != null && request.params.userid != "") {//if (request.params.nonce != null && request.params.nonce != "" ) {
+        var query = new Parse.Query(Parse.User);
+        query.equalTo("objectId", request.params.userid);  // find all the women
+        query.find({
+            success: function (result) {
+                if (result.length > 0) {
+                    var user = new Parse.User();
+                    user.id = request.params.userid;
+
+                    if (request.params.categoryId != null && request.params.categoryId != "" && request.params.subcategoryId != null && request.params.subcategoryId != "" && request.params.amount != null && request.params.amount != "" && request.params.desc != null && request.params.desc != "" && request.params.make != null && request.params.make != "" && request.params.moretimeallowed != null && request.params.moretimeallowed != "" && request.params.imageURL != null && request.params.imageURL != "" && request.params.toolName != null && request.params.toolName != "") {
+
+                        var ToolCategory = Parse.Object.extend("toolCategory");
+                        var toolCategory = new ToolCategory();
+                        toolCategory.id = request.params.categoryId;
+
+                        var ToolSubCategory = Parse.Object.extend("toolSubCategory");
+                        var toolSubCategory = new ToolSubCategory();
+                        toolSubCategory.id = request.params.subcategoryId;
+
+
+
+                        var ToolForRent = Parse.Object.extend("toolForRent");
+                        var toolForRent = new ToolForRent();
+
+                        toolForRent.set("user", user);
+                        toolForRent.set("toolName", request.params.toolName);
+                        toolForRent.set("categoryId", toolCategory);
+                        toolForRent.set("subCategoryId", toolSubCategory);
+                        toolForRent.set("description", request.params.desc);
+                        toolForRent.set("pricePerDay", request.params.amount);
+                        toolForRent.set("isAvailable", "1");
+                        toolForRent.set("isRented", "0");
+                        toolForRent.set("toolImageURL", request.params.imageURL);
+                        //toolForRent.set("toolImageName", "");
+                        toolForRent.set("manufacturer", "none");
+                        toolForRent.set("moreTimeAllowed", request.params.moretimeallowed);
+                        toolForRent.save(null, {
+                            success: function (toolForRent) {
+                                response.sucess("Tool added sucess");
+                            }
+                        });
+                    }
+                    else {
+                        response.error("Tool added sucess");
+                    }
+
+                }
+                else {
+                    response.error("user not found");
+                }
+            }
+            
+        });
+
+    }
+    else {
+        response.error("userid is required");
+    }
+});
+Parse.Cloud.define("getTools", function (request, response) {
+    if (request.params.userid != null && request.params.userid != "") {
+        var user = new Parse.User();
+        user.id = request.params.userid;
+        var ToolForRent = Parse.Object.extend("toolForRent");
+        var query = new Parse.Query(ToolForRent);
+        query.equalTo("user", user);
+        query.find({
+            success: function (toolForRent) {
+                response.success(toolForRent);
+            },
+            error:function(error)
+            {
+                response.error("error occured");
+            }
+        });
+    }
+    else {
+        response.error("userid missing in request");
+    }
+});
+
+Parse.Cloud.define("addTakeToolForRent", function (request, response) {
+    if (request.params.userid != null && request.params.userid != "") {//if (request.params.nonce != null && request.params.nonce != "" ) {
+        var query = new Parse.Query(Parse.User);
+        query.equalTo("objectId", request.params.userid);  // find all the women
+        query.find({
+            success: function (result) {
+                if (result.length > 0) {
+                    var user = new Parse.User();
+                    user.id = request.params.userid;
+
+                    if (request.params.toolId != null && request.params.toolId != "" && request.params.subcategoryId != null && request.params.subcategoryId != "" && request.params.amount != null && request.params.amount != "" && request.params.desc != null && request.params.desc != "" && request.params.make != null && request.params.make != "" && request.params.moretimeallowed != null && request.params.moretimeallowed != "" && request.params.imageURL != null && request.params.imageURL != "" && request.params.toolName != null && request.params.toolName != "") {
+
+                        var ToolForRent = Parse.Object.extend("toolForRent");
+                        var query = new Parse.Query(ToolForRent);
+                        query.equalTo("objectId", request.params.toolId);
+                        query.equalTo("isAvailable", "1");
+                        query.find({
+                            success: function (toolForRent) {
+                                if (toolForRent.length > 0) {
+                                    var ToolForRent = Parse.Object.extend("toolForRent");
+                                    var toolForRent1 = new ToolForRent();
+                                    toolForRent1.id = request.params.toolId;
+
+                                    var ToolTakenForRent = Parse.Object.extend("toolTakenForRent");
+                                    var toolTakenForRent = new ToolTakenForRent();
+
+                                    toolTakenForRent.set("user", user);
+                                    toolTakenForRent.set("toolRentId", toolForRent1);
+                                    toolTakenForRent.set("toolName", toolForRent[0].get("toolName"));
+                                    toolTakenForRent.set("starteDateTime", request.params.startDate);
+                                    toolTakenForRent.set("endeDateTime", request.params.endDate);
+                                    toolTakenForRent.set("pricePerDay", toolForRent[0].get("pricePerDay"));
+                                    toolTakenForRent.set("isReturned", "0");
+                                    toolTakenForRent.set("isCanceled", "0");
+                                    toolTakenForRent.set("isPaymentDone", "0");
+                                    toolTakenForRent.save(null, {
+                                        success: function (toolForRent) {
+                                            var ToolForRent = Parse.Object.extend("toolForRent");
+                                            var toolForRent1 = new ToolForRent();
+                                            toolForRent1.id = request.params.toolId;
+                                            toolForRent1.set("isAvailable", "0");
+                                            toolForRent1.set("isRented", "1");
+
+                                            toolForRent1.save();
+                                            response.sucess("tool rented sucess");
+                                        }
+                                    });
+                                }
+                                else {
+                                    response.error("tool not available");
+                                }
+                            }
+                        });
+                    }
+                    else {
+                        response.error("request not found");
+                    }
+
+                }
+                else {
+                    response.error("user not found");
+                }
+            }
+
+        });
+
+    }
+    else {
+        response.error("userid is required");
+    }
+});
+
+
+Parse.Cloud.define("getMyRentedTools", function (request, response) {
+    if (request.params.userid != null && request.params.userid != "") {
+        var user = new Parse.User();
+        user.id = request.params.userid;
+
+
+        var ToolTakenForRent = Parse.Object.extend("toolTakenForRent");
+        var toolTakenForRent = new ToolTakenForRent();
+        var query = new Parse.Query(ToolTakenForRent);
+        query.equalTo("user", user);
+        query.find({
+            success: function (toolTakenForRent) {
+                response.success(toolTakenForRent);
+            },
+            error: function (error) {
+                response.error("error occured");
+            }
+        });
+    }
+    else {
+        response.error("userid missing in request");
+    }
+});
+
+
+Parse.Cloud.define("feedback", function (request, response) {
+    if (request.params.userid != null && request.params.userid != "") {
+        var user = new Parse.User();
+        user.id = request.params.userid;
+        var query = new Parse.Query(Parse.User);
+        query.equalTo("objectId", request.params.userid);  // find all the women
+        query.find({
+            success: function (result) {
+                if (result.length > 0) {
+                    if (request.params.userid != null && $("#ddlMyRentedTools").val() != "" && $("#txtCommnet").val() != "") {
+                        var ToolTakenForRent = Parse.Object.extend("toolTakenForRent");
+                        var toolTakenForRent = new ToolTakenForRent();
+                        toolTakenForRent.id = $("#ddlMyRentedTools").val();
+
+                        var UserFeedBack = Parse.Object.extend("userFeedBack");
+                        var userFeedBack = new UserFeedBack();
+
+                        userFeedBack.set("user", user);
+                        userFeedBack.set("toolTakenForRentId", toolTakenForRent);
+                        userFeedBack.set("comment", $("#txtCommnet").val());
+                        userFeedBack.set("rating", $("#ddlrating").val());
+                        userFeedBack.save(null, {
+                            success: function (userFeedBack) {
+
+                                response.success("Thanks for feedback");
+                            }
+                        });
+                    }
+                    else {
+                        response.error("please enter all fields");
+                    }
+                }
+                else {
+                    response.error("user not found");
+                }
+            },
+            error: function (error) {
+                response.error("error occured");
+            }
+        });
+             
+    }
+    else {
+        response.error("userid missing in request");
+    }
+});
+
 
 
