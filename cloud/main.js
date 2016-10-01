@@ -170,7 +170,7 @@ Parse.Cloud.define("addBraintreeCreditCard", function (request, response) {
 
 
 
-Parse.Cloud.define("addUpdateUserdetails", function (request, response) {
+Parse.Cloud.define("addUpdateUserdetailsTest", function (request, response) {
     if (request.params.userid != null && request.params.userid != "") {
         var query = new Parse.Query(Parse.User);
         query.equalTo("objectId", request.params.userid);
@@ -406,7 +406,7 @@ Parse.Cloud.define("addUpdateUserdetailsNew", function (request, response) {
 });
 
 
-Parse.Cloud.define("addUpdateUserdetailsTest", function (request, response) {
+Parse.Cloud.define("addUpdateUserdetails", function (request, response) {
     if (request.params.userid != null && request.params.userid != "") {
         var query = new Parse.Query(Parse.User);
         query.equalTo("objectId", request.params.userid);
