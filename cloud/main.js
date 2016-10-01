@@ -223,7 +223,44 @@ Parse.Cloud.define("setPrimaryCreditCard", function (request, response) {
                     query.equalTo("user", user);
                     query.equalTo("objectId", request.params.userCreditCardid);
                     query.find().then(function (userCreditCardInfo) {
-                        response.success(userCreditCardInfo);
+                        //response.success(userCreditCardInfo);
+
+                        if (userCreditCardInfo.length > 0) {
+                            var query = new Parse.Query(UserCreditCardInfo);
+                            query.equalTo("user", user);
+                            query.find().then(function (userCreditCardInfo) {
+                                if (userCreditCardInfo.length > 0) {
+                                    for(var i=0;i<userCreditCardInfo.length;i++)
+                                    {
+                                        var userCreditCardInfo = Parse.Object.extend("userCreditCardInfo");
+                                        var userCreditCardInfo = new userCreditCardInfo();
+
+                                        var cardid = "";
+                                        var cardid = userCreditCardInfo[i].id;
+
+                                        userCreditCardInfo.id = cardid;
+                                        if (cardid == request.params.userCreditCardid) {
+                                            userCreditCardInfo.set("isPrimary", "1");
+                                        }
+                                        else {
+                                            userCreditCardInfo.set("isPrimary", "0");
+                                        }
+                                        userCreditCardInfo.save();
+
+                                    }
+                                    response.success("Primary cc set successfuly");
+                                }
+                                else {
+                                    response.error("No CC  found in your account");
+                                }
+                            }, function (error) {
+                                response.error("error occured");
+                            });
+
+                        }
+                        else {
+                            response.error("CC not found in your account");
+                        }
                     }, function (error) {
                         response.error("error occured");
                     });
