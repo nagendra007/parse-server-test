@@ -186,13 +186,12 @@ Parse.Cloud.define("addUpdateUserdetails", function (request, response) {
                     var query = new Parse.Query(UserDetails);
                     query.equalTo("user", user);
                     query.find().then(function (userDetailss) {
-                        var point = new Parse.GeoPoint(19.2403, 73.1305);
-                        var myid = "";
+                        
                         if (userDetailss.length > 0) {
-                            //response.success(userDetailss[0].id);
+                            var point = new Parse.GeoPoint(19.2403, 73.1305);
                             var myid = "";
                             myid = userDetailss[0].id;
-                            //var UserDetails1 = Parse.Object.extend("userDetails");
+                            var UserDetails1 = Parse.Object.extend("userDetails");
                             var userDetails2 = new UserDetails();
                             userDetails2.id = myid;//"snlWbSHB1P";  //   userDetailss[0].id;//
 
@@ -245,11 +244,11 @@ Parse.Cloud.define("addUpdateUserdetails", function (request, response) {
                             //    response.error("Error: " + error.code + " " + error.message);
                             //});
 
-                            //response.success("already have");
+                           // response.success("update success");
                         }
                         else {
                             //var UserDetailstest = Parse.Object.extend("userDetails");
-                           // var point = new Parse.GeoPoint(19.2403, 73.1305);
+                           var point = new Parse.GeoPoint(19.2403, 73.1305);
                             var myid = "";
                             var user = new Parse.User();
                             user.id = request.params.userid;
@@ -315,10 +314,9 @@ Parse.Cloud.define("addUpdateUserdetails", function (request, response) {
                                     response.error("error in adding card in collection");
                                 }
                             });
-
                         }
                     });
-                    //response.success("Data saved");
+                    //response.success("Add success");
                 }
                 else {
                     response.error("user not found");
