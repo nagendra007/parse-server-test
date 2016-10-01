@@ -232,21 +232,20 @@ Parse.Cloud.define("setPrimaryCreditCard", function (request, response) {
                                 if (userCreditCardInfo.length > 0) {
                                     for(var i=0;i<userCreditCardInfo.length;i++)
                                     {
-                                        var userCreditCardInfo = Parse.Object.extend("userCreditCardInfo");
-                                        var userCreditCardInfo = new userCreditCardInfo();
+                                        var userCreditCardInfo1 = Parse.Object.extend("userCreditCardInfo");
+                                        var userCreditCardInfo1 = new userCreditCardInfo1();
 
                                         var cardid = "";
                                         var cardid = userCreditCardInfo[i].id;
 
-                                        userCreditCardInfo.id = cardid;
+                                        userCreditCardInfo1.id = cardid;
                                         if (cardid == request.params.userCreditCardid) {
-                                            userCreditCardInfo.set("isPrimary", "1");
+                                            userCreditCardInfo1.set("isPrimary", "1");
                                         }
                                         else {
-                                            userCreditCardInfo.set("isPrimary", "0");
+                                            userCreditCardInfo1.set("isPrimary", "0");
                                         }
-                                        userCreditCardInfo.save();
-
+                                        userCreditCardInfo1.save();
                                     }
                                     response.success("Primary cc set successfuly");
                                 }
