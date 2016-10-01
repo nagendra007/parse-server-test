@@ -239,58 +239,58 @@ Parse.Cloud.define("addUpdateUserdetails", function (request, response) {
                             });
                         }
                         else {
-                            var UserDetails = Parse.Object.extend("userDetails");
-                                var userDetails = new UserDetails();
-                                if (request.params.email != null && request.params.email != "") {
-                                    userDetails.set("email", request.params.email);
-                                }
-                                if (request.params.firstName != null && request.params.firstName != "") {
-                                    userDetails.set("firstName", request.params.firstName);
-                                }
-                                if (request.params.lastName != null && request.params.lastName != "") {
-                                    userDetails.set("lastName", request.params.lastName);
-                                }
-                                if (request.params.dob != null && request.params.dob != "") {
-                                    userDetails.set("dob", request.params.dob);
-                                }
-                                if (request.params.gender != null && request.params.gender != "") {
-                                    userDetails.set("gender", request.params.gender);
-                                }
-                                if (request.params.imageURL != null && request.params.imageURL != "") {
-                                    userDetails.set("imageURL", request.params.imageURL);
-                                }
-                                //userDetails.set("imageName", parseFile);
-                                userDetails.set("isVerified", "1");
-                                userDetails.set("scanDocId", "");
-                                if (request.params.phoneNo != null && request.params.phoneNo != "") {
-                                    userDetails.set("phoneNo", request.params.phoneNo);
-                                }
-                                if (request.params.altPhoneNo != null && request.params.altPhoneNo != "") {
-                                    userDetails.set("altPhoneNo", request.params.altPhoneNo);
-                                }
-                                if (request.params.address != null && request.params.address != "") {
-                                    userDetails.set("address", request.params.address);
-                                }
-                                if (request.params.city != null && request.params.city != "") {
-                                    userDetails.set("city", request.params.city);
-                                }
-                                if (request.params.zipCode != null && request.params.zipCode != "") {
-                                    userDetails.set("zipCode", request.params.zipCode);
-                                }
-                                if (request.params.state != null && request.params.state != "") {
-                                    userDetails.set("state", request.params.state);
-                                }
-                                userDetails.set("location", point);
-                                userDetails.set("user", user);
+                            var UserDetailstest = Parse.Object.extend("userDetails");
+                            var userDetailstest = new UserDetailstest();
+                            if (request.params.email != null && request.params.email != "") {
+                                userDetailstest.set("email", request.params.email);
+                            }
+                            if (request.params.firstName != null && request.params.firstName != "") {
+                                userDetailstest.set("firstName", request.params.firstName);
+                            }
+                            if (request.params.lastName != null && request.params.lastName != "") {
+                                userDetailstest.set("lastName", request.params.lastName);
+                            }
+                            if (request.params.dob != null && request.params.dob != "") {
+                                userDetailstest.set("dob", request.params.dob);
+                            }
+                            if (request.params.gender != null && request.params.gender != "") {
+                                userDetailstest.set("gender", request.params.gender);
+                            }
+                            if (request.params.imageURL != null && request.params.imageURL != "") {
+                                userDetailstest.set("imageURL", request.params.imageURL);
+                            }
+                            //userDetails.set("imageName", parseFile);
+                            userDetailstest.set("isVerified", "1");
+                            userDetailstest.set("scanDocId", "");
+                            if (request.params.phoneNo != null && request.params.phoneNo != "") {
+                                userDetailstest.set("phoneNo", request.params.phoneNo);
+                            }
+                            if (request.params.altPhoneNo != null && request.params.altPhoneNo != "") {
+                                userDetailstest.set("altPhoneNo", request.params.altPhoneNo);
+                            }
+                            if (request.params.address != null && request.params.address != "") {
+                                userDetailstest.set("address", request.params.address);
+                            }
+                            if (request.params.city != null && request.params.city != "") {
+                                userDetailstest.set("city", request.params.city);
+                            }
+                            if (request.params.zipCode != null && request.params.zipCode != "") {
+                                userDetailstest.set("zipCode", request.params.zipCode);
+                            }
+                            if (request.params.state != null && request.params.state != "") {
+                                userDetailstest.set("state", request.params.state);
+                            }
+                            userDetailstest.set("location", point);
+                            userDetailstest.set("user", user);
 
-                                userDetails.save(null, {
-                                    success: function (userDetails) {
-                                        response.sucess(userDetails);
-                                    },
-                                    error: function (error) {
-                                        response.error("user detail error occured");
-                                    }
-                                });
+                            userDetailstest.save(null, {
+                                success: function (result) {
+                                    response.sucess(result);
+                                },
+                                error: function (error) {
+                                    response.error("user detail error occured");
+                                }
+                            });
                         }
                     });
                     //response.success("Data saved");
