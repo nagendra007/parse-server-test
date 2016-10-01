@@ -324,7 +324,7 @@ Parse.Cloud.define("addUpdateUserdetailsNew", function (request, response) {
         user.id = request.params.userid;
         var UserDetails = Parse.Object.extend("userDetails");
         var userDetailstest = new UserDetails();
-        userDetailstest.id = myid;
+        //userDetailstest.id = myid;
         if (request.params.email != null && request.params.email != "") {
             userDetailstest.set("email", request.params.email);
         }
@@ -367,12 +367,21 @@ Parse.Cloud.define("addUpdateUserdetailsNew", function (request, response) {
         userDetailstest.set("location", point);
         userDetailstest.set("user", user);
 
-        userDetailstest.save({
-            success: function (results) {
-                response.success(results);
+        //userDetailstest.save({
+        //    success: function (results) {
+        //        response.success(results);
+        //    },
+        //    error: function (error) {
+        //        response.error("Error: " + error.code + " " + error.message);
+        //    }
+        //});
+
+        userDetailstest.save(null, {
+            success: function (userDetailstest) {
+                response.success(userDetailstest);
             },
             error: function (error) {
-                response.error("Error: " + error.code + " " + error.message);
+                response.error("error in adding card in collection");
             }
         });
 
