@@ -239,10 +239,11 @@ Parse.Cloud.define("addUpdateUserdetails", function (request, response) {
 
             if (userDetailss.length > 0) {
                 //response.success(userDetailss[0].id);
-
+                var myid = "";
+                myid = userDetailss[0].id;
                 var UserDetails1 = Parse.Object.extend("userDetails");
                 var userDetails2 = new UserDetails1();
-                userDetails2.id = "snlWbSHB1P";  //   userDetailss[0].id;// 
+                userDetails2.id = myid;//"snlWbSHB1P";  //   userDetailss[0].id;//
                 userDetails2.set("address", "3653451 ave");
                 userDetails2.save({
                     success: function (results) {
