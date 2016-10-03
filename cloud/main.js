@@ -520,6 +520,7 @@ Parse.Cloud.define("search", function (request, response) {
                     query.containedIn("user", myusers);
                     query.include("categoryId");
                     query.include("subCategoryId");
+                    query.include("userDetailsId");
                     query.find({
                         success: function (toolForRent) {
                             response.success(toolForRent);
@@ -568,72 +569,81 @@ Parse.Cloud.define("getuserdetails", function (request, response) {
 
 Parse.Cloud.define("addTool", function (request, response) {
     if (request.params.userid != null && request.params.userid != "") {
-        var query = new Parse.Query(Parse.User);
-        query.equalTo("objectId", request.params.userid);  // find all the women
-        query.find({
-            success: function (result) {
-                if (result.length > 0) {
-                    var user = new Parse.User();
-                    user.id = request.params.userid;
+        var user = new Parse.User();
+        user.id = request.params.userid;
 
-                    if (request.params.categoryId != null && request.params.categoryId != "" && request.params.subcategoryId != null && request.params.subcategoryId != "" && request.params.amount != null && request.params.amount != "" && request.params.desc != null && request.params.desc != "" && request.params.make != null && request.params.make != "" && request.params.moretimeallowed != null && request.params.moretimeallowed != "" && request.params.imageURL != null && request.params.imageURL != "" && request.params.toolName != null && request.params.toolName != "") {
+        var query = new Parse.Query("userDetails");
+        query.equalTo("user", user);
+        query.find().then(function (result) {
+            if (result.length > 0) {
 
-                        var ToolCategory = Parse.Object.extend("toolCategory");
-                        var toolCategory = new ToolCategory();
-                        toolCategory.id = request.params.categoryId;
+                if (request.params.categoryId != null && request.params.categoryId != "" && request.params.subcategoryId != null && request.params.subcategoryId != "" && request.params.amount != null && request.params.amount != "" && request.params.desc != null && request.params.desc != "" && request.params.make != null && request.params.make != "" && request.params.moretimeallowed != null && request.params.moretimeallowed != "" && request.params.imageURL != null && request.params.imageURL != "" && request.params.toolName != null && request.params.toolName != "") {
 
-                        var ToolSubCategory = Parse.Object.extend("toolSubCategory");
-                        var toolSubCategory = new ToolSubCategory();
-                        toolSubCategory.id = request.params.subcategoryId;
 
-                        //var ToolSubCategory = Parse.Object.extend("toolSubCategory");
-                        var query = new Parse.Query(ToolSubCategory);
-                        query.equalTo("categoryId", toolCategory);
-                        query.equalTo("objectId", request.params.subcategoryId);
-                        query.find().then(function (toolSubCategory1) {
-                            if (toolSubCategory1.length > 0) {
+                    var userdetailsId = "";
+                    var userdetailsId = results[0].id;
+                    var Userdetails = Parse.Object.extend("userDetails");
+                    var userdetails = new Userdetails();
+                    userdetails.id = userdetailsId;
 
-                                var ToolForRent = Parse.Object.extend("toolForRent");
-                                var toolForRent = new ToolForRent();
 
-                                toolForRent.set("user", user);
-                                toolForRent.set("toolName", request.params.toolName);
-                                toolForRent.set("categoryId", toolCategory);
-                                toolForRent.set("subCategoryId", toolSubCategory);
-                                toolForRent.set("description", request.params.desc);
-                                toolForRent.set("pricePerDay", request.params.amount);
-                                toolForRent.set("isAvailable", "1");
-                                toolForRent.set("isRented", "0");
-                                toolForRent.set("toolImageURL", request.params.imageURL);
-                                //toolForRent.set("toolImageName", "");
-                                toolForRent.set("manufacturer", "none");
-                                toolForRent.set("moreTimeAllowed", request.params.moretimeallowed);
-                                toolForRent.save(null, {
-                                    success: function (toolForRent) {
-                                        response.success("Tool added success");
-                                    },
-                                    error: function (error) {
-                                        response.error("error occured");
-                                    }
-                                });
-                            }
-                            else {
-                                response.error("categoty or sub category invalid");
-                            }
-                        }, function (error) {
-                            response.error(error);
-                        });
-                    }
-                    else {
-                        response.error("missing request parameters");
-                    }
+                    var ToolCategory = Parse.Object.extend("toolCategory");
+                    var toolCategory = new ToolCategory();
+                    toolCategory.id = request.params.categoryId;
 
+                    var ToolSubCategory = Parse.Object.extend("toolSubCategory");
+                    var toolSubCategory = new ToolSubCategory();
+                    toolSubCategory.id = request.params.subcategoryId;
+
+                    //var ToolSubCategory = Parse.Object.extend("toolSubCategory");
+                    var query = new Parse.Query(ToolSubCategory);
+                    query.equalTo("categoryId", toolCategory);
+                    query.equalTo("objectId", request.params.subcategoryId);
+                    query.find().then(function (toolSubCategory1) {
+                        if (toolSubCategory1.length > 0) {
+
+                            var ToolForRent = Parse.Object.extend("toolForRent");
+                            var toolForRent = new ToolForRent();
+
+                            toolForRent.set("user", user);
+                            toolForRent.set("toolName", request.params.toolName);
+                            toolForRent.set("categoryId", toolCategory);
+                            toolForRent.set("subCategoryId", toolSubCategory);
+                            toolForRent.set("userDetailsId", userdetails);
+                            toolForRent.set("description", request.params.desc);
+                            toolForRent.set("pricePerDay", request.params.amount);
+                            toolForRent.set("isAvailable", "1");
+                            toolForRent.set("isRented", "0");
+                            toolForRent.set("toolImageURL", request.params.imageURL);
+                            //toolForRent.set("toolImageName", "");
+                            toolForRent.set("manufacturer", "none");
+                            toolForRent.set("moreTimeAllowed", request.params.moretimeallowed);
+                            toolForRent.save(null, {
+                                success: function (toolForRent) {
+                                    response.success("Tool added success");
+                                },
+                                error: function (error) {
+                                    response.error("error occured");
+                                }
+                            });
+                        }
+                        else {
+                            response.error("categoty or sub category invalid");
+                        }
+                    }, function (error) {
+                        response.error(error);
+                    });
                 }
                 else {
-                    response.error("user not found");
+                    response.error("missing request parameters");
                 }
+
             }
-            
+            else {
+                response.error("user not found");
+            }
+        }, function (error) {
+            response.error(error);
         });
 
     }
