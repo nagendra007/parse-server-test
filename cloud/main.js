@@ -380,7 +380,9 @@ Parse.Cloud.define("addUpdateUserdetails", function (request, response) {
                     var query = new Parse.Query(UserDetails);
                     query.equalTo("user", user);
                     query.find().then(function (userDetailss) {
-                        var point = new Parse.GeoPoint(19.2403, 73.1305);
+                        
+
+                        //var point = new Parse.GeoPoint( 19.2403, 73.1305);
                         var UserDetails = Parse.Object.extend("userDetails");
                         var userDetailstest = new UserDetails();
 
@@ -436,7 +438,15 @@ Parse.Cloud.define("addUpdateUserdetails", function (request, response) {
                         if (request.params.state != null && request.params.state != "") {
                             userDetailstest.set("state", request.params.state);
                         }
-                        userDetailstest.set("location", point);
+                        if (request.params.latitude != null && request.params.latitude != "" && request.params.longitude != null && request.params.longitude != "") {
+                            var point = new Parse.GeoPoint(parseFloat(request.params.latitude), parseFloat(request.params.longitude));
+                            userDetailstest.set("location", point);
+                        }
+                        else {
+                            var point = new Parse.GeoPoint(parseFloat(0), parseFloat(0));
+                            userDetailstest.set("location", point);
+                        }
+                        
                         
 
                         //userDetailstest.save({
@@ -632,129 +642,14 @@ Parse.Cloud.define("addTool", function (request, response) {
     }
 });
 
-Parse.Cloud.define("sendEmail", function (request, response) {
-    var mandrill = require('mandrill-api/mandrill');
-    var mandrill_client = new mandrill.Mandrill('bGUnQ6_ltOqp4rkonKZO7Q');//('524eb66b5ed31021f065ffea4ef0a220');//
-    
-    var message = {
-        "html": "<p>Example HTML content nagendra</p>",
-        "text": "Example text content",
-        "subject": "example subject",
-        "from_email": "nagendra.singh@ninedots.com",
-        "from_name": "sender test",
-        "to": [{
-            "email": "nagendra.singh@ninedots.com",
-            "name": "nagendra",
-            "type": "to"
-        }]
-    };
-    var async = false;
-    var ip_pool = "Main Pool";
-    var send_at = "example send_at";
-    mandrill_client.messages.send({ "message": message, "async": async }, function (result) {//, "ip_pool": ip_pool, "send_at": send_at
-        response.success(result);
-        /*
-        [{
-                "email": "recipient.email@example.com",
-                "status": "sent",
-                "reject_reason": "hard-bounce",
-                "_id": "abc123abc123abc123abc123abc123"
-            }]
-        */
-    }, function (e) {
-        response.success(e);
-        // Mandrill returns the error as an object with name and message keys
-        //console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
-        // A mandrill error occurred: Unknown_Subaccount - No subaccount exists with the id 'customer-123'
-    });
-
-
-//    mandrill_client.sendEmail({
-//        message: {
-//            text: "test",
-//            subject: "Parse and Mandrill!",
-//            from_email: "nagendra.singh@ninedots.com",
-//            from_name: "testing",
-//            to: [
-//                {
-//                    email: "gunjan.sharma@ninedots.com",
-//                    name: "Some Name"
-//                }
-//            ]
-//        },
-//        async: true
-//    }, {
-//        success: function (httpResponse) {
-//            response.success("email sent");
-//        },
-//        error: function (httpResponse) {
-//            response.success(httpResponse);
-//        }
-//    }
-//);
-    //var Mandrill = require('mandrill');
-    //Mandrill.initialize('MANDRILL_KEY');
-    //Mandrill.sendEmail({
-    //    message: {
-    //        text: request.params.text,
-    //        subject: "Parse and Mandrill!",
-    //        from_email: "email@example.com",
-    //        from_name: "Name",
-    //        to: [
-    //            {
-    //                email: request.params.email,
-    //                name: "Some Name"
-    //            }
-    //        ]
-    //    },
-    //    async: true
-    //}, {
-    //    success: function (httpResponse) {
-    //        response.success("email sent");
-    //    },
-    //    error: function (httpResponse) {
-
-    //    }
-    //}
-    //);
-
-    //var Mandrill = require('cloud/mandrillTemplateSend.js');
-
-    //Mandrill.initialize('bGUnQ6_ltOqp4rkonKZO7Q');
-    //Mandrill.sendTemplate({
-    //    template_name: request.params.templateName,
-    //    template_content: [{
-    //        name: "test",
-    //        content: "hi hello" //Those are required but they are ignored
-    //    }],
-    //    message: {
-    //        to: [{
-    //            email: request.params.toEmail,
-    //            name: request.params.toName
-    //        }],
-    //        important: true
-    //    },
-    //    async: false
-    //}, {
-    //    success: function (httpResponse) {
-    //        console.log(httpResponse);
-    //        response.success("Email sent!");
-    //    },
-    //    error: function (httpResponse) {
-    //        console.error(httpResponse);
-    //        response.error("Uh oh, something went wrong");
-    //    }
-    //});
-});
-
-
-Parse.Cloud.define("getTools", function (request, response) {
+Parse.Cloud.define("getRentableTools", function (request, response) {
     if (request.params.userid != null && request.params.userid != "") {
         var user = new Parse.User();
         user.id = request.params.userid;
         var ToolForRent = Parse.Object.extend("toolForRent");
         var query = new Parse.Query(ToolForRent);
         query.equalTo("user", user);
+        query.equalTo("isAvailable", "1");
         query.find({
             success: function (toolForRent) {
                 response.success(toolForRent);
@@ -770,6 +665,47 @@ Parse.Cloud.define("getTools", function (request, response) {
     }
 });
 
+Parse.Cloud.define("getRentedTools", function (request, response) {
+    if (request.params.userid != null && request.params.userid != "") {
+        var user = new Parse.User();
+        user.id = request.params.userid;
+        var ToolForRent = Parse.Object.extend("toolForRent");
+        var query = new Parse.Query(ToolForRent);
+        query.equalTo("user", user);
+        query.equalTo("isAvailable", "0");
+        query.find({
+            success: function (toolForRent) {
+                if(toolForRent.length>0)
+                {
+                    var ToolTakenForRent = Parse.Object.extend("toolTakenForRent");
+                    var query = new Parse.Query(ToolTakenForRent);
+                    query.containedIn("toolRentId", toolForRent);
+                    query.equalTo("isPaymentDone", "0");
+                    query.include("toollRentId");
+                    query.include("userDetailsId");
+                    query.find({
+                        success: function (toolTakenForRent) {
+                            response.success(toolTakenForRent);
+                        },
+                        error: function (error) {
+                            response.error(error);
+                        }
+                    });
+                }
+            },
+            error: function (error) {
+                response.error("error occured");
+            }
+        });
+    }
+    else {
+        response.error("userid missing in request");
+    }
+});
+
+
+
+
 Parse.Cloud.define("addTakeToolForRent", function (request, response) {
     if (request.params.userid != null && request.params.userid != "") {//if (request.params.nonce != null && request.params.nonce != "" ) {
         var query = new Parse.Query(Parse.User);
@@ -781,46 +717,72 @@ Parse.Cloud.define("addTakeToolForRent", function (request, response) {
                     user.id = request.params.userid;
 
                     if (request.params.toolId != null && request.params.toolId != "" && request.params.subcategoryId != null && request.params.subcategoryId != "" && request.params.amount != null && request.params.amount != "" && request.params.desc != null && request.params.desc != "" && request.params.make != null && request.params.make != "" && request.params.moretimeallowed != null && request.params.moretimeallowed != "" && request.params.imageURL != null && request.params.imageURL != "" && request.params.toolName != null && request.params.toolName != "") {
-
-                        var ToolForRent = Parse.Object.extend("toolForRent");
-                        var query = new Parse.Query(ToolForRent);
-                        query.equalTo("objectId", request.params.toolId);
-                        query.equalTo("isAvailable", "1");
+                       
+                        var query = new Parse.Query("userDetails");
+                        query.equalTo("user", user);
                         query.find({
-                            success: function (toolForRent) {
-                                if (toolForRent.length > 0) {
+                            success: function (results) {
+                                if (result.length > 0) {
+
+                                    var userdetailsId = "";
+                                    var userdetailsId = results[0].id;
+                                    var Userdetails = Parse.Object.extend("userDetails");
+                                    var userdetails = new Userdetails();
+                                    userdetails.id = userdetailsId;
+
+
                                     var ToolForRent = Parse.Object.extend("toolForRent");
-                                    var toolForRent1 = new ToolForRent();
-                                    toolForRent1.id = request.params.toolId;
-
-                                    var ToolTakenForRent = Parse.Object.extend("toolTakenForRent");
-                                    var toolTakenForRent = new ToolTakenForRent();
-
-                                    toolTakenForRent.set("user", user);
-                                    toolTakenForRent.set("toolRentId", toolForRent1);
-                                    toolTakenForRent.set("toolName", toolForRent[0].get("toolName"));
-                                    toolTakenForRent.set("starteDateTime", request.params.startDate);
-                                    toolTakenForRent.set("endeDateTime", request.params.endDate);
-                                    toolTakenForRent.set("pricePerDay", toolForRent[0].get("pricePerDay"));
-                                    toolTakenForRent.set("isReturned", "0");
-                                    toolTakenForRent.set("isCanceled", "0");
-                                    toolTakenForRent.set("isPaymentDone", "0");
-                                    toolTakenForRent.save(null, {
+                                    var query = new Parse.Query(ToolForRent);
+                                    query.equalTo("objectId", request.params.toolId);
+                                    query.equalTo("isAvailable", "1");
+                                    query.find({
                                         success: function (toolForRent) {
-                                            var ToolForRent = Parse.Object.extend("toolForRent");
-                                            var toolForRent1 = new ToolForRent();
-                                            toolForRent1.id = request.params.toolId;
-                                            toolForRent1.set("isAvailable", "0");
-                                            toolForRent1.set("isRented", "1");
+                                            if (toolForRent.length > 0) {
 
-                                            toolForRent1.save();
-                                            response.sucess("tool rented sucess");
+
+
+                                                var ToolForRent = Parse.Object.extend("toolForRent");
+                                                var toolForRent1 = new ToolForRent();
+                                                toolForRent1.id = request.params.toolId;
+
+                                                var ToolTakenForRent = Parse.Object.extend("toolTakenForRent");
+                                                var toolTakenForRent = new ToolTakenForRent();
+
+                                                toolTakenForRent.set("user", user);
+                                                toolTakenForRent.set("userDetailsId", userdetails);
+                                                toolTakenForRent.set("toolRentId", toolForRent1);
+                                                toolTakenForRent.set("toolName", toolForRent[0].get("toolName"));
+                                                toolTakenForRent.set("starteDateTime", request.params.startDate);
+                                                toolTakenForRent.set("endeDateTime", request.params.endDate);
+                                                toolTakenForRent.set("pricePerDay", toolForRent[0].get("pricePerDay"));
+                                                toolTakenForRent.set("isReturned", "0");
+                                                toolTakenForRent.set("isCanceled", "0");
+                                                toolTakenForRent.set("isPaymentDone", "0");
+                                                toolTakenForRent.save(null, {
+                                                    success: function (toolForRent) {
+                                                        var ToolForRent = Parse.Object.extend("toolForRent");
+                                                        var toolForRent1 = new ToolForRent();
+                                                        toolForRent1.id = request.params.toolId;
+                                                        toolForRent1.set("isAvailable", "0");
+                                                        toolForRent1.set("isRented", "1");
+
+                                                        toolForRent1.save();
+                                                        response.sucess("tool rented sucess");
+                                                    }
+                                                });
+                                            }
+                                            else {
+                                                response.error("tool not available");
+                                            }
                                         }
                                     });
                                 }
                                 else {
-                                    response.error("tool not available");
+                                    response.error("User details not found, please update your profile");
                                 }
+                            },
+                            error: function (error) {
+                                response.error("Error: " + error.code + " " + error.message);
                             }
                         });
                     }
@@ -915,7 +877,120 @@ Parse.Cloud.define("feedback", function (request, response) {
     }
 });
 
+Parse.Cloud.define("sendEmail", function (request, response) {
+    var mandrill = require('mandrill-api/mandrill');
+    var mandrill_client = new mandrill.Mandrill('bGUnQ6_ltOqp4rkonKZO7Q');//('524eb66b5ed31021f065ffea4ef0a220');//
 
+    var message = {
+        "html": "<p>Example HTML content nagendra</p>",
+        "text": "Example text content",
+        "subject": "example subject",
+        "from_email": "nagendra.singh@ninedots.com",
+        "from_name": "sender test",
+        "to": [{
+            "email": "nagendra.singh@ninedots.com",
+            "name": "nagendra",
+            "type": "to"
+        }]
+    };
+    var async = false;
+    var ip_pool = "Main Pool";
+    var send_at = "example send_at";
+    mandrill_client.messages.send({ "message": message, "async": async }, function (result) {//, "ip_pool": ip_pool, "send_at": send_at
+        response.success(result);
+        /*
+        [{
+                "email": "recipient.email@example.com",
+                "status": "sent",
+                "reject_reason": "hard-bounce",
+                "_id": "abc123abc123abc123abc123abc123"
+            }]
+        */
+    }, function (e) {
+        response.success(e);
+        // Mandrill returns the error as an object with name and message keys
+        //console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
+        // A mandrill error occurred: Unknown_Subaccount - No subaccount exists with the id 'customer-123'
+    });
+
+
+    //    mandrill_client.sendEmail({
+    //        message: {
+    //            text: "test",
+    //            subject: "Parse and Mandrill!",
+    //            from_email: "nagendra.singh@ninedots.com",
+    //            from_name: "testing",
+    //            to: [
+    //                {
+    //                    email: "gunjan.sharma@ninedots.com",
+    //                    name: "Some Name"
+    //                }
+    //            ]
+    //        },
+    //        async: true
+    //    }, {
+    //        success: function (httpResponse) {
+    //            response.success("email sent");
+    //        },
+    //        error: function (httpResponse) {
+    //            response.success(httpResponse);
+    //        }
+    //    }
+    //);
+    //var Mandrill = require('mandrill');
+    //Mandrill.initialize('MANDRILL_KEY');
+    //Mandrill.sendEmail({
+    //    message: {
+    //        text: request.params.text,
+    //        subject: "Parse and Mandrill!",
+    //        from_email: "email@example.com",
+    //        from_name: "Name",
+    //        to: [
+    //            {
+    //                email: request.params.email,
+    //                name: "Some Name"
+    //            }
+    //        ]
+    //    },
+    //    async: true
+    //}, {
+    //    success: function (httpResponse) {
+    //        response.success("email sent");
+    //    },
+    //    error: function (httpResponse) {
+
+    //    }
+    //}
+    //);
+
+    //var Mandrill = require('cloud/mandrillTemplateSend.js');
+
+    //Mandrill.initialize('bGUnQ6_ltOqp4rkonKZO7Q');
+    //Mandrill.sendTemplate({
+    //    template_name: request.params.templateName,
+    //    template_content: [{
+    //        name: "test",
+    //        content: "hi hello" //Those are required but they are ignored
+    //    }],
+    //    message: {
+    //        to: [{
+    //            email: request.params.toEmail,
+    //            name: request.params.toName
+    //        }],
+    //        important: true
+    //    },
+    //    async: false
+    //}, {
+    //    success: function (httpResponse) {
+    //        console.log(httpResponse);
+    //        response.success("Email sent!");
+    //    },
+    //    error: function (httpResponse) {
+    //        console.error(httpResponse);
+    //        response.error("Uh oh, something went wrong");
+    //    }
+    //});
+});
 
 
 
