@@ -801,7 +801,14 @@ Parse.Cloud.define("addTakeToolForRent", function (request, response) {
                     //success: function (toolForRent) {
                     if (toolForRent.length > 0) {
 
+                        var toolName="";
+                        toolName = toolForRent[0].get("toolName");
+                        var pricePerDay="";
+                        pricePerDay = toolForRent[0].get("pricePerDay");
+
+
                         var ToolForRent = Parse.Object.extend("toolForRent");
+
                         var toolForRent1 = new ToolForRent();
                         toolForRent1.id = request.params.toolId;
 
@@ -812,10 +819,10 @@ Parse.Cloud.define("addTakeToolForRent", function (request, response) {
                         toolTakenForRent.set("user", user);
                         toolTakenForRent.set("userDetailsId", userdetails);
                         toolTakenForRent.set("toolRentId", toolForRent1);
-                        toolTakenForRent.set("toolName", toolForRent[0].get("toolName"));
+                        toolTakenForRent.set("toolName", toolName);
                         toolTakenForRent.set("starteDateTime", request.params.startDate);
                         toolTakenForRent.set("endeDateTime", request.params.endDate);
-                        toolTakenForRent.set("pricePerDay", toolForRent[0].get("pricePerDay"));
+                        toolTakenForRent.set("pricePerDay", pricePerDay);
                         toolTakenForRent.set("isReturned", "0");
                         toolTakenForRent.set("isCanceled", "0");
                         toolTakenForRent.set("isPaymentDone", "0");
