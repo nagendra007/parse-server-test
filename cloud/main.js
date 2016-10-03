@@ -610,7 +610,7 @@ Parse.Cloud.define("addTool", function (request, response) {
                                 toolForRent.set("moreTimeAllowed", request.params.moretimeallowed);
                                 toolForRent.save(null, {
                                     success: function (toolForRent) {
-                                        response.success("Tool added sucess");
+                                        response.success("Tool added success");
                                     },
                                     error: function (error) {
                                         response.error("error occured");
@@ -833,7 +833,7 @@ Parse.Cloud.define("addTakeToolForRent", function (request, response) {
                                 toolForRent1.set("isRented", "1");
 
                                 toolForRent1.save();
-                                response.success("tool rented sucess");
+                                response.success("tool rented success");
                             },
                             error: function (error) {
                                 response.error(error);
@@ -879,6 +879,7 @@ Parse.Cloud.define("getSubCategory", function (request, response) {
         var ToolSubCategory = Parse.Object.extend("toolSubCategory");
         var query = new Parse.Query(ToolSubCategory);
         query.equalTo("categoryId", toolCategory);
+        query.include("categoryId");
         query.find({
             success: function (results) {
                 response.success(results);
