@@ -8,8 +8,8 @@ var gateway = braintree.connect({
     privateKey: "31e804049ca424d8c0ffcf31cf2a86e5"
 });
 
-Parse.Cloud.define('hello', function(req, res) {
-  res.success('Hi Singh test');
+Parse.Cloud.define('hello', function (req, res) {
+    res.success('Hi Singh test');
 });
 
 Parse.Cloud.define("braintreepayold", function (request, response) {
@@ -53,7 +53,7 @@ Parse.Cloud.define("braintreepayold", function (request, response) {
                                     response.error("error in adding card in collection");
                                 }
                             });
-                           
+
                         }
                         else {
                             response.error(err);
@@ -77,7 +77,7 @@ Parse.Cloud.define("braintreepayold", function (request, response) {
 
 Parse.Cloud.define("toolpayment", function (request, response) {
     if (request.params.userid != null && request.params.userid != "" && request.params.BTcustomerid != null && request.params.BTcustomerid != "" && request.params.BTcardid != null && request.params.BTcardid != "" && request.params.amount != null && request.params.amount != "" && request.params.toolTakenForRentID != null && request.params.toolTakenForRentID != "") {
-        
+
 
         var query = new Parse.Query(Parse.User);
         query.equalTo("objectId", request.params.userid);
@@ -171,7 +171,7 @@ Parse.Cloud.define("addCreditCard", function (request, response) {
                     //    lastName: request.params.lastName,// results[0].lastName,
                     //    email: results[0].email,
                     //    paymentMethodNonce: request.params.nonce,
-                    
+
                     //}, function (err, result) {
                     //   // result.success;
                     //    // true
@@ -198,8 +198,7 @@ Parse.Cloud.define("addCreditCard", function (request, response) {
                             }
                         }
                     }, function (err, result) {
-                        if (result.success == true)
-                        {
+                        if (result.success == true) {
                             var BTcustomerid = result.customer.id;
                             var BTcardid = result.customer.creditCards[0].token;
                             var cardtype = result.customer.creditCards[0].cardType;
@@ -222,7 +221,7 @@ Parse.Cloud.define("addCreditCard", function (request, response) {
                                     response.error("error in adding card in collection");
                                 }
                             });
-                            
+
                         }
                         else {
                             response.error("error in adding card");
@@ -232,7 +231,7 @@ Parse.Cloud.define("addCreditCard", function (request, response) {
 
                         // result.customer.id;
                         // e.g. 494019
-                        
+
                     });
 
                     //response.success(results);
@@ -264,10 +263,10 @@ Parse.Cloud.define("getCreditCardList", function (request, response) {
                     user.id = request.params.userid;
 
                     var UserCreditCardInfo = Parse.Object.extend("userCreditCardInfo");
-                    
+
                     var query = new Parse.Query(UserCreditCardInfo);
                     query.equalTo("user", user);
-                    query.select("BTcustomerid", "BTcardid", "cardtype","maskedNumber","ExpirationMonth","ExpirationYear","objectId","isPrimary");
+                    query.select("BTcustomerid", "BTcardid", "cardtype", "maskedNumber", "ExpirationMonth", "ExpirationYear", "objectId", "isPrimary");
                     query.find({
                         success: function (userCreditCardInfo) {
                             response.success(userCreditCardInfo);
@@ -315,8 +314,7 @@ Parse.Cloud.define("setPrimaryCreditCard", function (request, response) {
                             query.equalTo("user", user);
                             query.find().then(function (userCreditCardInfo) {
                                 if (userCreditCardInfo.length > 0) {
-                                    for(var i=0;i<userCreditCardInfo.length;i++)
-                                    {
+                                    for (var i = 0; i < userCreditCardInfo.length; i++) {
                                         var userCreditCardInfo1 = Parse.Object.extend("userCreditCardInfo");
                                         var userCreditCardInfo1 = new userCreditCardInfo1();
 
@@ -380,14 +378,14 @@ Parse.Cloud.define("addUpdateUserdetails", function (request, response) {
                     var query = new Parse.Query(UserDetails);
                     query.equalTo("user", user);
                     query.find().then(function (userDetailss) {
-                        
+
 
                         //var point = new Parse.GeoPoint( 19.2403, 73.1305);
                         var UserDetails = Parse.Object.extend("userDetails");
                         var userDetailstest = new UserDetails();
 
                         if (userDetailss.length > 0) {
-                            
+
                             var myid = "";
                             myid = userDetailss[0].id;
                             userDetailstest.id = myid;
@@ -398,7 +396,7 @@ Parse.Cloud.define("addUpdateUserdetails", function (request, response) {
                             userDetailstest.set("user", user);
                         }
 
-                       
+
                         if (request.params.email != null && request.params.email != "") {
                             userDetailstest.set("email", request.params.email);
                         }
@@ -446,8 +444,8 @@ Parse.Cloud.define("addUpdateUserdetails", function (request, response) {
                             var point = new Parse.GeoPoint(parseFloat(0), parseFloat(0));
                             userDetailstest.set("location", point);
                         }
-                        
-                        
+
+
 
                         //userDetailstest.save({
                         //    success: function (results) {
@@ -483,8 +481,8 @@ Parse.Cloud.define("addUpdateUserdetails", function (request, response) {
 Parse.Cloud.define("search", function (request, response) {
     if (request.params.latitude != null && request.params.latitude != "" && request.params.longitude != null && request.params.longitude != "" && request.params.miles != null && request.params.miles != "" && request.params.categoryId != null && request.params.categoryId != "" && request.params.subcategoryId != null && request.params.subcategoryId != "") {
 
-       // var point = new Parse.GeoPoint(request.params.latitude, request.params.longitude);
-        var point = new Parse.GeoPoint(18.2403, 73.1305);
+        var point = new Parse.GeoPoint(parseFloat( request.params.latitude), parseFloat( request.params.longitude));
+        //var point = new Parse.GeoPoint(18.2403, 73.1305);
         var UserDetails = Parse.Object.extend("userDetails");
         var userDetails = new UserDetails();
         var query = new Parse.Query(UserDetails);
@@ -547,7 +545,7 @@ Parse.Cloud.define("search", function (request, response) {
 
 
 Parse.Cloud.define("getuserdetails", function (request, response) {
-    if (request.params.userid != null && request.params.userid != "" ) {//if (request.params.nonce != null && request.params.nonce != "" ) {
+    if (request.params.userid != null && request.params.userid != "") {//if (request.params.nonce != null && request.params.nonce != "" ) {
         var user = new Parse.User();
         user.id = request.params.userid;
         var query = new Parse.Query("userDetails");
@@ -555,7 +553,7 @@ Parse.Cloud.define("getuserdetails", function (request, response) {
         query.equalTo("user", user);
         query.find({
             success: function (results) {
-                    response.success(results);
+                response.success(results);
             },
             error: function (error) {
                 response.error("Error: " + error.code + " " + error.message);
@@ -664,8 +662,7 @@ Parse.Cloud.define("getRentableTools", function (request, response) {
             success: function (toolForRent) {
                 response.success(toolForRent);
             },
-            error:function(error)
-            {
+            error: function (error) {
                 response.error("error occured");
             }
         });
@@ -685,8 +682,7 @@ Parse.Cloud.define("getRentedTools", function (request, response) {
         query.equalTo("isAvailable", "0");
         query.find({
             success: function (toolForRent) {
-                if(toolForRent.length>0)
-                {
+                if (toolForRent.length > 0) {
                     var ToolTakenForRent = Parse.Object.extend("toolTakenForRent");
                     var query = new Parse.Query(ToolTakenForRent);
                     query.containedIn("toolRentId", toolForRent);
@@ -809,9 +805,9 @@ Parse.Cloud.define("addTakeToolForRent", function (request, response) {
                     //success: function (toolForRent) {
                     if (toolForRent.length > 0) {
 
-                        var toolName="";
+                        var toolName = "";
                         toolName = toolForRent[0].get("toolName");
-                        var pricePerDay="";
+                        var pricePerDay = "";
                         pricePerDay = toolForRent[0].get("pricePerDay");
 
 
@@ -868,16 +864,16 @@ Parse.Cloud.define("addTakeToolForRent", function (request, response) {
 });
 
 Parse.Cloud.define("getCategory", function (request, response) {
-   
+
     var query = new Parse.Query("toolCategory");
-        query.find({
-            success: function (results) {
-                response.success(results);
-            },
-            error: function (error) {
-                response.error("Error: " + error.code + " " + error.message);
-            }
-        });
+    query.find({
+        success: function (results) {
+            response.success(results);
+        },
+        error: function (error) {
+            response.error("Error: " + error.code + " " + error.message);
+        }
+    });
 });
 
 Parse.Cloud.define("getSubCategory", function (request, response) {
