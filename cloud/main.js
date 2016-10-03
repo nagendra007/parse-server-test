@@ -625,7 +625,7 @@ Parse.Cloud.define("addTool", function (request, response) {
                         });
                     }
                     else {
-                        response.error("Tool added sucess");
+                        response.error("missing request parameters");
                     }
 
                 }
@@ -827,13 +827,13 @@ Parse.Cloud.define("addTakeToolForRent", function (request, response) {
                                                 toolTakenForRent.set("isPaymentDone", "0");
                                                 toolTakenForRent.save(null, {
                                                     success: function (toolForRent) {
-                                                        var ToolForRent = Parse.Object.extend("toolForRent");
-                                                        var toolForRent1 = new ToolForRent();
-                                                        toolForRent1.id = request.params.toolId;
-                                                        toolForRent1.set("isAvailable", "0");
-                                                        toolForRent1.set("isRented", "1");
+                                                        //var ToolForRent = Parse.Object.extend("toolForRent");
+                                                        //var toolForRent1 = new ToolForRent();
+                                                        //toolForRent1.id = request.params.toolId;
+                                                        //toolForRent1.set("isAvailable", "0");
+                                                        //toolForRent1.set("isRented", "1");
 
-                                                        toolForRent1.save();
+                                                        //toolForRent1.save();
                                                         response.sucess("tool rented sucess");
                                                     },
                                                     error: function (error) {
