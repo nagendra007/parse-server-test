@@ -12,7 +12,7 @@ Parse.Cloud.define('hello', function(req, res) {
   res.success('Hi Singh test');
 });
 
-Parse.Cloud.define("braintreepay", function (request, response) {
+Parse.Cloud.define("braintreepayold", function (request, response) {
     if (request.params.userid != null && request.params.userid != "" && request.params.BTcustomerid != null && request.params.BTcustomerid != "" && request.params.BTcardid != null && request.params.BTcardid != "" && request.params.amount != null && request.params.amount != "" && request.params.toolTakenForRentID != null && request.params.toolTakenForRentID != "") {
         var user = new Parse.User();
         user.id = request.params.userid;
@@ -558,8 +558,12 @@ Parse.Cloud.define("getuserdetails", function (request, response) {
 
 
 
+
+
+
+
 Parse.Cloud.define("addTool", function (request, response) {
-    if (request.params.userid != null && request.params.userid != "") {//if (request.params.nonce != null && request.params.nonce != "" ) {
+    if (request.params.userid != null && request.params.userid != "") {
         var query = new Parse.Query(Parse.User);
         query.equalTo("objectId", request.params.userid);  // find all the women
         query.find({
@@ -578,27 +582,39 @@ Parse.Cloud.define("addTool", function (request, response) {
                         var toolSubCategory = new ToolSubCategory();
                         toolSubCategory.id = request.params.subcategoryId;
 
+                        //var ToolSubCategory = Parse.Object.extend("toolSubCategory");
+                        var query = new Parse.Query(ToolSubCategory);
+                        query.equalTo("categoryId", toolCategory);
+                        query.equalTo("objectId", request.params.subcategoryId);
+                        query.find().then(function (toolSubCategory) {
+                            if (toolSubCategory.length > 0) {
 
+                                var ToolForRent = Parse.Object.extend("toolForRent");
+                                var toolForRent = new ToolForRent();
 
-                        var ToolForRent = Parse.Object.extend("toolForRent");
-                        var toolForRent = new ToolForRent();
-
-                        toolForRent.set("user", user);
-                        toolForRent.set("toolName", request.params.toolName);
-                        toolForRent.set("categoryId", toolCategory);
-                        toolForRent.set("subCategoryId", toolSubCategory);
-                        toolForRent.set("description", request.params.desc);
-                        toolForRent.set("pricePerDay", request.params.amount);
-                        toolForRent.set("isAvailable", "1");
-                        toolForRent.set("isRented", "0");
-                        toolForRent.set("toolImageURL", request.params.imageURL);
-                        //toolForRent.set("toolImageName", "");
-                        toolForRent.set("manufacturer", "none");
-                        toolForRent.set("moreTimeAllowed", request.params.moretimeallowed);
-                        toolForRent.save(null, {
-                            success: function (toolForRent) {
-                                response.sucess("Tool added sucess");
+                                toolForRent.set("user", user);
+                                toolForRent.set("toolName", request.params.toolName);
+                                toolForRent.set("categoryId", toolCategory);
+                                toolForRent.set("subCategoryId", toolSubCategory);
+                                toolForRent.set("description", request.params.desc);
+                                toolForRent.set("pricePerDay", request.params.amount);
+                                toolForRent.set("isAvailable", "1");
+                                toolForRent.set("isRented", "0");
+                                toolForRent.set("toolImageURL", request.params.imageURL);
+                                //toolForRent.set("toolImageName", "");
+                                toolForRent.set("manufacturer", "none");
+                                toolForRent.set("moreTimeAllowed", request.params.moretimeallowed);
+                                toolForRent.save(null, {
+                                    success: function (toolForRent) {
+                                        response.sucess("Tool added sucess");
+                                    }
+                                });
                             }
+                            else {
+                                response.error("categoty or sub category invalid");
+                            }
+                        }, function (error) {
+
                         });
                     }
                     else {
