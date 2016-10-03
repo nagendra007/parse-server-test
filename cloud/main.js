@@ -879,7 +879,7 @@ Parse.Cloud.define("getSubCategory", function (request, response) {
         var ToolSubCategory = Parse.Object.extend("toolSubCategory");
         var query = new Parse.Query(ToolSubCategory);
         query.equalTo("categoryId", toolCategory);
-        query.include("categoryId");
+        //query.include("categoryId");
         query.find({
             success: function (results) {
                 response.success(results);
@@ -895,6 +895,29 @@ Parse.Cloud.define("getSubCategory", function (request, response) {
 
 });
 
+Parse.Cloud.define("uploadImage", function (request, response) {
+    var file = new Parse.File("logo.png", {
+        base64: request.body.image
+    });
+
+    //file.save().then(function () {
+    //    response.success( file.url());
+
+    //});
+
+    //var parseFile = new Parse.File(name, file);
+    file.save().then(function (parseFile) {
+        var url = parseFile.url();
+        response.success(url);
+    }, function (error) {
+        response.success(error);
+    });
+
+
+    //if (req.params.image) {
+    //    console.log("data found12345");
+    //}
+});
 
 
 
