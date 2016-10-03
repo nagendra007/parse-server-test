@@ -607,6 +607,9 @@ Parse.Cloud.define("addTool", function (request, response) {
                                 toolForRent.save(null, {
                                     success: function (toolForRent) {
                                         response.sucess("Tool added sucess");
+                                    },
+                                    error: function (error) {
+                                        response.error("error occured");
                                     }
                                 });
                             }
@@ -614,7 +617,7 @@ Parse.Cloud.define("addTool", function (request, response) {
                                 response.error("categoty or sub category invalid");
                             }
                         }, function (error) {
-
+                            response.error(error);
                         });
                     }
                     else {
