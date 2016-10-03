@@ -774,8 +774,6 @@ Parse.Cloud.define("feedback", function (request, response) {
     }
 });
 
-
-
 Parse.Cloud.define("addTakeToolForRent", function (request, response) {
     if (request.params.userid != null && request.params.userid != "" && request.params.toolId != null && request.params.toolId != "" && request.params.startDate != null && request.params.startDate != "" && request.params.endDate != null && request.params.endDate != "") {
 
@@ -859,7 +857,42 @@ Parse.Cloud.define("addTakeToolForRent", function (request, response) {
     }
 });
 
+Parse.Cloud.define("getCategory", function (request, response) {
+   
+    var query = new Parse.Query("toolCategory");
+        query.find({
+            success: function (results) {
+                response.success(results);
+            },
+            error: function (error) {
+                response.error("Error: " + error.code + " " + error.message);
+            }
+        });
+});
 
+Parse.Cloud.define("getSubCategory", function (request, response) {
+    if (request.params.categoryId != null && request.params.categoryId != "") {
+        var ToolCategory = Parse.Object.extend("toolCategory");
+        var toolCategory = new ToolCategory();
+        toolCategory.id = request.params.categoryId;
+
+        var ToolSubCategory = Parse.Object.extend("toolSubCategory");
+        var query = new Parse.Query(ToolSubCategory);
+        query.equalTo("categoryId", toolCategory);
+        query.find({
+            success: function (results) {
+                response.success(results);
+            },
+            error: function (error) {
+                response.error("Error: " + error.code + " " + error.message);
+            }
+        });
+    }
+    else {
+        response.error("Category id missing in request parameters");
+    }
+
+});
 
 
 
