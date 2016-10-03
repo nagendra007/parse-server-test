@@ -75,7 +75,7 @@ Parse.Cloud.define("braintreepay", function (request, response) {
 });
 
 
-Parse.Cloud.define("braintreepaynew", function (request, response) {
+Parse.Cloud.define("toolpayment", function (request, response) {
     if (request.params.userid != null && request.params.userid != "" && request.params.BTcustomerid != null && request.params.BTcustomerid != "" && request.params.BTcardid != null && request.params.BTcardid != "" && request.params.amount != null && request.params.amount != "" && request.params.toolTakenForRentID != null && request.params.toolTakenForRentID != "") {
         
 
@@ -267,6 +267,7 @@ Parse.Cloud.define("getCreditCardList", function (request, response) {
                     
                     var query = new Parse.Query(UserCreditCardInfo);
                     query.equalTo("user", user);
+                    query.select("BTcustomerid", "BTcardid", "cardtype","maskedNumber","ExpirationMonth","ExpirationYear","objectId","isPrimary");
                     query.find({
                         success: function (userCreditCardInfo) {
                             response.success(userCreditCardInfo);
