@@ -586,8 +586,8 @@ Parse.Cloud.define("addTool", function (request, response) {
                         var query = new Parse.Query(ToolSubCategory);
                         query.equalTo("categoryId", toolCategory);
                         query.equalTo("objectId", request.params.subcategoryId);
-                        query.find().then(function (toolSubCategory) {
-                            if (toolSubCategory.length > 0) {
+                        query.find().then(function (toolSubCategory1) {
+                            if (toolSubCategory1.length > 0) {
 
                                 var ToolForRent = Parse.Object.extend("toolForRent");
                                 var toolForRent = new ToolForRent();
