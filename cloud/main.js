@@ -156,7 +156,7 @@ Parse.Cloud.define("toolpayment", function (request, response) {
     }
 });
 
-Parse.Cloud.define("addBraintreeCreditCard", function (request, response) {
+Parse.Cloud.define("addCreditCard", function (request, response) {
     if (request.params.userid != null && request.params.userid != "" && request.params.CardholderName != null && request.params.CardholderName != "" && request.params.Number != null && request.params.Number != "" && request.params.CVV != null && request.params.CVV != "" && request.params.ExpirationMonth != null && request.params.ExpirationMonth != "" && request.params.ExpirationYear != null && request.params.ExpirationYear != "") {//if (request.params.nonce != null && request.params.nonce != "" ) {
         var user = new Parse.User();
         user.id = request.params.userid;
