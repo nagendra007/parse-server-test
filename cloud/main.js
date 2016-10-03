@@ -778,94 +778,83 @@ Parse.Cloud.define("feedback", function (request, response) {
 
 Parse.Cloud.define("addTakeToolForRent", function (request, response) {
     if (request.params.userid != null && request.params.userid != "") {//if (request.params.nonce != null && request.params.nonce != "" ) {
-        var query = new Parse.Query(Parse.User);
-        query.equalTo("objectId", request.params.userid);  // find all the women
-        query.find({
-            success: function (result) {
+
+        var user = new Parse.User();
+        user.id = request.params.userid;
+        if (request.params.toolId != null && request.params.toolId != "" && request.params.startDate != null && request.params.startDate != "" && request.params.endDate != null && request.params.endDate != "") {
+            var query = new Parse.Query("userDetails");
+            query.equalTo("user", user);
+            query.find().then(function (results) {
+                //success: function (results) {
                 if (result.length > 0) {
-                    var user = new Parse.User();
-                    user.id = request.params.userid;
-                    if (request.params.toolId != null && request.params.toolId != "" && request.params.startDate != null && request.params.startDate != "" && request.params.endDate != null && request.params.endDate != "") {
 
-                        var query = new Parse.Query("userDetails");
-                        query.equalTo("user", user);
-                        query.find().then(function (results) {
-                            //success: function (results) {
-                            if (result.length > 0) {
+                    var userdetailsId = "";
+                    var userdetailsId = results[0].id;
+                    var Userdetails = Parse.Object.extend("userDetails");
+                    var userdetails = new Userdetails();
+                    userdetails.id = userdetailsId;
 
-                                var userdetailsId = "";
-                                var userdetailsId = results[0].id;
-                                var Userdetails = Parse.Object.extend("userDetails");
-                                var userdetails = new Userdetails();
-                                userdetails.id = userdetailsId;
+                    var ToolForRent = Parse.Object.extend("toolForRent");
+                    var query = new Parse.Query(ToolForRent);
+                    query.equalTo("objectId", request.params.toolId);
+                    query.equalTo("isAvailable", "1");
+                    query.find().then(function (toolForRent) {
+                        //success: function (toolForRent) {
+                        if (toolForRent.length > 0) {
 
-                                var ToolForRent = Parse.Object.extend("toolForRent");
-                                var query = new Parse.Query(ToolForRent);
-                                query.equalTo("objectId", request.params.toolId);
-                                query.equalTo("isAvailable", "1");
-                                query.find().then(function (toolForRent) {
-                                    //success: function (toolForRent) {
-                                    if (toolForRent.length > 0) {
+                            var ToolForRent = Parse.Object.extend("toolForRent");
+                            var toolForRent1 = new ToolForRent();
+                            toolForRent1.id = request.params.toolId;
 
-                                        var ToolForRent = Parse.Object.extend("toolForRent");
-                                        var toolForRent1 = new ToolForRent();
-                                        toolForRent1.id = request.params.toolId;
-
-                                        var ToolTakenForRent = Parse.Object.extend("toolTakenForRent");
-                                        var toolTakenForRent = new ToolTakenForRent();
+                            var ToolTakenForRent = Parse.Object.extend("toolTakenForRent");
+                            var toolTakenForRent = new ToolTakenForRent();
 
 
-                                        toolTakenForRent.set("user", user);
-                                        toolTakenForRent.set("userDetailsId", userdetails);
-                                        toolTakenForRent.set("toolRentId", toolForRent1);
-                                        toolTakenForRent.set("toolName", toolForRent[0].get("toolName"));
-                                        toolTakenForRent.set("starteDateTime", request.params.startDate);
-                                        toolTakenForRent.set("endeDateTime", request.params.endDate);
-                                        toolTakenForRent.set("pricePerDay", toolForRent[0].get("pricePerDay"));
-                                        toolTakenForRent.set("isReturned", "0");
-                                        toolTakenForRent.set("isCanceled", "0");
-                                        toolTakenForRent.set("isPaymentDone", "0");
-                                        toolTakenForRent.save(null, {
-                                            success: function (toolTakenForRent) {
-                                                //var ToolForRent = Parse.Object.extend("toolForRent");
-                                                //var toolForRent1 = new ToolForRent();
-                                                //toolForRent1.id = request.params.toolId;
-                                                //toolForRent1.set("isAvailable", "0");
-                                                //toolForRent1.set("isRented", "1");
+                            toolTakenForRent.set("user", user);
+                            toolTakenForRent.set("userDetailsId", userdetails);
+                            toolTakenForRent.set("toolRentId", toolForRent1);
+                            toolTakenForRent.set("toolName", toolForRent[0].get("toolName"));
+                            toolTakenForRent.set("starteDateTime", request.params.startDate);
+                            toolTakenForRent.set("endeDateTime", request.params.endDate);
+                            toolTakenForRent.set("pricePerDay", toolForRent[0].get("pricePerDay"));
+                            toolTakenForRent.set("isReturned", "0");
+                            toolTakenForRent.set("isCanceled", "0");
+                            toolTakenForRent.set("isPaymentDone", "0");
+                            toolTakenForRent.save(null, {
+                                success: function (toolTakenForRent) {
+                                    //var ToolForRent = Parse.Object.extend("toolForRent");
+                                    //var toolForRent1 = new ToolForRent();
+                                    //toolForRent1.id = request.params.toolId;
+                                    //toolForRent1.set("isAvailable", "0");
+                                    //toolForRent1.set("isRented", "1");
 
-                                                //toolForRent1.save();
-                                                response.sucess("tool rented sucess");
-                                            },
-                                            error: function (error) {
-                                                response.error(error);
-                                            }
-                                        });
-                                    }
-                                    else {
-                                        response.error("tool not available");
-                                    }
-                                });
-                            }
-                            else {
-                                response.error("User details not found, please update your profile");
-                            }
-                        }, function (error) {
-                            response.error("Error: " + error.code + " " + error.message);
-                        });
-                    }
-                    else {
-                        response.error("some missing request parameters");
-                    }
-
+                                    //toolForRent1.save();
+                                    response.sucess("tool rented sucess");
+                                },
+                                error: function (error) {
+                                    response.error(error);
+                                }
+                            });
+                        }
+                        else {
+                            response.error("tool not available");
+                        }
+                    });
                 }
                 else {
-                    response.error("user not found");
+                    response.error("User details not found, please update your profile");
                 }
-            }
-
-        });
+            }, function (error) {
+                response.error("Error: " + error.code + " " + error.message);
+            });
+        }
+        else {
+            response.error("some missing request parameters");
+        }
 
     }
+
+
     else {
         response.error("userid is required");
     }
