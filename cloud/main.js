@@ -606,7 +606,7 @@ Parse.Cloud.define("addTool", function (request, response) {
                                 toolForRent.set("moreTimeAllowed", request.params.moretimeallowed);
                                 toolForRent.save(null, {
                                     success: function (toolForRent) {
-                                        response.sucess("Tool added sucess");
+                                        response.success("Tool added sucess");
                                     },
                                     error: function (error) {
                                         response.error("error occured");
