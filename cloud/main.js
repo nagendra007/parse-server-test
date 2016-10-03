@@ -633,6 +633,40 @@ Parse.Cloud.define("addTool", function (request, response) {
 });
 
 Parse.Cloud.define("sendEmail", function (request, response) {
+    var mandrill = require('mandrill-api/mandrill');
+    var mandrill_client = new mandrill.Mandrill('bGUnQ6_ltOqp4rkonKZO7Q');
+
+    var message = {
+        "html": "<p>Example HTML content nagendra</p>",
+        "text": "Example text content",
+        "subject": "example subject",
+        "from_email": "nagendra.singh@ninedots.com",
+        "from_name": "sender test",
+        "to": [{
+            "email": "nagendra.singh@ninedots.com",
+            "name": "nagendra",
+            "type": "to"
+        }]
+    };
+    var async = false;
+    var ip_pool = "Main Pool";
+    var send_at = "example send_at";
+    mandrill_client.messages.send({ "message": message, "async": async }, function (result) {//, "ip_pool": ip_pool, "send_at": send_at
+        response.success(result);
+        /*
+        [{
+                "email": "recipient.email@example.com",
+                "status": "sent",
+                "reject_reason": "hard-bounce",
+                "_id": "abc123abc123abc123abc123abc123"
+            }]
+        */
+    }, function (e) {
+        response.success(e);
+        // Mandrill returns the error as an object with name and message keys
+        console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
+        // A mandrill error occurred: Unknown_Subaccount - No subaccount exists with the id 'customer-123'
+    });
     //var Mandrill = require('mandrill');
     //Mandrill.initialize('MANDRILL_KEY');
     //Mandrill.sendEmail({
@@ -659,33 +693,33 @@ Parse.Cloud.define("sendEmail", function (request, response) {
     //}
     //);
 
-    var Mandrill = require('cloud/mandrillTemplateSend.js');
+    //var Mandrill = require('cloud/mandrillTemplateSend.js');
 
-    Mandrill.initialize('bGUnQ6_ltOqp4rkonKZO7Q');
-    Mandrill.sendTemplate({
-        template_name: request.params.templateName,
-        template_content: [{
-            name: "test",
-            content: "hi hello" //Those are required but they are ignored
-        }],
-        message: {
-            to: [{
-                email: request.params.toEmail,
-                name: request.params.toName
-            }],
-            important: true
-        },
-        async: false
-    }, {
-        success: function (httpResponse) {
-            console.log(httpResponse);
-            response.success("Email sent!");
-        },
-        error: function (httpResponse) {
-            console.error(httpResponse);
-            response.error("Uh oh, something went wrong");
-        }
-    });
+    //Mandrill.initialize('bGUnQ6_ltOqp4rkonKZO7Q');
+    //Mandrill.sendTemplate({
+    //    template_name: request.params.templateName,
+    //    template_content: [{
+    //        name: "test",
+    //        content: "hi hello" //Those are required but they are ignored
+    //    }],
+    //    message: {
+    //        to: [{
+    //            email: request.params.toEmail,
+    //            name: request.params.toName
+    //        }],
+    //        important: true
+    //    },
+    //    async: false
+    //}, {
+    //    success: function (httpResponse) {
+    //        console.log(httpResponse);
+    //        response.success("Email sent!");
+    //    },
+    //    error: function (httpResponse) {
+    //        console.error(httpResponse);
+    //        response.error("Uh oh, something went wrong");
+    //    }
+    //});
 });
 
 
