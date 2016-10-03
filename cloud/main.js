@@ -828,13 +828,13 @@ Parse.Cloud.define("addTakeToolForRent", function (request, response) {
                         toolTakenForRent.set("isPaymentDone", "0");
                         toolTakenForRent.save(null, {
                             success: function (toolTakenForRent) {
-                                //var ToolForRent = Parse.Object.extend("toolForRent");
-                                //var toolForRent1 = new ToolForRent();
-                                //toolForRent1.id = request.params.toolId;
-                                //toolForRent1.set("isAvailable", "0");
-                                //toolForRent1.set("isRented", "1");
+                                var ToolForRent = Parse.Object.extend("toolForRent");
+                                var toolForRent1 = new ToolForRent();
+                                toolForRent1.id = request.params.toolId;
+                                toolForRent1.set("isAvailable", "0");
+                                toolForRent1.set("isRented", "1");
 
-                                //toolForRent1.save();
+                                toolForRent1.save();
                                 response.success("tool rented sucess");
                             },
                             error: function (error) {
