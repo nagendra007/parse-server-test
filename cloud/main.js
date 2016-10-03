@@ -574,8 +574,8 @@ Parse.Cloud.define("addTool", function (request, response) {
 
         var query = new Parse.Query("userDetails");
         query.equalTo("user", user);
-        query.find().then(function (result) {
-            if (result.length > 0) {
+        query.find().then(function (results) {
+            if (results.length > 0) {
 
                 if (request.params.categoryId != null && request.params.categoryId != "" && request.params.subcategoryId != null && request.params.subcategoryId != "" && request.params.amount != null && request.params.amount != "" && request.params.desc != null && request.params.desc != "" && request.params.make != null && request.params.make != "" && request.params.moretimeallowed != null && request.params.moretimeallowed != "" && request.params.imageURL != null && request.params.imageURL != "" && request.params.toolName != null && request.params.toolName != "") {
 
