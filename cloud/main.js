@@ -106,8 +106,6 @@ Parse.Cloud.define("braintreepaynew", function (request, response) {
                             }, function (err, result) {
                                 if (result.success == true) {
 
-                                   
-
                                     var UserPayment = Parse.Object.extend("userPayment");
                                     var userPayment = new UserPayment();
                                     userPayment.set("user", user);
@@ -115,13 +113,16 @@ Parse.Cloud.define("braintreepaynew", function (request, response) {
                                     userPayment.set("amount", result.transaction.amount);
                                     userPayment.save(null, {
                                         success: function (userPayment) {
-                                            response.success(userPayment);
-                                            //var toolTakenForRent = new ToolTakenForRent();
-                                            //toolTakenForRent.id = request.params.toolTakenForRentID;
-                                            //toolTakenForRent.set("isPaymentDone", "1");
-                                            //toolTakenForRent.set("userPaymentId", userPayment);
+                                            //response.success(userPayment);
 
-                                            //response.success("payment done successfuly");
+                                            var userPayment = new UserPayment();
+                                            userPayment.id = userPayment.id;
+                                            var toolTakenForRent = new ToolTakenForRent();
+                                            toolTakenForRent.id = request.params.toolTakenForRentID;
+                                            toolTakenForRent.set("isPaymentDone", "1");
+                                            toolTakenForRent.set("userPaymentId", userPayment);
+                                            toolTakenForRent.save();
+                                            response.success("payment done successfuly");
                                         },
                                         error: function (error) {
                                             response.error("error in adding card in collection");
