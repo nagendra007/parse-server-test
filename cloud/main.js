@@ -665,8 +665,8 @@ Parse.Cloud.define("sendEmail", function (request, response) {
     Mandrill.sendTemplate({
         template_name: request.params.templateName,
         template_content: [{
-            name: "example name",
-            content: "example content" //Those are required but they are ignored
+            name: "test",
+            content: "hi hello" //Those are required but they are ignored
         }],
         message: {
             to: [{
