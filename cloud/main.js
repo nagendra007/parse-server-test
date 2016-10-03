@@ -835,7 +835,7 @@ Parse.Cloud.define("addTakeToolForRent", function (request, response) {
                                 //toolForRent1.set("isRented", "1");
 
                                 //toolForRent1.save();
-                                response.sucess("tool rented sucess");
+                                response.success("tool rented sucess");
                             },
                             error: function (error) {
                                 response.error(error);
