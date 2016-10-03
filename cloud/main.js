@@ -16,12 +16,14 @@ Parse.Cloud.define("braintreepay", function (request, response) {
     if (request.params.userid != null && request.params.userid != "" && request.params.BTcustomerid != null && request.params.BTcustomerid != "" && request.params.BTcardid != null && request.params.BTcardid != "" && request.params.amount != null && request.params.amount != "" && request.params.toolTakenForRentID != null && request.params.toolTakenForRentID != "") {
         var user = new Parse.User();
         user.id = request.params.userid;
-        var query = new Parse.Query("userDetails");
-        query.include('user');
-        query.equalTo("user", user);
+
+
+        var query = new Parse.Query(Parse.User);
+        query.equalTo("objectId", request.params.userid);
         query.find({
-            success: function (results) {
-                if (results.length > 0) {
+            success: function (result) {
+                if (result.length > 0) {
+
 
                     gateway.transaction.sale({
                         amount: request.params.amount,
@@ -34,9 +36,9 @@ Parse.Cloud.define("braintreepay", function (request, response) {
                     }, function (err, result) {
                         if (result.success == true) {
 
-                            //var ToolTakenForRent = Parse.Object.extend("toolTakenForRent");
-                            //var toolTakenForRent = new ToolTakenForRent();
-                            //toolTakenForRent.id = request.params.toolTakenForRentID;
+                            var ToolTakenForRent = Parse.Object.extend("toolTakenForRent");
+                            var toolTakenForRent = new ToolTakenForRent();
+                            toolTakenForRent.id = request.params.toolTakenForRentID;
 
                             var UserPayment = Parse.Object.extend("userPayment");
                             var userPayment = new UserPayment();
@@ -56,6 +58,87 @@ Parse.Cloud.define("braintreepay", function (request, response) {
                         else {
                             response.error(err);
                         }
+                    });
+                }
+                else {
+                    response.error("User not found");
+                }
+            },
+            error: function (error) {
+                response.error("Error: " + error.code + " " + error.message);
+            }
+        });
+    }
+    else {
+        response.error("all Params are required");
+    }
+});
+
+
+Parse.Cloud.define("braintreepaynew", function (request, response) {
+    if (request.params.userid != null && request.params.userid != "" && request.params.BTcustomerid != null && request.params.BTcustomerid != "" && request.params.BTcardid != null && request.params.BTcardid != "" && request.params.amount != null && request.params.amount != "" && request.params.toolTakenForRentID != null && request.params.toolTakenForRentID != "") {
+        
+
+        var query = new Parse.Query(Parse.User);
+        query.equalTo("objectId", request.params.userid);
+        query.find({
+            success: function (result) {
+                if (result.length > 0) {
+
+                    var user = new Parse.User();
+                    user.id = request.params.userid;
+
+
+                    var ToolTakenForRent = Parse.Object.extend("toolTakenForRent");
+                    var query = new Parse.Query(ToolTakenForRent);
+                    query.equalTo("user", user);
+                    query.equalTo("objectId", request.params.toolTakenForRentID);
+                    query.find().then(function (toolTakenForRent) {
+                        if (toolTakenForRent.length > 0) {
+                            gateway.transaction.sale({
+                                amount: request.params.amount,
+                                //paymentMethodNonce: request.params.nonce,
+                                CustomerId: request.params.BTcustomerid,// balcustomerid,
+                                PaymentMethodToken: request.params.BTcardid,
+                                options: {
+                                    submitForSettlement: true
+                                }
+                            }, function (err, result) {
+                                if (result.success == true) {
+
+                                   
+
+                                    var UserPayment = Parse.Object.extend("userPayment");
+                                    var userPayment = new UserPayment();
+                                    userPayment.set("user", user);
+                                    userPayment.set("txnId", result.transaction.id);
+                                    userPayment.set("amount", result.transaction.amount);
+                                    userPayment.save(null, {
+                                        success: function (userPayment) {
+                                            response.success(userPayment);
+                                            //var toolTakenForRent = new ToolTakenForRent();
+                                            //toolTakenForRent.id = request.params.toolTakenForRentID;
+                                            //toolTakenForRent.set("isPaymentDone", "1");
+                                            //toolTakenForRent.set("userPaymentId", userPayment);
+
+                                            //response.success("payment done successfuly");
+                                        },
+                                        error: function (error) {
+                                            response.error("error in adding card in collection");
+                                        }
+                                    });
+
+                                }
+                                else {
+                                    response.error(err);
+                                }
+                            });
+                        }
+                        else {
+                            response.error("taken tool not found");
+                        }
+                    }, function (error) {
+                        response.error("error occured");
                     });
                 }
                 else {
@@ -275,241 +358,6 @@ Parse.Cloud.define("setPrimaryCreditCard", function (request, response) {
     }
     else {
         response.error("please pass request params");
-    }
-});
-
-Parse.Cloud.define("addUpdateUserdetailsTest", function (request, response) {
-    if (request.params.userid != null && request.params.userid != "") {
-        var query = new Parse.Query(Parse.User);
-        query.equalTo("objectId", request.params.userid);
-        query.find({
-            success: function (result) {
-                if (result.length > 0) {
-
-                    var user = new Parse.User();
-                    user.id = request.params.userid;
-
-                    var UserDetails = Parse.Object.extend("userDetails");
-                    //var userDetails1 = new UserDetails();
-                    var query = new Parse.Query(UserDetails);
-                    query.equalTo("user", user);
-                    query.find().then(function (userDetailss) {
-                        
-                        if (userDetailss.length > 0) {
-                            var point = new Parse.GeoPoint(19.2403, 73.1305);
-                            var myid = "";
-                            myid = userDetailss[0].id;
-                            var UserDetails1 = Parse.Object.extend("userDetails");
-                            var userDetails2 = new UserDetails();
-                            userDetails2.id = myid;//"snlWbSHB1P";  //   userDetailss[0].id;//
-
-                            if (request.params.firstName != null && request.params.firstName != "") {
-                                userDetails2.set("firstName", request.params.firstName);
-                            }
-                            if (request.params.lastName != null && request.params.lastName != "") {
-                                userDetails2.set("lastName", "");
-                            }
-                            if (request.params.dob != null && request.params.dob != "") {
-                                userDetails2.set("dob", request.params.dob);
-                            }
-                            if (request.params.gender != null && request.params.gender != "") {
-                                userDetails2.set("gender", request.params.gender);
-                            }
-                            if (request.params.imageURL != null && request.params.imageURL != "") {
-                                userDetails2.set("imageURL", request.params.imageURL);
-                            }
-                            if (request.params.phoneNo != null && request.params.phoneNo != "") {
-                                userDetails2.set("phoneNo", request.params.phoneNo);
-                            }
-                            if (request.params.altPhoneNo != null && request.params.altPhoneNo != "") {
-                                userDetails2.set("altPhoneNo", request.params.altPhoneNo);
-                            }
-                            if (request.params.address != null && request.params.address != "") {
-                                userDetails2.set("address", request.params.address);
-                            }
-                            if (request.params.city != null && request.params.city != "") {
-                                userDetails2.set("city", request.params.city);
-                            }
-                            if (request.params.zipCode != null && request.params.zipCode != "") {
-                                userDetails2.set("zipCode", request.params.zipCode);
-                            }
-                            if (request.params.state != null && request.params.state != "") {
-                                userDetails2.set("state", request.params.state);
-                            }
-                            userDetails2.set("location", point);
-                            userDetails2.save({
-                                success: function (results) {
-                                    response.success(results);
-                                },
-                                error: function (error) {
-                                    response.error("Error: " + error.code + " " + error.message);
-                                }
-                            });
-                            //userDetails2.save().then(function (results) {
-                            //    response.success(results);
-                            //},
-                            //function (error) {
-                            //    response.error("Error: " + error.code + " " + error.message);
-                            //});
-
-                           // response.success("update success");
-                        }
-                        else {
-                            //var UserDetailstest = Parse.Object.extend("userDetails");
-                           var point = new Parse.GeoPoint(19.2403, 73.1305);
-                            var myid = "";
-                            var user = new Parse.User();
-                            user.id = request.params.userid;
-                            var UserDetails = Parse.Object.extend("userDetails");
-                            var userDetailstest = new UserDetails();
-                            //userDetailstest.id = myid;
-                            if (request.params.email != null && request.params.email != "") {
-                                userDetailstest.set("email", request.params.email);
-                            }
-                            if (request.params.firstName != null && request.params.firstName != "") {
-                                userDetailstest.set("firstName", request.params.firstName);
-                            }
-                            if (request.params.lastName != null && request.params.lastName != "") {
-                                userDetailstest.set("lastName", request.params.lastName);
-                            }
-                            if (request.params.dob != null && request.params.dob != "") {
-                                userDetailstest.set("dob", request.params.dob);
-                            }
-                            if (request.params.gender != null && request.params.gender != "") {
-                                userDetailstest.set("gender", request.params.gender);
-                            }
-                            if (request.params.imageURL != null && request.params.imageURL != "") {
-                                userDetailstest.set("imageURL", request.params.imageURL);
-                            }
-                            //userDetails.set("imageName", parseFile);
-                            userDetailstest.set("isVerified", "1");
-                            userDetailstest.set("scanDocId", "");
-                            if (request.params.phoneNo != null && request.params.phoneNo != "") {
-                                userDetailstest.set("phoneNo", request.params.phoneNo);
-                            }
-                            if (request.params.altPhoneNo != null && request.params.altPhoneNo != "") {
-                                userDetailstest.set("altPhoneNo", request.params.altPhoneNo);
-                            }
-                            if (request.params.address != null && request.params.address != "") {
-                                userDetailstest.set("address", request.params.address);
-                            }
-                            if (request.params.city != null && request.params.city != "") {
-                                userDetailstest.set("city", request.params.city);
-                            }
-                            if (request.params.zipCode != null && request.params.zipCode != "") {
-                                userDetailstest.set("zipCode", request.params.zipCode);
-                            }
-                            if (request.params.state != null && request.params.state != "") {
-                                userDetailstest.set("state", request.params.state);
-                            }
-                            userDetailstest.set("location", point);
-                            userDetailstest.set("user", user);
-
-                            //userDetailstest.save({
-                            //    success: function (results) {
-                            //        response.success(results);
-                            //    },
-                            //    error: function (error) {
-                            //        response.error("Error: " + error.code + " " + error.message);
-                            //    }
-                            //});
-
-                            userDetailstest.save(null, {
-                                success: function (userDetailstest) {
-                                    response.success(userDetailstest);
-                                },
-                                error: function (error) {
-                                    response.error("error in adding card in collection");
-                                }
-                            });
-                        }
-                    });
-                    //response.success("Add success");
-                }
-                else {
-                    response.error("user not found");
-                }
-            }
-        });
-    }
-    else {
-        response.error("please provide userid");
-    }
-});
-
-Parse.Cloud.define("addUpdateUserdetailsNew", function (request, response) {
-    if (request.params.userid != null && request.params.userid != "") {
-        var point = new Parse.GeoPoint(19.2403, 73.1305);
-        var myid = "";
-        var user = new Parse.User();
-        user.id = request.params.userid;
-        var UserDetails = Parse.Object.extend("userDetails");
-        var userDetailstest = new UserDetails();
-        //userDetailstest.id = myid;
-        if (request.params.email != null && request.params.email != "") {
-            userDetailstest.set("email", request.params.email);
-        }
-        if (request.params.firstName != null && request.params.firstName != "") {
-            userDetailstest.set("firstName", request.params.firstName);
-        }
-        if (request.params.lastName != null && request.params.lastName != "") {
-            userDetailstest.set("lastName", request.params.lastName);
-        }
-        if (request.params.dob != null && request.params.dob != "") {
-            userDetailstest.set("dob", request.params.dob);
-        }
-        if (request.params.gender != null && request.params.gender != "") {
-            userDetailstest.set("gender", request.params.gender);
-        }
-        if (request.params.imageURL != null && request.params.imageURL != "") {
-            userDetailstest.set("imageURL", request.params.imageURL);
-        }
-        //userDetails.set("imageName", parseFile);
-        userDetailstest.set("isVerified", "1");
-        userDetailstest.set("scanDocId", "");
-        if (request.params.phoneNo != null && request.params.phoneNo != "") {
-            userDetailstest.set("phoneNo", request.params.phoneNo);
-        }
-        if (request.params.altPhoneNo != null && request.params.altPhoneNo != "") {
-            userDetailstest.set("altPhoneNo", request.params.altPhoneNo);
-        }
-        if (request.params.address != null && request.params.address != "") {
-            userDetailstest.set("address", request.params.address);
-        }
-        if (request.params.city != null && request.params.city != "") {
-            userDetailstest.set("city", request.params.city);
-        }
-        if (request.params.zipCode != null && request.params.zipCode != "") {
-            userDetailstest.set("zipCode", request.params.zipCode);
-        }
-        if (request.params.state != null && request.params.state != "") {
-            userDetailstest.set("state", request.params.state);
-        }
-        userDetailstest.set("location", point);
-        userDetailstest.set("user", user);
-
-        //userDetailstest.save({
-        //    success: function (results) {
-        //        response.success(results);
-        //    },
-        //    error: function (error) {
-        //        response.error("Error: " + error.code + " " + error.message);
-        //    }
-        //});
-
-        userDetailstest.save(null, {
-            success: function (userDetailstest) {
-                response.success(userDetailstest);
-            },
-            error: function (error) {
-                response.error("error in adding card in collection");
-            }
-        });
-
-
-    }
-    else {
-        response.error("please provide userid");
     }
 });
 
