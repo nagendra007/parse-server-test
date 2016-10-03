@@ -634,7 +634,7 @@ Parse.Cloud.define("addTool", function (request, response) {
 
 Parse.Cloud.define("sendEmail", function (request, response) {
     var mandrill = require('mandrill-api/mandrill');
-    var mandrill_client = new mandrill.Mandrill('bGUnQ6_ltOqp4rkonKZO7Q');
+    var mandrill_client = new mandrill.Mandrill('524eb66b5ed31021f065ffea4ef0a220');//'bGUnQ6_ltOqp4rkonKZO7Q');
 
     var message = {
         "html": "<p>Example HTML content nagendra</p>",
