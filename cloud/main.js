@@ -556,12 +556,6 @@ Parse.Cloud.define("getuserdetails", function (request, response) {
     }
 });
 
-
-
-
-
-
-
 Parse.Cloud.define("addTool", function (request, response) {
     if (request.params.userid != null && request.params.userid != "") {
         var query = new Parse.Query(Parse.User);
@@ -637,6 +631,64 @@ Parse.Cloud.define("addTool", function (request, response) {
         response.error("userid is required");
     }
 });
+
+Parse.Cloud.define("sendEmail", function (request, response) {
+    //var Mandrill = require('mandrill');
+    //Mandrill.initialize('MANDRILL_KEY');
+    //Mandrill.sendEmail({
+    //    message: {
+    //        text: request.params.text,
+    //        subject: "Parse and Mandrill!",
+    //        from_email: "email@example.com",
+    //        from_name: "Name",
+    //        to: [
+    //            {
+    //                email: request.params.email,
+    //                name: "Some Name"
+    //            }
+    //        ]
+    //    },
+    //    async: true
+    //}, {
+    //    success: function (httpResponse) {
+    //        response.success("email sent");
+    //    },
+    //    error: function (httpResponse) {
+
+    //    }
+    //}
+    //);
+
+    var Mandrill = require('cloud/mandrillTemplateSend.js');
+
+    Mandrill.initialize('bGUnQ6_ltOqp4rkonKZO7Q');
+    Mandrill.sendTemplate({
+        template_name: request.params.templateName,
+        template_content: [{
+            name: "example name",
+            content: "example content" //Those are required but they are ignored
+        }],
+        message: {
+            to: [{
+                email: request.params.toEmail,
+                name: request.params.toName
+            }],
+            important: true
+        },
+        async: false
+    }, {
+        success: function (httpResponse) {
+            console.log(httpResponse);
+            response.success("Email sent!");
+        },
+        error: function (httpResponse) {
+            console.error(httpResponse);
+            response.error("Uh oh, something went wrong");
+        }
+    });
+});
+
+
 Parse.Cloud.define("getTools", function (request, response) {
     if (request.params.userid != null && request.params.userid != "") {
         var user = new Parse.User();
@@ -803,6 +855,9 @@ Parse.Cloud.define("feedback", function (request, response) {
         response.error("userid missing in request");
     }
 });
+
+
+
 
 
 
