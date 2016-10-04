@@ -902,22 +902,37 @@ Parse.Cloud.define("getSubCategory", function (request, response) {
 });
 
 Parse.Cloud.define("uploadImage", function (request, response) {
-    var file = new Parse.File("logo.png", {
-        base64: request.body.image
-    });
+    if (request.params.fileName != null && request.params.fileName != "" && request.params.base64 != null && request.params.base64 != "") {
 
-    //file.save().then(function () {
-    //    response.success( file.url());
+        var parseFile = new Parse.File(name, { base64: request.params.base64 });
+        parseFile.save().then(function (parseFile) {
+            var url = parseFile.url();
+            response.success(file.url());
+        }, function (error) {
+            response.error(error);
+        });
+    }
+    else {
+        response.error("missing file parameters");
+    }
 
+
+    //var file = new Parse.File("logo.png", {
+    //    base64: request.body.image
     //});
 
-    //var parseFile = new Parse.File(name, file);
-    file.save().then(function (parseFile) {
-        var url = parseFile.url();
-        response.success(url);
-    }, function (error) {
-        response.success(error);
-    });
+    ////file.save().then(function () {
+    ////    response.success( file.url());
+
+    ////});
+
+    ////var parseFile = new Parse.File(name, file);
+    //file.save().then(function (parseFile) {
+    //    var url = parseFile.url();
+    //    response.success(url);
+    //}, function (error) {
+    //    response.success(error);
+    //});
 
 
     //if (req.params.image) {
