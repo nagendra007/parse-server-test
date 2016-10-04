@@ -935,11 +935,32 @@ Parse.Cloud.define("uploadImage", function (request, response) {
     //});
 
 
-    //if (req.params.image) {
-    //    console.log("data found12345");
-    //}
+    
 });
 
+Parse.Cloud.define("getToolDetails", function (request, response) {
+    if ( request.params.toolId != null && request.params.toolId != "") {
+        var user = new Parse.User();
+        user.id = request.params.userid;
+        var ToolForRent = Parse.Object.extend("toolForRent");
+        var query = new Parse.Query(ToolForRent);
+        //query.equalTo("user", user);
+        //query.equalTo("isAvailable", "1");
+        query.equalTo("objectId", request.params.toolId);
+        query.include("userDetailsId");
+        query.find({
+            success: function (toolForRent) {
+                response.success(toolForRent);
+            },
+            error: function (error) {
+                response.error("error occured");
+            }
+        });
+    }
+    else {
+        response.error("userid missing in request");
+    }
+});
 
 
 
