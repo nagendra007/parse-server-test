@@ -64,9 +64,10 @@ app.get('/test', function(req, res) {
 });
 
 app.get('/client_token', function (req, res) {
-    gateway.clientToken.generate({}, function (err, response) {
-        res.send(response.clientToken);
-    });
+    //gateway.clientToken.generate({}, function (err, response) {
+    //    res.send(response.clientToken);
+    //});
+    res.status(200).send('I dream of being a website.  Please star the parse-server repo on GitHub!');
 });
 //app.post("/checkout", function (req, res) {
 //    var nonceFromTheClient = req.body.payment_method_nonce;
