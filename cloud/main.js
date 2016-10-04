@@ -962,7 +962,47 @@ Parse.Cloud.define("getToolDetails", function (request, response) {
     }
 });
 
+Parse.Cloud.define("uploadImageBlob", function (request, response) {
+    if (request.params.fileName != null && request.params.fileName != "" && request.params.base64 != null && request.params.base64 != "") {
+        var azure = require('azure-storage');
+        var blobSvc = azure.createBlobService("isazurestore", "pRzLhNX1f0uxa/zJq7eHGEItUV7QLZpyATYxOjqMGmHDRuW7OpngVPXlicmuO1MOjP9oGS4mHRodlOHAnjuWTA==");
+        blobSvc.createContainerIfNotExists('toolio', function (error, result, response) {
+            if (!error) {
+                response.error(error);
+            }
 
+        });
+        var uploadOptions = {
+            container: 'toolio',
+            blob: request.params.fileName,
+            text: request.params.base64
+        }
+
+        blobSvc.createBlockBlobFromText(uploadOptions.container,
+                                           uploadOptions.blob,
+                                           uploadOptions.text,
+                      {
+                          contentType: 'image/jpeg',
+                          contentEncoding: 'base64'
+                      },
+                      function (error, result, response) {
+                          if (error) {
+                              response.error(error);
+                          }
+                          var data = {
+                              result: result,
+                              response: response
+                          }
+                          response.success(data);
+                      });
+
+    }
+    else {
+        response.error("missing file parameters");
+    }
+
+
+});
 
 Parse.Cloud.define("sendEmail", function (request, response) {
     var mandrill = require('mandrill-api/mandrill');
