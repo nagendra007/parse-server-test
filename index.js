@@ -63,11 +63,11 @@ app.get('/test', function(req, res) {
   res.sendFile(path.join(__dirname, '/public/test.html'));
 });
 
-//app.get("/client_token", function (req, res) {
-//    gateway.clientToken.generate({}, function (err, response) {
-//        res.send(response.clientToken);
-//    });
-//});
+app.get("/client_token", function (req, res) {
+    gateway.clientToken.generate({}, function (err, response) {
+        res.send(response.clientToken);
+    });
+});
 //app.post("/checkout", function (req, res) {
 //    var nonceFromTheClient = req.body.payment_method_nonce;
     // Use payment method nonce here

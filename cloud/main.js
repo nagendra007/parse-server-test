@@ -962,47 +962,128 @@ Parse.Cloud.define("getToolDetails", function (request, response) {
     }
 });
 
-//Parse.Cloud.define("uploadImageBlob", function (request, response) {
-//    if (request.params.fileName != null && request.params.fileName != "" && request.params.base64 != null && request.params.base64 != "") {
-//        var azure = require('azure-storage');
-//        var blobSvc = azure.createBlobService("isazurestore", "pRzLhNX1f0uxa/zJq7eHGEItUV7QLZpyATYxOjqMGmHDRuW7OpngVPXlicmuO1MOjP9oGS4mHRodlOHAnjuWTA==");
-//        blobSvc.createContainerIfNotExists('toolio', function (error, result, response) {
-//            if (!error) {
-//                response.error(error);
-//            }
+Parse.Cloud.define("setDeviceToken", function (request, response) {
+    if (request.params.userid != null && request.params.userid != "" && request.params.deviceToken != null && request.params.deviceToken != "" && request.params.deviceType != null && request.params.deviceType != "") {
+        var user = new Parse.User();
+        user.id = request.params.userid;
+        var query = new Parse.Query(Parse.User);
+        query.equalTo("objectId", request.params.userid);  // find all the women
+        query.find({
+            success: function (result) {
+                if (result.length > 0) {
+                    var query = new Parse.Query(Parse.Installation);
+                    query.equalTo('user', user);
+                    query.equalTo('deviceToken', request.params.deviceToken);
+                    query.equalTo('deviceType', request.params.deviceType);
+                    query.find().then(function (result) {
+                        if (result.length > 0)
+                        {
+                            response.success("Device already registered");
+                        }
+                        else {
+                            var installationQuery = Parse.Installation;
+                            var abc = new installationQuery();
+                            abc.set('deviceToken', request.params.deviceToken);
+                            abc.set('deviceType', request.params.deviceType);
 
-//        });
-//        var uploadOptions = {
-//            container: 'toolio',
-//            blob: request.params.fileName,
-//            text: request.params.base64
-//        }
+                            abc.set('user', user);
+                            abc.save();
 
-//        blobSvc.createBlockBlobFromText(uploadOptions.container,
-//                                           uploadOptions.blob,
-//                                           uploadOptions.text,
-//                      {
-//                          contentType: 'image/jpeg',
-//                          contentEncoding: 'base64'
-//                      },
-//                      function (error, result, response) {
-//                          if (error) {
-//                              response.error(error);
-//                          }
-//                          var data = {
-//                              result: result,
-//                              response: response
-//                          }
-//                          response.success(data);
-//                      });
+                            response.success("device added success");
+                        }
+                       
+                    }, function (error) {
+                        response.error("user not found");
+                    });
 
-//    }
-//    else {
-//        response.error("missing file parameters");
-//    }
+                }
+                else {
+                    response.error("user not found");
+                }
+            },
+            error: function (error) {
+                response.error("error occured");
+            }
+        });
+
+    }
+    else {
+        response.error("userid missing in request");
+    }
+});
+
+Parse.Cloud.define("sendPushMeesage", function (request, response) {
+    if (request.params.userid != null && request.params.userid != "") {
+        var user = new Parse.User();
+        user.id = request.params.userid;
+        var query = new Parse.Query(Parse.User);
+        query.equalTo("objectId", request.params.userid);  // find all the women
+        query.find({
+            success: function (result) {
+                if (result.length > 0) {
+
+                    var query = new Parse.Query(Parse.Installation);
+                    query.equalTo('user', user);
+
+                    Parse.Push.send({
+                        where: query, // Set our Installation query
+                        data: {
+                            alert: "Hey you tool time is going to out."
+                        }
+                    }, {
+                        success: function () {
+                            response.success("Push was successful");
+                        },
+                        error: function (error) {
+                            response.error(error);
+                        },
+                        useMasterKey: true
+                    });
+
+                }
+                else {
+                    response.error("user not found");
+                }
+            },
+            error: function (error) {
+                response.error("error occured");
+            }
+        });
+
+    }
+    else {
+        response.error("userid missing in request");
+    }
+});
+
+Parse.Cloud.define("uploadImageBlob", function (request, response) {
+    if (request.params.fileName != null && request.params.fileName != "" && request.params.base64 != null && request.params.base64 != "" && request.params.contentType != null && request.params.contentType != "") {
+        var azure = require('azure-storage');
+        var blobSvc = azure.createBlobService("isazurestore", "pRzLhNX1f0uxa/zJq7eHGEItUV7QLZpyATYxOjqMGmHDRuW7OpngVPXlicmuO1MOjP9oGS4mHRodlOHAnjuWTA==");
+        //var blobSvc = azure.createBlobService("bbazurestore", "G+bJuIymQk/BXUNy8SFnnBSj9O5Li22GosaCPy6reG/M+Hjsby6Zu7efv0YOa/LpudE7CVCWQX+Crn1d8XVDBg==");
+        blobSvc.createContainerIfNotExists('toolio', function (error, result, response1) {
+            if (!error) {
+               //response.error(error);
+            }
+            //response.success(response1);
+        });
+        blobSvc.createBlockBlobFromText('toolio', request.params.fileName, request.params.base64, { contentType: 'image/png', contentEncoding: 'base64' },
+                      function (error, result, response1) {
+                          if (error) {
+                              response.error(error);
+                          }
+                          response.success(response1);
+                      });
+
+    }
+    else {
+        response.error("missing file parameters");
+    }
 
 
-//});
+});
+
+
 
 Parse.Cloud.define("sendEmail", function (request, response) {
     var mandrill = require('mandrill-api/mandrill');
@@ -1118,6 +1199,9 @@ Parse.Cloud.define("sendEmail", function (request, response) {
     //    }
     //});
 });
+
+
+
 
 
 
