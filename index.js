@@ -57,13 +57,17 @@ app.get('/', function(req, res) {
   res.status(200).send('I dream of being a website.  Please star the parse-server repo on GitHub!');
 });
 
+app.get('/me', function (req, res) {
+    res.status(200).send('Awesome!');
+});
+
 // There will be a test page available on the /test path of your server url
 // Remove this before launching your app
 app.get('/test', function(req, res) {
   res.sendFile(path.join(__dirname, '/public/test.html'));
 });
 
-app.get('/client_token', function (req, res) {
+app.get('/clienttoken', function (req, res) {
     //gateway.clientToken.generate({}, function (err, response) {
     //    res.send(response.clientToken);
     //});
