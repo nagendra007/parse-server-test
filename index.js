@@ -63,7 +63,7 @@ app.get('/test', function(req, res) {
   res.sendFile(path.join(__dirname, '/public/test.html'));
 });
 
-app.get("/client_token", function (req, res) {
+app.get('/client_token', function (req, res) {
     gateway.clientToken.generate({}, function (err, response) {
         res.send(response.clientToken);
     });

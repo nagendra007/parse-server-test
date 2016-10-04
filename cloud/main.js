@@ -74,7 +74,6 @@ Parse.Cloud.define("braintreepayold", function (request, response) {
     }
 });
 
-
 Parse.Cloud.define("toolpayment", function (request, response) {
     if (request.params.userid != null && request.params.userid != "" && request.params.BTcustomerid != null && request.params.BTcustomerid != "" && request.params.BTcardid != null && request.params.BTcardid != "" && request.params.amount != null && request.params.amount != "" && request.params.toolTakenForRentID != null && request.params.toolTakenForRentID != "") {
 
@@ -361,7 +360,6 @@ Parse.Cloud.define("setPrimaryCreditCard", function (request, response) {
     }
 });
 
-
 Parse.Cloud.define("addUpdateUserdetails", function (request, response) {
     if (request.params.userid != null && request.params.userid != "") {
         var query = new Parse.Query(Parse.User);
@@ -542,7 +540,6 @@ Parse.Cloud.define("search", function (request, response) {
         response.error("all Params are required");
     }
 });
-
 
 Parse.Cloud.define("getuserdetails", function (request, response) {
     if (request.params.userid != null && request.params.userid != "") {//if (request.params.nonce != null && request.params.nonce != "" ) {
@@ -961,6 +958,12 @@ Parse.Cloud.define("getToolDetails", function (request, response) {
         response.error("userid missing in request");
     }
 });
+
+
+
+
+
+
 
 Parse.Cloud.define("setDeviceToken", function (request, response) {
     if (request.params.userid != null && request.params.userid != "" && request.params.deviceToken != null && request.params.deviceToken != "" && request.params.deviceType != null && request.params.deviceType != "") {
