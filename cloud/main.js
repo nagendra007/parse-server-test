@@ -904,7 +904,7 @@ Parse.Cloud.define("getSubCategory", function (request, response) {
 Parse.Cloud.define("uploadImage", function (request, response) {
     if (request.params.fileName != null && request.params.fileName != "" && request.params.base64 != null && request.params.base64 != "") {
 
-        var parseFile = new Parse.File(name, { base64: request.params.base64 });
+        var parseFile = new Parse.File(request.params.fileName, { base64: request.params.base64 });
         parseFile.save().then(function (parseFile) {
             var url = parseFile.url();
             response.success(file.url());
