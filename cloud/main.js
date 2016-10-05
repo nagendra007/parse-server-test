@@ -756,29 +756,29 @@ Parse.Cloud.define("feedback", function (request, response) {
                                 var toolForRent = new ToolForRent();
                                 toolForRent.id = tooldata.id;
 
-                                response.success(tooldata.id);
+                               // response.success(tooldata.id);
 
                                 var toolTakenForRent = new ToolTakenForRent();
                                 toolTakenForRent.id = request.params.toolTakenForRentID;
 
                                 
 
-                                //var UserFeedBack = Parse.Object.extend("userFeedBack");
-                                //var userFeedBack = new UserFeedBack();
+                                var UserFeedBack = Parse.Object.extend("userFeedBack");
+                                var userFeedBack = new UserFeedBack();
 
-                                //userFeedBack.set("user", user);
-                                //userFeedBack.set("toolTakenForRentId", toolTakenForRent);
-                                //userFeedBack.set("toolForRentId", tooldata);
-                                //userFeedBack.set("comment", request.params.comment);
-                                //userFeedBack.set("rating", request.params.rating);
-                                //userFeedBack.save(null, {
-                                //    success: function (userFeedBack) {
+                                userFeedBack.set("user", user);
+                                userFeedBack.set("toolTakenForRentId", toolTakenForRent);
+                                userFeedBack.set("toolForRentId", toolForRent);
+                                userFeedBack.set("comment", request.params.comment);
+                                userFeedBack.set("rating", request.params.rating);
+                                userFeedBack.save(null, {
+                                    success: function (userFeedBack) {
 
-                                //        response.success("Thanks for feedback");
-                                //    }, error: function (error) {
-                                //        response.error(error);
-                                //    }
-                                //});
+                                        response.success("Thanks for feedback");
+                                    }, error: function (error) {
+                                        response.error(error);
+                                    }
+                                });
                             }
                             else {
                                 response.error("Taken tool not found");
