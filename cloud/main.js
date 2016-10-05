@@ -961,11 +961,6 @@ Parse.Cloud.define("getToolDetails", function (request, response) {
     }
 });
 
-
-
-
-
-
 Parse.Cloud.define("updateTool", function (request, response) {
     if (request.params.userid != null && request.params.userid != "") {
         var user = new Parse.User();
@@ -1037,6 +1032,73 @@ Parse.Cloud.define("updateTool", function (request, response) {
         response.error("userid is required");
     }
 });
+
+Parse.Cloud.define("btClientToken", function (request, response) {
+    if (request.params.userid != null && request.params.userid != "") {
+        var query = new Parse.Query(Parse.User);
+        query.equalTo("objectId", request.params.userid);
+        query.find({
+            success: function (result) {
+                if (result.length > 0) {
+                    gateway.clientToken.generate({}, function (err, res) {
+                        response.success(res.clientToken);
+                    },
+                    function (error) {
+                        response.error(error);
+                    });
+                }
+                else {
+                    response.error("user not found");
+                }
+            },
+            error: function (error) {
+                response.error(error);
+            }
+        });
+    }
+    else {
+        response.error("please provide userid");
+    }
+});
+
+Parse.Cloud.define("getToolRating", function (request, response) {
+    if (request.params.userid != null && request.params.userid != "" && request.params.toolId != null && request.params.toolId != "") {
+        var query = new Parse.Query(Parse.User);
+        query.equalTo("objectId", request.params.userid);
+        query.find({
+            success: function (result) {
+                if (result.length > 0) {
+                    var UserFeedBack = Parse.Object.extend("userFeedBack");
+                    var query = new Parse.Query(UserFeedBack);
+                    query.equalTo("toolTakenForRentId.objectId", request.params.toolId);
+                    query.find().then(function (userFeedBack) {
+                        if (userFeedBack.length > 0) {
+                            response.success(userFeedBack);
+                        }
+                        else {
+                            response.error("0");
+                        }
+                    },
+                    function (error) {
+                        response.error(error);
+                    });
+                }
+                else {
+                    response.error("user not found");
+                }
+            },
+            error: function (error) {
+                response.error(error);
+            }
+        });
+    }
+    else {
+        response.error("please provide userid");
+    }
+});
+
+
+
 
 Parse.Cloud.define("setDeviceToken", function (request, response) {
     if (request.params.userid != null && request.params.userid != "" && request.params.deviceToken != null && request.params.deviceToken != "" && request.params.deviceType != null && request.params.deviceType != "") {
@@ -1158,36 +1220,6 @@ Parse.Cloud.define("uploadImageBlob", function (request, response) {
 
 
 });
-
-Parse.Cloud.define("btClientToken", function (request, response) {
-    if (request.params.userid != null && request.params.userid != "") {
-        var query = new Parse.Query(Parse.User);
-        query.equalTo("objectId", request.params.userid);
-        query.find({
-            success: function (result) {
-                if (result.length > 0) {
-                    gateway.clientToken.generate({}, function (err, res) {
-                        response.success(res.clientToken);
-                    },
-                    function (error) {
-                        response.error(error);
-                    });
-                }
-                else {
-                    response.error("user not found");
-                }
-            },
-            error:function(error)
-            {
-                response.error(error);
-            }
-        });
-    }
-    else {
-        response.error("please provide userid");
-    }
-});
-
 
 Parse.Cloud.define("sendEmail", function (request, response) {
     var mandrill = require('mandrill-api/mandrill');
