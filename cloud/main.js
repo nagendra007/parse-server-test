@@ -985,7 +985,7 @@ Parse.Cloud.define("uploadImage", function (request, response) {
 });
 
 Parse.Cloud.define("getToolDetails", function (request, response) {
-    if ( request.params.toolId != null && request.params.toolId != "") {
+    if (request.params.toolId != null && request.params.toolId != "") { //request.params.userid != null && request.params.userid!="" &&
         var user = new Parse.User();
         user.id = request.params.userid;
         var ToolForRent = Parse.Object.extend("toolForRent");
@@ -1019,6 +1019,13 @@ Parse.Cloud.define("updateTool", function (request, response) {
             if (results.length > 0) {
 
                 if (request.params.toolId != null && request.params.toolId != "" && request.params.amount != null && request.params.amount != "" && request.params.desc != null && request.params.desc != "" && request.params.make != null && request.params.make != "" && request.params.moretimeallowed != null && request.params.moretimeallowed != "" && request.params.imageURL != null && request.params.imageURL != "" && request.params.toolName != null && request.params.toolName != "" && request.params.startDate != null && request.params.startDate != "" && request.params.endDate != null && request.params.endDate != "") {
+                    var newamount = parseFloat(request.params.amount);
+                    var decimalAmount = "";
+                    decimalAmount = newamount.toFixed(2);
+
+                    var sdate = new Date(request.params.startDate);
+                    var edate = new Date(request.params.endDate);
+
 
                     var ToolForRent1 = Parse.Object.extend("toolForRent");
                     var query = new Parse.Query(ToolForRent1);
@@ -1037,15 +1044,15 @@ Parse.Cloud.define("updateTool", function (request, response) {
                             //toolForRent.set("subCategoryId", toolSubCategory);
                             //toolForRent.set("userDetailsId", userdetails);
                             toolForRent.set("description", request.params.desc);
-                            toolForRent.set("pricePerDay", request.params.amount);
+                            toolForRent.set("pricePerDay", decimalAmount);
                             //toolForRent.set("isAvailable", "1");
                             //toolForRent.set("isRented", "0");
                             toolForRent.set("toolImageURL", request.params.imageURL);
                             //toolForRent.set("toolImageName", "");
                             toolForRent.set("manufacturer", request.params.make);
                             toolForRent.set("moreTimeAllowed", request.params.moretimeallowed);
-                            toolForRent.set("startDate", request.params.startDate);
-                            toolForRent.set("endDate", request.params.endDate);
+                            toolForRent.set("startDate",sdate);
+                            toolForRent.set("endDate", edate);
                             toolForRent.save(null, {
                                 success: function (toolForRent) {
                                     response.success("Tool updated success");
