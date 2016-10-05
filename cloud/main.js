@@ -514,7 +514,7 @@ Parse.Cloud.define("search", function (request, response) {
                     var ToolForRent = Parse.Object.extend("toolForRent");
                     var query = new Parse.Query(ToolForRent);
                     query.equalTo("isAvailable", "1");
-
+                    query.equalTo("isDeleted", "0");
 
                     var ToolCategory = Parse.Object.extend("toolCategory");
                     var toolcategory = new ToolCategory();
@@ -848,6 +848,7 @@ Parse.Cloud.define("addTakeToolForRent", function (request, response) {
                 var query = new Parse.Query(ToolForRent);
                 query.equalTo("objectId", request.params.toolId);
                 query.equalTo("isAvailable", "1");
+                query.equalTo("isDeleted", "0");
                 query.find().then(function (toolForRent) {
                     //success: function (toolForRent) {
                     if (toolForRent.length > 0) {
@@ -1029,6 +1030,7 @@ Parse.Cloud.define("updateTool", function (request, response) {
                     var ToolForRent1 = Parse.Object.extend("toolForRent");
                     var query = new Parse.Query(ToolForRent1);
                     query.equalTo("isAvailable", "1");
+                    query.equalTo("isDeleted", "0");
                     query.equalTo("objectId", request.params.toolId);
                     query.equalTo("user", user);
                     query.find().then(function (toolForRent1) {
@@ -1062,7 +1064,7 @@ Parse.Cloud.define("updateTool", function (request, response) {
                             });
                         }
                         else {
-                            response.error("Tool not found or not available");
+                            response.error("Tool deleted or not available ");
                         }
                     }, function (error) {
                         response.error(error);
