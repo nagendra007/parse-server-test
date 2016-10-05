@@ -676,6 +676,7 @@ Parse.Cloud.define("getRentableTools", function (request, response) {
         var query = new Parse.Query(ToolForRent);
         query.equalTo("user", user);
         query.equalTo("isAvailable", "1");
+        query.equalTo("isDeleted", "0");
         query.find({
             success: function (toolForRent) {
                 response.success(toolForRent);
@@ -698,6 +699,7 @@ Parse.Cloud.define("getRentedTools", function (request, response) {
         var query = new Parse.Query(ToolForRent);
         query.equalTo("user", user);
         query.equalTo("isAvailable", "0");
+        query.equalTo("isDeleted", "0");
         query.find({
             success: function (toolForRent) {
                 if (toolForRent.length > 0) {
@@ -1163,6 +1165,8 @@ Parse.Cloud.define("getToolRating", function (request, response) {
     }
 });
 
+
+
 Parse.Cloud.define("removeTool", function (request, response) {
     if (request.params.userid != null && request.params.userid != "") {
         var user = new Parse.User();
@@ -1178,7 +1182,6 @@ Parse.Cloud.define("removeTool", function (request, response) {
 
                     var sdate = new Date(request.params.startDate);
                     var edate = new Date(request.params.endDate);
-
 
                     var ToolForRent1 = Parse.Object.extend("toolForRent");
                     var query = new Parse.Query(ToolForRent1);
@@ -1196,10 +1199,10 @@ Parse.Cloud.define("removeTool", function (request, response) {
                             toolForRent.set("isDeleted", "1");
                             toolForRent.save(null, {
                                 success: function (toolForRent) {
-                                    response.success("Tool updated success");
+                                    response.success("Tool deleted success");
                                 },
                                 error: function (error) {
-                                    response.error("error occured");
+                                    response.error(error);
                                 }
                             });
                         }
