@@ -633,6 +633,7 @@ Parse.Cloud.define("addTool", function (request, response) {
                             toolForRent.set("moreTimeAllowed", request.params.moretimeallowed);
                             toolForRent.set("startDate", sdate);
                             toolForRent.set("endDate", edate);
+                            toolForRent.set("isDeleted", "0");
                             toolForRent.save(null, {
                                 success: function (toolForRent) {
                                     response.success("Tool added success");
@@ -1012,12 +1013,10 @@ Parse.Cloud.define("updateTool", function (request, response) {
     if (request.params.userid != null && request.params.userid != "") {
         var user = new Parse.User();
         user.id = request.params.userid;
-
         var query = new Parse.Query("userDetails");
         query.equalTo("user", user);
         query.find().then(function (results) {
             if (results.length > 0) {
-
                 if (request.params.toolId != null && request.params.toolId != "" && request.params.amount != null && request.params.amount != "" && request.params.desc != null && request.params.desc != "" && request.params.make != null && request.params.make != "" && request.params.moretimeallowed != null && request.params.moretimeallowed != "" && request.params.imageURL != null && request.params.imageURL != "" && request.params.toolName != null && request.params.toolName != "" && request.params.startDate != null && request.params.startDate != "" && request.params.endDate != null && request.params.endDate != "") {
                     var newamount = parseFloat(request.params.amount);
                     var decimalAmount = "";
@@ -1063,7 +1062,7 @@ Parse.Cloud.define("updateTool", function (request, response) {
                             });
                         }
                         else {
-                            response.error("tool not found");
+                            response.error("Tool not found or not available");
                         }
                     }, function (error) {
                         response.error(error);
@@ -1161,6 +1160,73 @@ Parse.Cloud.define("getToolRating", function (request, response) {
         response.error("please provide userid");
     }
 });
+
+Parse.Cloud.define("removeTool", function (request, response) {
+    if (request.params.userid != null && request.params.userid != "") {
+        var user = new Parse.User();
+        user.id = request.params.userid;
+        var query = new Parse.Query("userDetails");
+        query.equalTo("user", user);
+        query.find().then(function (results) {
+            if (results.length > 0) {
+                if (request.params.toolId != null && request.params.toolId != "") {
+                    var newamount = parseFloat(request.params.amount);
+                    var decimalAmount = "";
+                    decimalAmount = newamount.toFixed(2);
+
+                    var sdate = new Date(request.params.startDate);
+                    var edate = new Date(request.params.endDate);
+
+
+                    var ToolForRent1 = Parse.Object.extend("toolForRent");
+                    var query = new Parse.Query(ToolForRent1);
+                    query.equalTo("isAvailable", "1");
+                    query.equalTo("objectId", request.params.toolId);
+                    query.equalTo("user", user);
+                    query.find().then(function (toolForRent1) {
+                        if (toolForRent1.length > 0) {
+                            var toolId = request.params.toolId
+
+                            var ToolForRent = Parse.Object.extend("toolForRent");
+
+                            var toolForRent = new ToolForRent();
+                            toolForRent.id = toolId;
+                            toolForRent.set("isDeleted", "1");
+                            toolForRent.save(null, {
+                                success: function (toolForRent) {
+                                    response.success("Tool updated success");
+                                },
+                                error: function (error) {
+                                    response.error("error occured");
+                                }
+                            });
+                        }
+                        else {
+                            response.error("Tool not found or currently rented");
+                        }
+                    }, function (error) {
+                        response.error(error);
+                    });
+                }
+                else {
+                    response.error("missing request parameters");
+                }
+
+            }
+            else {
+                response.error("user not found");
+            }
+        }, function (error) {
+            response.error(error);
+        });
+
+    }
+    else {
+        response.error("userid is required");
+    }
+});
+
+
 
 
 
