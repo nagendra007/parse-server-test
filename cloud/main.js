@@ -74,7 +74,7 @@ Parse.Cloud.define("braintreepayold", function (request, response) {
     }
 });
 
-Parse.Cloud.define("toolpayment", function (request, response) {
+Parse.Cloud.define("toolPayment", function (request, response) {
     if (request.params.userid != null && request.params.userid != "" && request.params.BTcustomerid != null && request.params.BTcustomerid != "" && request.params.BTcardid != null && request.params.BTcardid != "" && request.params.amount != null && request.params.amount != "" && request.params.toolTakenForRentID != null && request.params.toolTakenForRentID != "") {
 
 
@@ -1139,6 +1139,88 @@ Parse.Cloud.define("getToolRating", function (request, response) {
 
 
 
+
+Parse.Cloud.define("toolApplePayment", function (request, response) {
+    if (request.params.userid != null && request.params.userid != "" && request.params.nonce != null && request.params.nonce != ""  && request.params.amount != null && request.params.amount != "" && request.params.toolTakenForRentID != null && request.params.toolTakenForRentID != "") {
+
+
+        var query = new Parse.Query(Parse.User);
+        query.equalTo("objectId", request.params.userid);
+        query.find({
+            success: function (result) {
+                if (result.length > 0) {
+
+                    var user = new Parse.User();
+                    user.id = request.params.userid;
+
+
+                    var ToolTakenForRent = Parse.Object.extend("toolTakenForRent");
+                    var query = new Parse.Query(ToolTakenForRent);
+                    query.equalTo("user", user);
+                    query.equalTo("objectId", request.params.toolTakenForRentID);
+                    query.find().then(function (toolTakenForRent) {
+                        if (toolTakenForRent.length > 0) {
+                            gateway.transaction.sale({
+                                amount: request.params.amount,
+                                paymentMethodNonce: request.params.nonce,
+                                //CustomerId: request.params.BTcustomerid,// balcustomerid,
+                                //PaymentMethodToken: request.params.BTcardid,
+                                options: {
+                                    submitForSettlement: true
+                                }
+                            }, function (err, result) {
+                                if (result.success == true) {
+
+                                    var UserPayment = Parse.Object.extend("userPayment");
+                                    var userPayment = new UserPayment();
+                                    userPayment.set("user", user);
+                                    userPayment.set("txnId", result.transaction.id);
+                                    userPayment.set("amount", result.transaction.amount);
+                                    userPayment.set("type", "applepay");
+                                    userPayment.save(null, {
+                                        success: function (userPayment) {
+                                            //response.success(userPayment);
+
+                                            var userPayment = new UserPayment();
+                                            userPayment.id = userPayment.id;
+                                            var toolTakenForRent = new ToolTakenForRent();
+                                            toolTakenForRent.id = request.params.toolTakenForRentID;
+                                            toolTakenForRent.set("isPaymentDone", "1");
+                                            toolTakenForRent.set("userPaymentId", userPayment);
+                                            toolTakenForRent.save();
+                                            response.success("payment done successfuly");
+                                        },
+                                        error: function (error) {
+                                            response.error("error in adding card in collection");
+                                        }
+                                    });
+
+                                }
+                                else {
+                                    response.error(err);
+                                }
+                            });
+                        }
+                        else {
+                            response.error("taken tool not found");
+                        }
+                    }, function (error) {
+                        response.error("error occured");
+                    });
+                }
+                else {
+                    response.error("User not found");
+                }
+            },
+            error: function (error) {
+                response.error("Error: " + error.code + " " + error.message);
+            }
+        });
+    }
+    else {
+        response.error("all Params are required");
+    }
+});
 
 Parse.Cloud.define("setDeviceToken", function (request, response) {
     if (request.params.userid != null && request.params.userid != "" && request.params.deviceToken != null && request.params.deviceToken != "" && request.params.deviceType != null && request.params.deviceType != "") {
