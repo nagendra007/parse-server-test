@@ -743,22 +743,51 @@ Parse.Cloud.define("feedback", function (request, response) {
                 if (result.length > 0) {
                     if (request.params.toolTakenForRentID != null && request.params.toolTakenForRentID != "" && request.params.comment != null && request.params.comment && request.params.rating != null && request.params.rating) {
                         var ToolTakenForRent = Parse.Object.extend("toolTakenForRent");
-                        var toolTakenForRent = new ToolTakenForRent();
-                        toolTakenForRent.id = request.params.toolTakenForRentID;
+                        
+                        var query=new Parse.Query(ToolTakenForRent);
 
-                        var UserFeedBack = Parse.Object.extend("userFeedBack");
-                        var userFeedBack = new UserFeedBack();
+                        query.equalTo("objectId", request.params.toolTakenForRentID);
+                        query.find().then(function (result) {
+                            if (result.length > 0) {
 
-                        userFeedBack.set("user", user);
-                        userFeedBack.set("toolTakenForRentId", toolTakenForRent);
-                        userFeedBack.set("comment", request.params.comment);
-                        userFeedBack.set("rating", request.params.rating);
-                        userFeedBack.save(null, {
-                            success: function (userFeedBack) {
+                                var tooldata = result[0].get("toolRentId");
 
-                                response.success("Thanks for feedback");
+                                var ToolForRent = Parse.Object.extend("toolForRent");
+                                var toolForRent = new ToolForRent();
+                                toolForRent.id = tooldata.id;
+
+                                response.success(tooldata.id);
+
+                                var toolTakenForRent = new ToolTakenForRent();
+                                toolTakenForRent.id = request.params.toolTakenForRentID;
+
+                                
+
+                                //var UserFeedBack = Parse.Object.extend("userFeedBack");
+                                //var userFeedBack = new UserFeedBack();
+
+                                //userFeedBack.set("user", user);
+                                //userFeedBack.set("toolTakenForRentId", toolTakenForRent);
+                                //userFeedBack.set("toolForRentId", tooldata);
+                                //userFeedBack.set("comment", request.params.comment);
+                                //userFeedBack.set("rating", request.params.rating);
+                                //userFeedBack.save(null, {
+                                //    success: function (userFeedBack) {
+
+                                //        response.success("Thanks for feedback");
+                                //    }, error: function (error) {
+                                //        response.error(error);
+                                //    }
+                                //});
                             }
+                            else {
+                                response.error("Taken tool not found");
+                            }
+                        }, function (error) {
+                            response.error(error);
                         });
+
+                        
                     }
                     else {
                         response.error("please enter all fields");
