@@ -587,7 +587,7 @@ Parse.Cloud.define("addTool", function (request, response) {
 
                 if (request.params.categoryId != null && request.params.categoryId != "" && request.params.subcategoryId != null && request.params.subcategoryId != "" && request.params.amount != null && request.params.amount != "" && request.params.desc != null && request.params.desc != "" && request.params.make != null && request.params.make != "" && request.params.moretimeallowed != null && request.params.moretimeallowed != "" && request.params.imageURL != null && request.params.imageURL != "" && request.params.toolName != null && request.params.toolName != "" && request.params.startDate != null && request.params.startDate != "" && request.params.endDate != null && request.params.endDate != "") {
 
-                    var newamount = parseFloat(request.params.amount)
+                    var newamount = parseFloat(request.params.amount);
                     var decimalAmount = "";
                     decimalAmount = newamount.toFixed(2);
 
