@@ -1097,15 +1097,26 @@ Parse.Cloud.define("getToolRating", function (request, response) {
         query.find({
             success: function (result) {
                 if (result.length > 0) {
+                    var ToolForRent = Parse.Object.extend("toolForRent");
+                    var toolForRent = new ToolForRent();
+                    toolForRent.id = request.params.toolId;
+
                     var UserFeedBack = Parse.Object.extend("userFeedBack");
                     var query = new Parse.Query(UserFeedBack);
-                    query.equalTo("toolTakenForRentId.toolRentId.objectId", request.params.toolId);
+                    query.equalTo("toolForRentId", toolForRent);
                     query.find().then(function (userFeedBack) {
                         if (userFeedBack.length > 0) {
-                            response.success(userFeedBack);
+                            var sumOfRating = 0;
+                            for (var i = 0; i < userFeedBack.length; i++) {
+                                sumOfRating = sumOfRating + parseFloat(userFeedBack[i].get("rating"));
+                            }
+                            var avg = sumOfRating / userFeedBack.length;
+                            var data = ({ avgrating: avg });
+                            response.success(data);
                         }
                         else {
-                            response.error("0");
+                            var data = ({ avgrating: 0 });
+                            response.success(data);
                         }
                     },
                     function (error) {
