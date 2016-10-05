@@ -965,6 +965,7 @@ Parse.Cloud.define("getToolDetails", function (request, response) {
 
 
 
+
 Parse.Cloud.define("updateTool", function (request, response) {
     if (request.params.userid != null && request.params.userid != "") {
         var user = new Parse.User();
@@ -1013,7 +1014,7 @@ Parse.Cloud.define("updateTool", function (request, response) {
                             });
                         }
                         else {
-                            response.error("categoty or sub category invalid");
+                            response.error("tool not found");
                         }
                     }, function (error) {
                         response.error(error);
@@ -1158,6 +1159,34 @@ Parse.Cloud.define("uploadImageBlob", function (request, response) {
 
 });
 
+Parse.Cloud.define("btClientToken", function (request, response) {
+    if (request.params.userid != null && request.params.userid != "") {
+        var query = new Parse.Query(Parse.User);
+        query.equalTo("objectId", request.params.userid);
+        query.find({
+            success: function (result) {
+                if (result.length > 0) {
+                    gateway.clientToken.generate({}, function (err, res) {
+                        response.success(res.clientToken);
+                    },
+                    function (error) {
+                        response.error(error);
+                    });
+                }
+                else {
+                    response.error("user not found");
+                }
+            },
+            error:function(error)
+            {
+                response.error(error);
+            }
+        });
+    }
+    else {
+        response.error("please provide userid");
+    }
+});
 
 
 Parse.Cloud.define("sendEmail", function (request, response) {
