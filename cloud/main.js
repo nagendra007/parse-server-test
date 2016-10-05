@@ -12,6 +12,8 @@ Parse.Cloud.define('hello', function (req, res) {
     res.success('Hi Singh test');
 });
 
+
+
 Parse.Cloud.define("braintreepayold", function (request, response) {
     if (request.params.userid != null && request.params.userid != "" && request.params.BTcustomerid != null && request.params.BTcustomerid != "" && request.params.BTcardid != null && request.params.BTcardid != "" && request.params.amount != null && request.params.amount != "" && request.params.toolTakenForRentID != null && request.params.toolTakenForRentID != "") {
         var user = new Parse.User();
@@ -116,11 +118,22 @@ Parse.Cloud.define("toolPayment", function (request, response) {
 
                                             var userPayment = new UserPayment();
                                             userPayment.id = userPayment.id;
-                                            var toolTakenForRent = new ToolTakenForRent();
-                                            toolTakenForRent.id = request.params.toolTakenForRentID;
-                                            toolTakenForRent.set("isPaymentDone", "1");
-                                            toolTakenForRent.set("userPaymentId", userPayment);
-                                            toolTakenForRent.save();
+                                            var toolTakenForRent1 = new ToolTakenForRent();
+                                            toolTakenForRent1.id = request.params.toolTakenForRentID;
+                                            toolTakenForRent1.set("isPaymentDone", "1");
+                                            toolTakenForRent1.set("userPaymentId", userPayment);
+                                            toolTakenForRent1.save();
+
+
+                                            var tooldata = toolTakenForRent[0].get("toolRentId");
+
+                                            var ToolForRent = Parse.Object.extend("toolForRent");
+                                            var toolForRent = new ToolForRent();
+                                            toolForRent.id = tooldata.id;
+                                            toolForRent.set("isAvailable", "1");
+                                            toolForRent.set("isRented", "0");
+                                            toolForRent.save();
+
                                             response.success("payment done successfuly");
                                         },
                                         error: function (error) {
@@ -574,7 +587,8 @@ Parse.Cloud.define("addTool", function (request, response) {
 
                 if (request.params.categoryId != null && request.params.categoryId != "" && request.params.subcategoryId != null && request.params.subcategoryId != "" && request.params.amount != null && request.params.amount != "" && request.params.desc != null && request.params.desc != "" && request.params.make != null && request.params.make != "" && request.params.moretimeallowed != null && request.params.moretimeallowed != "" && request.params.imageURL != null && request.params.imageURL != "" && request.params.toolName != null && request.params.toolName != "" && request.params.startDate != null && request.params.startDate != "" && request.params.endDate != null && request.params.endDate != "") {
 
-
+                    var sdate = new Date(request.params.startDate);
+                    var edate = new Date(request.params.endDate);
                     var userdetailsId = "";
                     var userdetailsId = results[0].id;
                     var Userdetails = Parse.Object.extend("userDetails");
@@ -613,14 +627,14 @@ Parse.Cloud.define("addTool", function (request, response) {
                             //toolForRent.set("toolImageName", "");
                             toolForRent.set("manufacturer", request.params.make);
                             toolForRent.set("moreTimeAllowed", request.params.moretimeallowed);
-                            toolForRent.set("startDate", request.params.startDate);
-                            toolForRent.set("endDate", request.params.endDate);
+                            toolForRent.set("startDate", sdate);
+                            toolForRent.set("endDate", edate);
                             toolForRent.save(null, {
                                 success: function (toolForRent) {
                                     response.success("Tool added success");
                                 },
                                 error: function (error) {
-                                    response.error("error occured");
+                                    response.error(error);
                                 }
                             });
                         }
@@ -1181,13 +1195,25 @@ Parse.Cloud.define("toolApplePayment", function (request, response) {
                                         success: function (userPayment) {
                                             //response.success(userPayment);
 
+
                                             var userPayment = new UserPayment();
                                             userPayment.id = userPayment.id;
-                                            var toolTakenForRent = new ToolTakenForRent();
-                                            toolTakenForRent.id = request.params.toolTakenForRentID;
-                                            toolTakenForRent.set("isPaymentDone", "1");
-                                            toolTakenForRent.set("userPaymentId", userPayment);
-                                            toolTakenForRent.save();
+                                            var toolTakenForRent1 = new ToolTakenForRent();
+                                            toolTakenForRent1.id = request.params.toolTakenForRentID;
+                                            toolTakenForRent1.set("isPaymentDone", "1");
+                                            toolTakenForRent1.set("userPaymentId", userPayment);
+                                            toolTakenForRent1.save();
+
+
+                                            var tooldata = toolTakenForRent[0].get("toolRentId");
+
+                                            var ToolForRent = Parse.Object.extend("toolForRent");
+                                            var toolForRent = new ToolForRent();
+                                            toolForRent.id = tooldata.id;
+                                            toolForRent.set("isAvailable", "1");
+                                            toolForRent.set("isRented", "0");
+                                            toolForRent.save();
+
                                             response.success("payment done successfuly");
                                         },
                                         error: function (error) {
