@@ -1070,7 +1070,7 @@ Parse.Cloud.define("getToolRating", function (request, response) {
                 if (result.length > 0) {
                     var UserFeedBack = Parse.Object.extend("userFeedBack");
                     var query = new Parse.Query(UserFeedBack);
-                    query.equalTo("toolTakenForRentId.objectId", request.params.toolId);
+                    query.equalTo("toolTakenForRentId.toolRentId.objectId", request.params.toolId);
                     query.find().then(function (userFeedBack) {
                         if (userFeedBack.length > 0) {
                             response.success(userFeedBack);
