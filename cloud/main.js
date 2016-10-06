@@ -9,7 +9,7 @@ var gateway = braintree.connect({
 });
 
 Parse.Cloud.define('hello', function (req, res) {
-    res.success('Hi Singh test');
+    res.success('Hi test');
 });
 
 
@@ -834,8 +834,11 @@ Parse.Cloud.define("feedback", function (request, response) {
 });
 
 Parse.Cloud.define("addTakeToolForRent", function (request, response) {
-    if (request.params.userid != null && request.params.userid != "" && request.params.toolId != null && request.params.toolId != "" && request.params.startDate != null && request.params.startDate != "" && request.params.endDate != null && request.params.endDate != "") {
-
+    if (request.params.userid != null && request.params.userid != "" && request.params.toolId != null && request.params.toolId != ""
+        && request.params.startDate != null && request.params.startDate != "" && request.params.endDate != null && request.params.endDate != "") {
+        //request.params.scheduleDate &&  request.params.scheduleDate && request.params.scheduleTime request.params.scheduleTime 
+        //request.params.isRentNowPickUp && request.params.isRentNowPickUp &&  request.params.isSchedulePickUp &&  request.params.isSchedulePickUp
+        
         var user = new Parse.User();
         user.id = request.params.userid;
         var query = new Parse.Query("userDetails");
@@ -873,13 +876,16 @@ Parse.Cloud.define("addTakeToolForRent", function (request, response) {
                         var ToolTakenForRent = Parse.Object.extend("toolTakenForRent");
                         var toolTakenForRent = new ToolTakenForRent();
 
+                        var sdate = new Date(request.params.startDate);
+                        var edate = new Date(request.params.endDate);
+
 
                         toolTakenForRent.set("user", user);
                         toolTakenForRent.set("userDetailsId", userdetails);
                         toolTakenForRent.set("toolRentId", toolForRent1);
                         toolTakenForRent.set("toolName", toolName);
-                        toolTakenForRent.set("starteDateTime", request.params.startDate);
-                        toolTakenForRent.set("endeDateTime", request.params.endDate);
+                        toolTakenForRent.set("starteDateTime", sdate);
+                        toolTakenForRent.set("endeDateTime", edate);
                         toolTakenForRent.set("pricePerDay", pricePerDay);
                         toolTakenForRent.set("isReturned", "0");
                         toolTakenForRent.set("isCanceled", "0");
@@ -1318,8 +1324,6 @@ Parse.Cloud.define("uploadToolImage", function (request, response) {
 
 });
 
-
-
 Parse.Cloud.define("toolApplePayment", function (request, response) {
     if (request.params.userid != null && request.params.userid != "" && request.params.nonce != null && request.params.nonce != ""  && request.params.amount != null && request.params.amount != "" && request.params.toolTakenForRentID != null && request.params.toolTakenForRentID != "") {
 
@@ -1535,7 +1539,7 @@ Parse.Cloud.define("uploadImageBlob", function (request, response) {
 
 });
 
-Parse.Cloud.define("sendEmail", function (request, response) {
+Parse.Cloud.define("sendEmailMandrill", function (request, response) {
     var mandrill = require('mandrill-api/mandrill');
     var mandrill_client = new mandrill.Mandrill('bGUnQ6_ltOqp4rkonKZO7Q');//('524eb66b5ed31021f065ffea4ef0a220');//
 
@@ -1650,7 +1654,81 @@ Parse.Cloud.define("sendEmail", function (request, response) {
     //});
 });
 
+Parse.Cloud.define("sendEmailSendGrid", function (request, response) {
+    
+    var helper = require('sendgrid').mail;
 
+    var from_email = new helper.Email("nagendra.singh@ninedots.com");
+    var to_email = new helper.Email("nagendra.singh@ninedots.com");
+    var subject = "Sending with SendGrid is Fun";
+    var content = new helper.Content("text/plain", "and easy to do anywhere, even with Node.js");
+    var mail = new helper.Mail(from_email, subject, to_email, content);
+
+    var sg = require('sendgrid')('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');
+    var request = sg.emptyRequest({
+        method: 'POST',
+        path: '/v3/mail/send',
+        body: mail.toJSON()
+    });
+
+    sg.API(request, function (error, res) {
+        if (error) {
+            response.error(error);
+        }
+        response.success(res);
+    });
+
+
+    //var sendgrid = require('sendgrid')('judF8IEyT9Wf2yuyKUWxgA');
+    //var email = new sendgrid.Email();
+
+    //email.addTo("nagendra.singh@ninedots.com");
+    //email.setFrom("nagendra.singh@ninedots.com");
+    //email.setSubject("Sending with SendGrid is Fun");
+    //email.setHtml("and easy to do anywhere, even with Node.js");
+
+    //sendgrid.send(email);
+
+
+    //sendgrid.send({
+    //    to: 'nagendra.singh@ninedots.com',
+    //    from: 'nagendra.singh@ninedots.com',
+    //    subject: 'test',
+    //    text: 'test'
+    //},function (err, json) {
+    //    if (err) {
+    //        response.error(err);
+    //    }
+    //    response.success(json);
+    //});
+
+});
+
+Parse.Cloud.define("sendEmail", function (request, response) {
+    if (request.params.toEmail != null && request.params.toEmail != null && request.params.subject != null && request.params.subject != null && request.params.body != null && request.params.body != null)
+        
+    var helper = require('sendgrid').mail;
+
+    var from_email = new helper.Email("nagendra.singh@ninedots.com");
+    var to_email = new helper.Email(request.params.toEmail);
+    var subject = request.params.subject;
+    var content = new helper.Content("text/html", request.params.body); //text/plain
+    var mail = new helper.Mail(from_email, subject, to_email, content);
+
+    var sg = require('sendgrid')('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');
+    var request = sg.emptyRequest({
+        method: 'POST',
+        path: '/v3/mail/send',
+        body: mail.toJSON()
+    });
+
+    sg.API(request, function (error, res) {
+        if (error) {
+            response.error(error);
+        }
+        response.success(res);
+    });
+});
 
 
 
