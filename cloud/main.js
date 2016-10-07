@@ -165,6 +165,7 @@ Parse.Cloud.define("addCreditCard", function (request, response) {
                             userCreditCardInfo.set("maskedNumber", maskedNumber);
                             userCreditCardInfo.set("ExpirationMonth", request.params.ExpirationMonth);
                             userCreditCardInfo.set("ExpirationYear", request.params.ExpirationYear);
+                            userCreditCardInfo1.set("isPrimary", "0");
                             userCreditCardInfo.save(null, {
                                 success: function (userCreditCardInfo) {
                                     response.success(userCreditCardInfo);
@@ -781,8 +782,8 @@ Parse.Cloud.define("feedback", function (request, response) {
 Parse.Cloud.define("addTakeToolForRent", function (request, response) {
     if (request.params.userid != null && request.params.userid != "" && request.params.toolId != null && request.params.toolId != ""
         && request.params.startDate != null && request.params.startDate != "" && request.params.endDate != null && request.params.endDate != "") {
-        //request.params.scheduleDate &&  request.params.scheduleDate && request.params.scheduleTime request.params.scheduleTime 
-        //request.params.isRentNowPickUp && request.params.isRentNowPickUp &&  request.params.isSchedulePickUp &&  request.params.isSchedulePickUp
+        //&& request.params.scheduleDate!= null  &&  request.params.scheduleDate!= ""  && request.params.scheduleTime!= null  request.params.scheduleTime != "" 
+        //&& request.params.isRentNowPickUp!= null  && request.params.isRentNowPickUp!= ""  &&  request.params.isSchedulePickUp!= null  &&  request.params.isSchedulePickUp!= "" 
         
         var user = new Parse.User();
         user.id = request.params.userid;
@@ -851,7 +852,6 @@ Parse.Cloud.define("addTakeToolForRent", function (request, response) {
                                     toolForRent1.id = request.params.toolId;
                                     toolForRent1.set("isAvailable", "0");
                                     toolForRent1.set("isRented", "1");
-
                                     toolForRent1.save();
                                     response.success("tool rented success");
                                 },
@@ -1096,7 +1096,7 @@ Parse.Cloud.define("btClientToken", function (request, response) {
     }
 });
 
-Parse.Cloud.define("getToolRating", function (request, response) {
+Parse.Cloud.define("getAvgToolRating", function (request, response) {
     if (request.params.userid != null && request.params.userid != "" && request.params.toolId != null && request.params.toolId != "") {
         var query = new Parse.Query(Parse.User);
         query.equalTo("objectId", request.params.userid);
@@ -1207,70 +1207,6 @@ Parse.Cloud.define("removeTool", function (request, response) {
     }
 });
 
-
-
-Parse.Cloud.define("braintreepayold", function (request, response) {
-    if (request.params.userid != null && request.params.userid != "" && request.params.BTcustomerid != null && request.params.BTcustomerid != "" && request.params.BTcardid != null && request.params.BTcardid != "" && request.params.amount != null && request.params.amount != "" && request.params.toolTakenForRentID != null && request.params.toolTakenForRentID != "") {
-        var user = new Parse.User();
-        user.id = request.params.userid;
-
-
-        var query = new Parse.Query(Parse.User);
-        query.equalTo("objectId", request.params.userid);
-        query.find({
-            success: function (result) {
-                if (result.length > 0) {
-
-
-                    gateway.transaction.sale({
-                        amount: request.params.amount,
-                        //paymentMethodNonce: request.params.nonce,
-                        CustomerId: request.params.BTcustomerid,// balcustomerid,
-                        PaymentMethodToken: request.params.BTcardid,
-                        options: {
-                            submitForSettlement: true
-                        }
-                    }, function (err, result) {
-                        if (result.success == true) {
-
-                            var ToolTakenForRent = Parse.Object.extend("toolTakenForRent");
-                            var toolTakenForRent = new ToolTakenForRent();
-                            toolTakenForRent.id = request.params.toolTakenForRentID;
-
-                            var UserPayment = Parse.Object.extend("userPayment");
-                            var userPayment = new UserPayment();
-                            userPayment.set("user", user);
-                            userPayment.set("txnId", result.transaction.id);
-                            userPayment.set("amount", result.transaction.amount);
-                            userPayment.save(null, {
-                                success: function (userPayment) {
-                                    response.success(userPayment);
-                                },
-                                error: function (error) {
-                                    response.error("error in adding card in collection");
-                                }
-                            });
-
-                        }
-                        else {
-                            response.error(err);
-                        }
-                    });
-                }
-                else {
-                    response.error("User not found");
-                }
-            },
-            error: function (error) {
-                response.error("Error: " + error.code + " " + error.message);
-            }
-        });
-    }
-    else {
-        response.error("all Params are required");
-    }
-});
-
 Parse.Cloud.define("uploadToolImage", function (request, response) {
     if (request.params.userid != null && request.params.userid != "" && request.params.toolId != null && request.params.toolId != "" && request.params.fileName != null && request.params.fileName != "" && request.params.base64 != null && request.params.base64 != "") {
 
@@ -1329,13 +1265,18 @@ Parse.Cloud.define("uploadToolImage", function (request, response) {
         });
 
 
-        
+
     }
     else {
         response.error("missing file parameters");
     }
 
 });
+
+
+
+
+
 
 Parse.Cloud.define("toolApplePayment", function (request, response) {
     if (request.params.userid != null && request.params.userid != "" && request.params.nonce != null && request.params.nonce != ""  && request.params.amount != null && request.params.amount != "" && request.params.toolTakenForRentID != null && request.params.toolTakenForRentID != "") {
@@ -1767,7 +1708,7 @@ Parse.Cloud.define("sendEmail", function (request, response) {
                 if (error) {
                     response.error(error);
                 }
-                response.success(res);
+                response.success("Email Sent successfuly");
             });
         }
         else {
@@ -1780,7 +1721,67 @@ Parse.Cloud.define("sendEmail", function (request, response) {
 
 });
 
+Parse.Cloud.define("braintreepayold", function (request, response) {
+    if (request.params.userid != null && request.params.userid != "" && request.params.BTcustomerid != null && request.params.BTcustomerid != "" && request.params.BTcardid != null && request.params.BTcardid != "" && request.params.amount != null && request.params.amount != "" && request.params.toolTakenForRentID != null && request.params.toolTakenForRentID != "") {
+        var user = new Parse.User();
+        user.id = request.params.userid;
 
+
+        var query = new Parse.Query(Parse.User);
+        query.equalTo("objectId", request.params.userid);
+        query.find({
+            success: function (result) {
+                if (result.length > 0) {
+
+
+                    gateway.transaction.sale({
+                        amount: request.params.amount,
+                        //paymentMethodNonce: request.params.nonce,
+                        CustomerId: request.params.BTcustomerid,// balcustomerid,
+                        PaymentMethodToken: request.params.BTcardid,
+                        options: {
+                            submitForSettlement: true
+                        }
+                    }, function (err, result) {
+                        if (result.success == true) {
+
+                            var ToolTakenForRent = Parse.Object.extend("toolTakenForRent");
+                            var toolTakenForRent = new ToolTakenForRent();
+                            toolTakenForRent.id = request.params.toolTakenForRentID;
+
+                            var UserPayment = Parse.Object.extend("userPayment");
+                            var userPayment = new UserPayment();
+                            userPayment.set("user", user);
+                            userPayment.set("txnId", result.transaction.id);
+                            userPayment.set("amount", result.transaction.amount);
+                            userPayment.save(null, {
+                                success: function (userPayment) {
+                                    response.success(userPayment);
+                                },
+                                error: function (error) {
+                                    response.error("error in adding card in collection");
+                                }
+                            });
+
+                        }
+                        else {
+                            response.error(err);
+                        }
+                    });
+                }
+                else {
+                    response.error("User not found");
+                }
+            },
+            error: function (error) {
+                response.error("Error: " + error.code + " " + error.message);
+            }
+        });
+    }
+    else {
+        response.error("all Params are required");
+    }
+});
 
 
 
