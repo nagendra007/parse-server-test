@@ -533,62 +533,67 @@ Parse.Cloud.define("addTool", function (request, response) {
 
                         var sdate = new Date(request.params.startDate);
                         var edate = new Date(request.params.endDate);
-                        var userdetailsId = "";
-                        var userdetailsId = results[0].id;
-                        var Userdetails = Parse.Object.extend("userDetails");
-                        var userdetails = new Userdetails();
-                        userdetails.id = userdetailsId;
+                        if (sdate <= edate) {
+                            var userdetailsId = "";
+                            var userdetailsId = results[0].id;
+                            var Userdetails = Parse.Object.extend("userDetails");
+                            var userdetails = new Userdetails();
+                            userdetails.id = userdetailsId;
 
 
-                        var ToolCategory = Parse.Object.extend("toolCategory");
-                        var toolCategory = new ToolCategory();
-                        toolCategory.id = request.params.categoryId;
+                            var ToolCategory = Parse.Object.extend("toolCategory");
+                            var toolCategory = new ToolCategory();
+                            toolCategory.id = request.params.categoryId;
 
-                        var ToolSubCategory = Parse.Object.extend("toolSubCategory");
-                        var toolSubCategory = new ToolSubCategory();
-                        toolSubCategory.id = request.params.subcategoryId;
+                            var ToolSubCategory = Parse.Object.extend("toolSubCategory");
+                            var toolSubCategory = new ToolSubCategory();
+                            toolSubCategory.id = request.params.subcategoryId;
 
-                        //var ToolSubCategory = Parse.Object.extend("toolSubCategory");
-                        var query = new Parse.Query(ToolSubCategory);
-                        query.equalTo("categoryId", toolCategory);
-                        query.equalTo("objectId", request.params.subcategoryId);
-                        query.find().then(function (toolSubCategory1) {
-                            if (toolSubCategory1.length > 0) {
+                            //var ToolSubCategory = Parse.Object.extend("toolSubCategory");
+                            var query = new Parse.Query(ToolSubCategory);
+                            query.equalTo("categoryId", toolCategory);
+                            query.equalTo("objectId", request.params.subcategoryId);
+                            query.find().then(function (toolSubCategory1) {
+                                if (toolSubCategory1.length > 0) {
 
-                                var ToolForRent = Parse.Object.extend("toolForRent");
-                                var toolForRent = new ToolForRent();
+                                    var ToolForRent = Parse.Object.extend("toolForRent");
+                                    var toolForRent = new ToolForRent();
 
-                                toolForRent.set("user", user);
-                                toolForRent.set("toolName", request.params.toolName);
-                                toolForRent.set("categoryId", toolCategory);
-                                toolForRent.set("subCategoryId", toolSubCategory);
-                                toolForRent.set("userDetailsId", userdetails);
-                                toolForRent.set("description", request.params.desc);
-                                toolForRent.set("pricePerDay", decimalAmount);
-                                toolForRent.set("isAvailable", "1");
-                                toolForRent.set("isRented", "0");
-                                toolForRent.set("toolImageURL", request.params.imageURL);
-                                //toolForRent.set("toolImageName", "");
-                                toolForRent.set("manufacturer", request.params.make);
-                                toolForRent.set("moreTimeAllowed", request.params.moretimeallowed);
-                                toolForRent.set("startDate", sdate);
-                                toolForRent.set("endDate", edate);
-                                toolForRent.set("isDeleted", "0");
-                                toolForRent.save(null, {
-                                    success: function (toolForRent) {
-                                        response.success("Tool added success");
-                                    },
-                                    error: function (error) {
-                                        response.error(error);
-                                    }
-                                });
-                            }
-                            else {
-                                response.error("categoty or sub category invalid");
-                            }
-                        }, function (error) {
-                            response.error(error);
-                        });
+                                    toolForRent.set("user", user);
+                                    toolForRent.set("toolName", request.params.toolName);
+                                    toolForRent.set("categoryId", toolCategory);
+                                    toolForRent.set("subCategoryId", toolSubCategory);
+                                    toolForRent.set("userDetailsId", userdetails);
+                                    toolForRent.set("description", request.params.desc);
+                                    toolForRent.set("pricePerDay", decimalAmount);
+                                    toolForRent.set("isAvailable", "1");
+                                    toolForRent.set("isRented", "0");
+                                    toolForRent.set("toolImageURL", request.params.imageURL);
+                                    //toolForRent.set("toolImageName", "");
+                                    toolForRent.set("manufacturer", request.params.make);
+                                    toolForRent.set("moreTimeAllowed", request.params.moretimeallowed);
+                                    toolForRent.set("startDate", sdate);
+                                    toolForRent.set("endDate", edate);
+                                    toolForRent.set("isDeleted", "0");
+                                    toolForRent.save(null, {
+                                        success: function (toolForRent) {
+                                            response.success("Tool added success");
+                                        },
+                                        error: function (error) {
+                                            response.error(error);
+                                        }
+                                    });
+                                }
+                                else {
+                                    response.error("categoty or sub category invalid");
+                                }
+                            }, function (error) {
+                                response.error(error);
+                            });
+                        }
+                        else {
+                            response.error("Invalid dates passed");
+                        }
                     }
                     else {
                         response.error("please pass valid amount");
@@ -818,42 +823,46 @@ Parse.Cloud.define("addTakeToolForRent", function (request, response) {
 
                         var sdate = new Date(request.params.startDate);
                         var edate = new Date(request.params.endDate);
+                        if (sdate <= edate) {
+
+                            toolTakenForRent.set("user", user);
+                            toolTakenForRent.set("userDetailsId", userdetails);
+                            toolTakenForRent.set("toolRentId", toolForRent1);
+                            toolTakenForRent.set("toolName", toolName);
+                            toolTakenForRent.set("starteDateTime", sdate);
+                            toolTakenForRent.set("endeDateTime", edate);
+                            toolTakenForRent.set("pricePerDay", pricePerDay);
+                            toolTakenForRent.set("isReturned", "0");
+                            toolTakenForRent.set("isCanceled", "0");
+                            toolTakenForRent.set("isPaymentDone", "0");
+
+                            //toolTakenForRent.set("scheduleDate", request.params.scheduleDate);
+                            //toolTakenForRent.set("scheduleTime", request.params.scheduleTime);
+                            //toolTakenForRent.set("isRentNowPickUp", request.params.isRentNowPickUp);
+                            //toolTakenForRent.set("isSchedulePickUp", request.params.isSchedulePickUp);
+                            //toolTakenForRent.set("isApproved", "0");
+                            //toolTakenForRent.set("isPicked", "0");
 
 
-                        toolTakenForRent.set("user", user);
-                        toolTakenForRent.set("userDetailsId", userdetails);
-                        toolTakenForRent.set("toolRentId", toolForRent1);
-                        toolTakenForRent.set("toolName", toolName);
-                        toolTakenForRent.set("starteDateTime", sdate);
-                        toolTakenForRent.set("endeDateTime", edate);
-                        toolTakenForRent.set("pricePerDay", pricePerDay);
-                        toolTakenForRent.set("isReturned", "0");
-                        toolTakenForRent.set("isCanceled", "0");
-                        toolTakenForRent.set("isPaymentDone", "0");
+                            toolTakenForRent.save(null, {
+                                success: function (toolTakenForRent) {
+                                    var ToolForRent = Parse.Object.extend("toolForRent");
+                                    var toolForRent1 = new ToolForRent();
+                                    toolForRent1.id = request.params.toolId;
+                                    toolForRent1.set("isAvailable", "0");
+                                    toolForRent1.set("isRented", "1");
 
-                        //toolTakenForRent.set("scheduleDate", request.params.scheduleDate);
-                        //toolTakenForRent.set("scheduleTime", request.params.scheduleTime);
-                        //toolTakenForRent.set("isRentNowPickUp", request.params.isRentNowPickUp);
-                        //toolTakenForRent.set("isSchedulePickUp", request.params.isSchedulePickUp);
-                        //toolTakenForRent.set("isApproved", "0");
-                        //toolTakenForRent.set("isPicked", "0");
-
-
-                        toolTakenForRent.save(null, {
-                            success: function (toolTakenForRent) {
-                                var ToolForRent = Parse.Object.extend("toolForRent");
-                                var toolForRent1 = new ToolForRent();
-                                toolForRent1.id = request.params.toolId;
-                                toolForRent1.set("isAvailable", "0");
-                                toolForRent1.set("isRented", "1");
-
-                                toolForRent1.save();
-                                response.success("tool rented success");
-                            },
-                            error: function (error) {
-                                response.error(error);
-                            }
-                        });
+                                    toolForRent1.save();
+                                    response.success("tool rented success");
+                                },
+                                error: function (error) {
+                                    response.error(error);
+                                }
+                            });
+                        }
+                        else {
+                            response.error("Invalid dates passed");
+                        }
                     }
                     else {
                         response.error("tool not available");
@@ -988,50 +997,54 @@ Parse.Cloud.define("updateTool", function (request, response) {
 
                         var sdate = new Date(request.params.startDate);
                         var edate = new Date(request.params.endDate);
+                        if (sdate <= edate) {
 
-
-                        var ToolForRent1 = Parse.Object.extend("toolForRent");
-                        var query = new Parse.Query(ToolForRent1);
-                        query.equalTo("isAvailable", "1");
-                        query.equalTo("isDeleted", "0");
-                        query.equalTo("objectId", request.params.toolId);
-                        query.equalTo("user", user);
-                        query.find().then(function (toolForRent1) {
-                            if (toolForRent1.length > 0) {
-                                var toolId = request.params.toolId
-                                var ToolForRent = Parse.Object.extend("toolForRent");
-                                var toolForRent = new ToolForRent();
-                                toolForRent.id = toolId;
-                                //toolForRent.set("user", user);
-                                toolForRent.set("toolName", request.params.toolName);
-                                //toolForRent.set("categoryId", toolCategory);
-                                //toolForRent.set("subCategoryId", toolSubCategory);
-                                //toolForRent.set("userDetailsId", userdetails);
-                                toolForRent.set("description", request.params.desc);
-                                toolForRent.set("pricePerDay", decimalAmount);
-                                //toolForRent.set("isAvailable", "1");
-                                //toolForRent.set("isRented", "0");
-                                toolForRent.set("toolImageURL", request.params.imageURL);
-                                //toolForRent.set("toolImageName", "");
-                                toolForRent.set("manufacturer", request.params.make);
-                                toolForRent.set("moreTimeAllowed", request.params.moretimeallowed);
-                                toolForRent.set("startDate", sdate);
-                                toolForRent.set("endDate", edate);
-                                toolForRent.save(null, {
-                                    success: function (toolForRent) {
-                                        response.success("Tool updated success");
-                                    },
-                                    error: function (error) {
-                                        response.error("error occured");
-                                    }
-                                });
-                            }
-                            else {
-                                response.error("Tool deleted or not available ");
-                            }
-                        }, function (error) {
-                            response.error(error);
-                        });
+                            var ToolForRent1 = Parse.Object.extend("toolForRent");
+                            var query = new Parse.Query(ToolForRent1);
+                            query.equalTo("isAvailable", "1");
+                            query.equalTo("isDeleted", "0");
+                            query.equalTo("objectId", request.params.toolId);
+                            query.equalTo("user", user);
+                            query.find().then(function (toolForRent1) {
+                                if (toolForRent1.length > 0) {
+                                    var toolId = request.params.toolId
+                                    var ToolForRent = Parse.Object.extend("toolForRent");
+                                    var toolForRent = new ToolForRent();
+                                    toolForRent.id = toolId;
+                                    //toolForRent.set("user", user);
+                                    toolForRent.set("toolName", request.params.toolName);
+                                    //toolForRent.set("categoryId", toolCategory);
+                                    //toolForRent.set("subCategoryId", toolSubCategory);
+                                    //toolForRent.set("userDetailsId", userdetails);
+                                    toolForRent.set("description", request.params.desc);
+                                    toolForRent.set("pricePerDay", decimalAmount);
+                                    //toolForRent.set("isAvailable", "1");
+                                    //toolForRent.set("isRented", "0");
+                                    toolForRent.set("toolImageURL", request.params.imageURL);
+                                    //toolForRent.set("toolImageName", "");
+                                    toolForRent.set("manufacturer", request.params.make);
+                                    toolForRent.set("moreTimeAllowed", request.params.moretimeallowed);
+                                    toolForRent.set("startDate", sdate);
+                                    toolForRent.set("endDate", edate);
+                                    toolForRent.save(null, {
+                                        success: function (toolForRent) {
+                                            response.success("Tool updated success");
+                                        },
+                                        error: function (error) {
+                                            response.error("error occured");
+                                        }
+                                    });
+                                }
+                                else {
+                                    response.error("Tool deleted or not available ");
+                                }
+                            }, function (error) {
+                                response.error(error);
+                            });
+                        }
+                        else {
+                            response.error("Invalid dates passed");
+                        }
                     }
                     else {
                         response.error("please pass valid amount");
