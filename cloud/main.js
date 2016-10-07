@@ -14,67 +14,7 @@ Parse.Cloud.define('hello', function (req, res) {
 
 
 
-Parse.Cloud.define("braintreepayold", function (request, response) {
-    if (request.params.userid != null && request.params.userid != "" && request.params.BTcustomerid != null && request.params.BTcustomerid != "" && request.params.BTcardid != null && request.params.BTcardid != "" && request.params.amount != null && request.params.amount != "" && request.params.toolTakenForRentID != null && request.params.toolTakenForRentID != "") {
-        var user = new Parse.User();
-        user.id = request.params.userid;
 
-
-        var query = new Parse.Query(Parse.User);
-        query.equalTo("objectId", request.params.userid);
-        query.find({
-            success: function (result) {
-                if (result.length > 0) {
-
-
-                    gateway.transaction.sale({
-                        amount: request.params.amount,
-                        //paymentMethodNonce: request.params.nonce,
-                        CustomerId: request.params.BTcustomerid,// balcustomerid,
-                        PaymentMethodToken: request.params.BTcardid,
-                        options: {
-                            submitForSettlement: true
-                        }
-                    }, function (err, result) {
-                        if (result.success == true) {
-
-                            var ToolTakenForRent = Parse.Object.extend("toolTakenForRent");
-                            var toolTakenForRent = new ToolTakenForRent();
-                            toolTakenForRent.id = request.params.toolTakenForRentID;
-
-                            var UserPayment = Parse.Object.extend("userPayment");
-                            var userPayment = new UserPayment();
-                            userPayment.set("user", user);
-                            userPayment.set("txnId", result.transaction.id);
-                            userPayment.set("amount", result.transaction.amount);
-                            userPayment.save(null, {
-                                success: function (userPayment) {
-                                    response.success(userPayment);
-                                },
-                                error: function (error) {
-                                    response.error("error in adding card in collection");
-                                }
-                            });
-
-                        }
-                        else {
-                            response.error(err);
-                        }
-                    });
-                }
-                else {
-                    response.error("User not found");
-                }
-            },
-            error: function (error) {
-                response.error("Error: " + error.code + " " + error.message);
-            }
-        });
-    }
-    else {
-        response.error("all Params are required");
-    }
-});
 
 Parse.Cloud.define("toolPayment", function (request, response) {
     if (request.params.userid != null && request.params.userid != "" && request.params.BTcustomerid != null && request.params.BTcustomerid != "" && request.params.BTcardid != null && request.params.BTcardid != "" && request.params.amount != null && request.params.amount != "" && request.params.toolTakenForRentID != null && request.params.toolTakenForRentID != "") {
@@ -1256,7 +1196,67 @@ Parse.Cloud.define("removeTool", function (request, response) {
 
 
 
+Parse.Cloud.define("braintreepayold", function (request, response) {
+    if (request.params.userid != null && request.params.userid != "" && request.params.BTcustomerid != null && request.params.BTcustomerid != "" && request.params.BTcardid != null && request.params.BTcardid != "" && request.params.amount != null && request.params.amount != "" && request.params.toolTakenForRentID != null && request.params.toolTakenForRentID != "") {
+        var user = new Parse.User();
+        user.id = request.params.userid;
 
+
+        var query = new Parse.Query(Parse.User);
+        query.equalTo("objectId", request.params.userid);
+        query.find({
+            success: function (result) {
+                if (result.length > 0) {
+
+
+                    gateway.transaction.sale({
+                        amount: request.params.amount,
+                        //paymentMethodNonce: request.params.nonce,
+                        CustomerId: request.params.BTcustomerid,// balcustomerid,
+                        PaymentMethodToken: request.params.BTcardid,
+                        options: {
+                            submitForSettlement: true
+                        }
+                    }, function (err, result) {
+                        if (result.success == true) {
+
+                            var ToolTakenForRent = Parse.Object.extend("toolTakenForRent");
+                            var toolTakenForRent = new ToolTakenForRent();
+                            toolTakenForRent.id = request.params.toolTakenForRentID;
+
+                            var UserPayment = Parse.Object.extend("userPayment");
+                            var userPayment = new UserPayment();
+                            userPayment.set("user", user);
+                            userPayment.set("txnId", result.transaction.id);
+                            userPayment.set("amount", result.transaction.amount);
+                            userPayment.save(null, {
+                                success: function (userPayment) {
+                                    response.success(userPayment);
+                                },
+                                error: function (error) {
+                                    response.error("error in adding card in collection");
+                                }
+                            });
+
+                        }
+                        else {
+                            response.error(err);
+                        }
+                    });
+                }
+                else {
+                    response.error("User not found");
+                }
+            },
+            error: function (error) {
+                response.error("Error: " + error.code + " " + error.message);
+            }
+        });
+    }
+    else {
+        response.error("all Params are required");
+    }
+});
 
 Parse.Cloud.define("uploadToolImage", function (request, response) {
     if (request.params.userid != null && request.params.userid != "" && request.params.toolId != null && request.params.toolId != "" && request.params.fileName != null && request.params.fileName != "" && request.params.base64 != null && request.params.base64 != "") {
@@ -1655,28 +1655,47 @@ Parse.Cloud.define("sendEmailMandrill", function (request, response) {
 });
 
 Parse.Cloud.define("sendEmailSendGrid", function (request, response) {
-    
-    var helper = require('sendgrid').mail;
 
-    var from_email = new helper.Email("nagendra.singh@ninedots.com");
-    var to_email = new helper.Email("nagendra.singh@ninedots.com");
-    var subject = "Sending with SendGrid is Fun";
-    var content = new helper.Content("text/plain", "and easy to do anywhere, even with Node.js");
-    var mail = new helper.Mail(from_email, subject, to_email, content);
+    var ApiKeyStores = Parse.Object.extend("apiKeyStores");
+    var apiKeyStores = new ApiKeyStores();
 
-    var sg = require('sendgrid')('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');
-    var request = sg.emptyRequest({
-        method: 'POST',
-        path: '/v3/mail/send',
-        body: mail.toJSON()
-    });
+    var query = new Parse.Query("apiKeyStores");
+    query.equalTo("plateform", "sendgrid");
+    query.find().then(function (results) {
+        if (results.length > 0) {
+            var apikey = results[0].get("apikey");
 
-    sg.API(request, function (error, res) {
-        if (error) {
-            response.error(error);
+            var helper = require('sendgrid').mail;
+
+            var from_email = new helper.Email("nagendra.singh@ninedots.com");
+            var to_email = new helper.Email("nagendra.singh@ninedots.com");
+            var subject = "Sending with SendGrid is Fun";
+            var content = new helper.Content("text/plain", "and easy to do anywhere, even with Node.js");
+            var mail = new helper.Mail(from_email, subject, to_email, content);
+
+            var sg = require('sendgrid')(apikey);
+            var request = sg.emptyRequest({
+                method: 'POST',
+                path: '/v3/mail/send',
+                body: mail.toJSON()
+            });
+
+            sg.API(request, function (error, res) {
+                if (error) {
+                    response.error(error);
+                }
+                response.success(res);
+            });
         }
-        response.success(res);
+        else {
+            response.error("sendgrid Key not found");
+        }
+    },
+    function (error) {
+        response.error(error);
     });
+
+
 
 
     //var sendgrid = require('sendgrid')('judF8IEyT9Wf2yuyKUWxgA');
@@ -1707,27 +1726,45 @@ Parse.Cloud.define("sendEmailSendGrid", function (request, response) {
 Parse.Cloud.define("sendEmail", function (request, response) {
     if (request.params.toEmail != null && request.params.toEmail != null && request.params.subject != null && request.params.subject != null && request.params.body != null && request.params.body != null)
         
-    var helper = require('sendgrid').mail;
 
-    var from_email = new helper.Email("nagendra.singh@ninedots.com");
-    var to_email = new helper.Email(request.params.toEmail);
-    var subject = request.params.subject;
-    var content = new helper.Content("text/html", request.params.body); //text/plain
-    var mail = new helper.Mail(from_email, subject, to_email, content);
+    var ApiKeyStores = Parse.Object.extend("apiKeyStores");
+    var apiKeyStores = new ApiKeyStores();
 
-    var sg = require('sendgrid')('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');
-    var request = sg.emptyRequest({
-        method: 'POST',
-        path: '/v3/mail/send',
-        body: mail.toJSON()
-    });
+    var query = new Parse.Query("apiKeyStores");
+    query.equalTo("plateform", "sendgrid");
+    query.find().then(function (results) {
+        if (results.length > 0) {
+            var apikey = results[0].get("apikey");
 
-    sg.API(request, function (error, res) {
-        if (error) {
-            response.error(error);
+            var helper = require('sendgrid').mail;
+            var from_email = new helper.Email("nagendra.singh@ninedots.com");
+            var to_email = new helper.Email(request.params.toEmail);
+            var subject = request.params.subject;
+            var content = new helper.Content("text/html", request.params.body); //text/plain
+            var mail = new helper.Mail(from_email, subject, to_email, content);
+
+            var sg = require('sendgrid')(apikey);
+            var request = sg.emptyRequest({
+                method: 'POST',
+                path: '/v3/mail/send',
+                body: mail.toJSON()
+            });
+
+            sg.API(request, function (error, res) {
+                if (error) {
+                    response.error(error);
+                }
+                response.success(res);
+            });
         }
-        response.success(res);
+        else {
+            response.error("sendgrid Key not found");
+        }
+    },
+    function (error) {
+        response.error(error);
     });
+
 });
 
 
