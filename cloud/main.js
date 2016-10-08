@@ -1678,47 +1678,71 @@ Parse.Cloud.define("sendEmailSendGrid", function (request, response) {
 });
 
 Parse.Cloud.define("sendEmail", function (request, response) {
-    if (request.params.toEmail != null && request.params.toEmail != null && request.params.subject != null && request.params.subject != null && request.params.body != null && request.params.body != null)
+    if (request.params.toEmail != null && request.params.toEmail != null && request.params.subject != null && request.params.subject != null && request.params.body != null && request.params.body != null) {
+        var helper = require('sendgrid').mail;
+        var from_email = new helper.Email("nagendra.singh@ninedots.com");
+        var to_email = new helper.Email(request.params.toEmail);
+        var subject = request.params.subject;
+        var content = new helper.Content("text/html", request.params.body); //text/plain
+        var mail = new helper.Mail(from_email, subject, to_email, content);
+
+        var sg = require('sendgrid')(process.env.SENDGRID_KEY);
+        var request1 = sg.emptyRequest({
+            method: 'POST',
+            path: '/v3/mail/send',
+            body: mail.toJSON()
+        });
+
+        sg.API(request1, function (error, res) {
+            if (error) {
+                response.error(error);
+            }
+            response.success("Email Sent successfuly");
+        });
+    }
+    else {
+        response.error("missing params");
+    }
         
 
-    var ApiKeyStores = Parse.Object.extend("apiKeyStores");
-    var apiKeyStores = new ApiKeyStores();
+    //var ApiKeyStores = Parse.Object.extend("apiKeyStores");
+    //var apiKeyStores = new ApiKeyStores();
 
-    var query = new Parse.Query("apiKeyStores");
-    query.equalTo("plateform", "sendgrid");
-    query.find().then(function (results) {
-        if (results.length > 0) {
-            var apikey = results[0].get("apikey");
+    //var query = new Parse.Query("apiKeyStores");
+    //query.equalTo("plateform", "sendgrid");
+    //query.find().then(function (results) {
+    //    if (results.length > 0) {
+    //        var apikey = results[0].get("apikey");
            
-            response.success(process.env.SENDGRID_KEY);
-            //var helper = require('sendgrid').mail;
-            //var from_email = new helper.Email("nagendra.singh@ninedots.com");
-            //var to_email = new helper.Email(request.params.toEmail);
-            //var subject = request.params.subject;
-            //var content = new helper.Content("text/html", request.params.body); //text/plain
-            //var mail = new helper.Mail(from_email, subject, to_email, content);
+    //        response.success(process.env.SENDGRID_KEY);
+    //        //var helper = require('sendgrid').mail;
+    //        //var from_email = new helper.Email("nagendra.singh@ninedots.com");
+    //        //var to_email = new helper.Email(request.params.toEmail);
+    //        //var subject = request.params.subject;
+    //        //var content = new helper.Content("text/html", request.params.body); //text/plain
+    //        //var mail = new helper.Mail(from_email, subject, to_email, content);
 
-            //var sg = require('sendgrid')(apikey);
-            //var request1 = sg.emptyRequest({
-            //    method: 'POST',
-            //    path: '/v3/mail/send',
-            //    body: mail.toJSON()
-            //});
+    //        //var sg = require('sendgrid')(apikey);
+    //        //var request1 = sg.emptyRequest({
+    //        //    method: 'POST',
+    //        //    path: '/v3/mail/send',
+    //        //    body: mail.toJSON()
+    //        //});
 
-            //sg.API(request1, function (error, res) {
-            //    if (error) {
-            //        response.error(error);
-            //    }
-            //    response.success("Email Sent successfuly");
-            //});
-        }
-        else {
-            response.error("sendgrid Key not found");
-        }
-    },
-    function (error) {
-        response.error(error);
-    });
+    //        //sg.API(request1, function (error, res) {
+    //        //    if (error) {
+    //        //        response.error(error);
+    //        //    }
+    //        //    response.success("Email Sent successfuly");
+    //        //});
+    //    }
+    //    else {
+    //        response.error("sendgrid Key not found");
+    //    }
+    //},
+    //function (error) {
+    //    response.error(error);
+    //});
 
 });
 
