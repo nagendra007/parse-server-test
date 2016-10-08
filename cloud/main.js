@@ -785,6 +785,9 @@ Parse.Cloud.define("addTakeToolForRent", function (request, response) {
         && request.params.scheduleDate != null && request.params.scheduleDate != "" && request.params.scheduleTime != null && request.params.scheduleTime != ""
         && request.params.isRentNowPickUp != null && request.params.isRentNowPickUp != "" && request.params.isSchedulePickUp != null && request.params.isSchedulePickUp != "") {
 
+        var scheduleTime = request.params.scheduleTime;
+        var isRentNowPickUp = request.params.isRentNowPickUp;
+        var isSchedulePickUp = request.params.isSchedulePickUp;
         var user = new Parse.User();
         user.id = request.params.userid;
         var query = new Parse.Query("userDetails");
@@ -840,9 +843,9 @@ Parse.Cloud.define("addTakeToolForRent", function (request, response) {
                             toolTakenForRent.set("isPaymentDone", "0");
 
                             toolTakenForRent.set("scheduleDate", scheduleDate);
-                            toolTakenForRent.set("scheduleTime", request.params.scheduleTime);
-                            toolTakenForRent.set("isRentNowPickUp", request.params.isRentNowPickUp);
-                            toolTakenForRent.set("isSchedulePickUp", request.params.isSchedulePickUp);
+                            toolTakenForRent.set("scheduleTime", scheduleTime);
+                            toolTakenForRent.set("isRentNowPickUp", isRentNowPickUp);
+                            toolTakenForRent.set("isSchedulePickUp", isSchedulePickUp);
                             toolTakenForRent.set("isApproved", "0");
                             toolTakenForRent.set("isPicked", "0");
 
