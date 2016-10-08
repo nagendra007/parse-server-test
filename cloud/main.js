@@ -1283,6 +1283,39 @@ Parse.Cloud.define("uploadToolImage", function (request, response) {
 
 
 
+Parse.Cloud.define("getTakeToolForRentDetails", function (request, response) {
+    if (request.params.userid != null && request.params.userid != "" && request.params.toolTakenForRentId != null && request.params.toolTakenForRentId != "") {
+        var user = new Parse.User();
+        user.id = request.params.userid;
+        var query = new Parse.Query("userDetails");
+        query.equalTo("user", user);
+        query.find().then(function (results) {
+            if (results.length > 0) {
+                var ToolTakenForRent = Parse.Object.extend("toolTakenForRent");
+                var query = new Parse.Query(ToolTakenForRent);
+                query.equalTo("objectId", request.params.toolTakenForRentId);
+                query.equalTo("user", user);
+                query.find().then(function (toolTakenForRent) {
+                    if (toolTakenForRent.length > 0) {
+                        response.success(toolTakenForRent);
+                    }
+                    else {
+                        response.error("tool Taken For Rent not found");
+                    }
+                });
+            }
+            else {
+                response.error("User details not found, please update your profile");
+            }
+        }, function (error) {
+            response.error("Error: " + error.code + " " + error.message);
+        });
+    }
+    else {
+        response.error("some missing request parameters");
+    }
+
+});
 
 
 
