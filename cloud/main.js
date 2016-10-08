@@ -781,9 +781,9 @@ Parse.Cloud.define("feedback", function (request, response) {
 
 Parse.Cloud.define("addTakeToolForRent", function (request, response) {
     if (request.params.userid != null && request.params.userid != "" && request.params.toolId != null && request.params.toolId != ""
-        && request.params.startDate != null && request.params.startDate != "" && request.params.endDate != null && request.params.endDate != "") {
-        //&& request.params.scheduleDate!= null  &&  request.params.scheduleDate!= ""  && request.params.scheduleTime!= null  request.params.scheduleTime != "" 
-        //&& request.params.isRentNowPickUp!= null  && request.params.isRentNowPickUp!= ""  &&  request.params.isSchedulePickUp!= null  &&  request.params.isSchedulePickUp!= "" 
+        && request.params.startDate != null && request.params.startDate != "" && request.params.endDate != null && request.params.endDate != ""
+        && request.params.scheduleDate!= null  &&  request.params.scheduleDate!= ""  && request.params.scheduleTime!= null && request.params.scheduleTime != "" 
+        && request.params.isRentNowPickUp!= null  && request.params.isRentNowPickUp!= ""  &&  request.params.isSchedulePickUp!= null  &&  request.params.isSchedulePickUp!= "" ) {
         
         var user = new Parse.User();
         user.id = request.params.userid;
@@ -824,6 +824,8 @@ Parse.Cloud.define("addTakeToolForRent", function (request, response) {
 
                         var sdate = new Date(request.params.startDate);
                         var edate = new Date(request.params.endDate);
+
+                        var scheduleDate = new date(request.params.scheduleDate);
                         if (sdate <= edate) {
 
                             toolTakenForRent.set("user", user);
@@ -837,12 +839,12 @@ Parse.Cloud.define("addTakeToolForRent", function (request, response) {
                             toolTakenForRent.set("isCanceled", "0");
                             toolTakenForRent.set("isPaymentDone", "0");
 
-                            //toolTakenForRent.set("scheduleDate", request.params.scheduleDate);
-                            //toolTakenForRent.set("scheduleTime", request.params.scheduleTime);
-                            //toolTakenForRent.set("isRentNowPickUp", request.params.isRentNowPickUp);
-                            //toolTakenForRent.set("isSchedulePickUp", request.params.isSchedulePickUp);
-                            //toolTakenForRent.set("isApproved", "0");
-                            //toolTakenForRent.set("isPicked", "0");
+                            toolTakenForRent.set("scheduleDate", scheduleDate);
+                            toolTakenForRent.set("scheduleTime", request.params.scheduleTime);
+                            toolTakenForRent.set("isRentNowPickUp", request.params.isRentNowPickUp);
+                            toolTakenForRent.set("isSchedulePickUp", request.params.isSchedulePickUp);
+                            toolTakenForRent.set("isApproved", "0");
+                            toolTakenForRent.set("isPicked", "0");
 
 
                             toolTakenForRent.save(null, {
@@ -1808,6 +1810,107 @@ Parse.Cloud.define("braintreepayold", function (request, response) {
     }
 });
 
+Parse.Cloud.define("addTakeToolForRentBackup", function (request, response) {
+    if (request.params.userid != null && request.params.userid != "" && request.params.toolId != null && request.params.toolId != ""
+        && request.params.startDate != null && request.params.startDate != "" && request.params.endDate != null && request.params.endDate != "") {
+        //&& request.params.scheduleDate!= null  &&  request.params.scheduleDate!= ""  && request.params.scheduleTime!= null  request.params.scheduleTime != "" 
+        //&& request.params.isRentNowPickUp!= null  && request.params.isRentNowPickUp!= ""  &&  request.params.isSchedulePickUp!= null  &&  request.params.isSchedulePickUp!= "" 
+
+        var user = new Parse.User();
+        user.id = request.params.userid;
+        var query = new Parse.Query("userDetails");
+        query.equalTo("user", user);
+        query.find().then(function (results) {
+            //success: function (results) {
+            if (results.length > 0) {
+
+                var userdetailsId = "";
+                var userdetailsId = results[0].id;
+                var Userdetails = Parse.Object.extend("userDetails");
+                var userdetails = new Userdetails();
+                userdetails.id = userdetailsId;
+
+                var ToolForRent = Parse.Object.extend("toolForRent");
+                var query = new Parse.Query(ToolForRent);
+                query.equalTo("objectId", request.params.toolId);
+                query.equalTo("isAvailable", "1");
+                query.equalTo("isDeleted", "0");
+                query.find().then(function (toolForRent) {
+                    //success: function (toolForRent) {
+                    if (toolForRent.length > 0) {
+
+                        var toolName = "";
+                        toolName = toolForRent[0].get("toolName");
+                        var pricePerDay = "";
+                        pricePerDay = toolForRent[0].get("pricePerDay");
+
+
+                        var ToolForRent = Parse.Object.extend("toolForRent");
+
+                        var toolForRent1 = new ToolForRent();
+                        toolForRent1.id = request.params.toolId;
+
+                        var ToolTakenForRent = Parse.Object.extend("toolTakenForRent");
+                        var toolTakenForRent = new ToolTakenForRent();
+
+                        var sdate = new Date(request.params.startDate);
+                        var edate = new Date(request.params.endDate);
+                        if (sdate <= edate) {
+
+                            toolTakenForRent.set("user", user);
+                            toolTakenForRent.set("userDetailsId", userdetails);
+                            toolTakenForRent.set("toolRentId", toolForRent1);
+                            toolTakenForRent.set("toolName", toolName);
+                            toolTakenForRent.set("starteDateTime", sdate);
+                            toolTakenForRent.set("endeDateTime", edate);
+                            toolTakenForRent.set("pricePerDay", pricePerDay);
+                            toolTakenForRent.set("isReturned", "0");
+                            toolTakenForRent.set("isCanceled", "0");
+                            toolTakenForRent.set("isPaymentDone", "0");
+
+                            //toolTakenForRent.set("scheduleDate", request.params.scheduleDate);
+                            //toolTakenForRent.set("scheduleTime", request.params.scheduleTime);
+                            //toolTakenForRent.set("isRentNowPickUp", request.params.isRentNowPickUp);
+                            //toolTakenForRent.set("isSchedulePickUp", request.params.isSchedulePickUp);
+                            //toolTakenForRent.set("isApproved", "0");
+                            //toolTakenForRent.set("isPicked", "0");
+
+
+                            toolTakenForRent.save(null, {
+                                success: function (toolTakenForRent) {
+                                    var ToolForRent = Parse.Object.extend("toolForRent");
+                                    var toolForRent1 = new ToolForRent();
+                                    toolForRent1.id = request.params.toolId;
+                                    toolForRent1.set("isAvailable", "0");
+                                    toolForRent1.set("isRented", "1");
+                                    toolForRent1.save();
+                                    response.success("tool rented success");
+                                },
+                                error: function (error) {
+                                    response.error(error);
+                                }
+                            });
+                        }
+                        else {
+                            response.error("Invalid dates passed");
+                        }
+                    }
+                    else {
+                        response.error("tool not available");
+                    }
+                });
+            }
+            else {
+                response.error("User details not found, please update your profile");
+            }
+        }, function (error) {
+            response.error("Error: " + error.code + " " + error.message);
+        });
+    }
+    else {
+        response.error("some missing request parameters");
+    }
+});
 
 //////Job Testing
 
