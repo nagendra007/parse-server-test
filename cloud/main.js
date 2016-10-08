@@ -781,9 +781,9 @@ Parse.Cloud.define("feedback", function (request, response) {
 
 Parse.Cloud.define("addTakeToolForRent", function (request, response) {
     if (request.params.userid != null && request.params.userid != "" && request.params.toolId != null && request.params.toolId != ""
-        && request.params.startDate != null && request.params.startDate != "" && request.params.endDate != null && request.params.endDate != ""
-        && request.params.scheduleDate!= null  &&  request.params.scheduleDate!= ""  && request.params.scheduleTime!= null && request.params.scheduleTime != "" 
-        && request.params.isRentNowPickUp!= null  && request.params.isRentNowPickUp!= ""  &&  request.params.isSchedulePickUp!= null  &&  request.params.isSchedulePickUp!= "" ) {
+        && request.params.startDate != null && request.params.startDate != "" && request.params.endDate != null && request.params.endDate != "" ) {
+        //&& request.params.scheduleDate!= null  &&  request.params.scheduleDate!= ""  && request.params.scheduleTime!= null && request.params.scheduleTime != "" 
+        //&& request.params.isRentNowPickUp!= null  && request.params.isRentNowPickUp!= ""  &&  request.params.isSchedulePickUp!= null  &&  request.params.isSchedulePickUp!= ""
         
         var user = new Parse.User();
         user.id = request.params.userid;
@@ -825,7 +825,7 @@ Parse.Cloud.define("addTakeToolForRent", function (request, response) {
                         var sdate = new Date(request.params.startDate);
                         var edate = new Date(request.params.endDate);
 
-                        var scheduleDate = new date(request.params.scheduleDate);
+                        //var scheduleDate = new date(request.params.scheduleDate);
                         if (sdate <= edate) {
 
                             toolTakenForRent.set("user", user);
