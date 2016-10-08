@@ -1689,27 +1689,27 @@ Parse.Cloud.define("sendEmail", function (request, response) {
     query.find().then(function (results) {
         if (results.length > 0) {
             var apikey = results[0].get("apikey");
+            response.success(apikey);
+            //var helper = require('sendgrid').mail;
+            //var from_email = new helper.Email("nagendra.singh@ninedots.com");
+            //var to_email = new helper.Email(request.params.toEmail);
+            //var subject = request.params.subject;
+            //var content = new helper.Content("text/html", request.params.body); //text/plain
+            //var mail = new helper.Mail(from_email, subject, to_email, content);
 
-            var helper = require('sendgrid').mail;
-            var from_email = new helper.Email("nagendra.singh@ninedots.com");
-            var to_email = new helper.Email(request.params.toEmail);
-            var subject = request.params.subject;
-            var content = new helper.Content("text/html", request.params.body); //text/plain
-            var mail = new helper.Mail(from_email, subject, to_email, content);
+            //var sg = require('sendgrid')(apikey);
+            //var request = sg.emptyRequest({
+            //    method: 'POST',
+            //    path: '/v3/mail/send',
+            //    body: mail.toJSON()
+            //});
 
-            var sg = require('sendgrid')(apikey);
-            var request = sg.emptyRequest({
-                method: 'POST',
-                path: '/v3/mail/send',
-                body: mail.toJSON()
-            });
-
-            sg.API(request, function (error, res) {
-                if (error) {
-                    response.error(error);
-                }
-                response.success("Email Sent successfuly");
-            });
+            //sg.API(request, function (error, res) {
+            //    if (error) {
+            //        response.error(error);
+            //    }
+            //    response.success("Email Sent successfuly");
+            //});
         }
         else {
             response.error("sendgrid Key not found");
@@ -1784,5 +1784,9 @@ Parse.Cloud.define("braintreepayold", function (request, response) {
 });
 
 
+//////Job Testing
 
+Parse.Cloud.job("my_job", function (request, response) {
+    response.success("Ran scheduled job.");
+});
 
