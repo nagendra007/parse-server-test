@@ -781,10 +781,10 @@ Parse.Cloud.define("feedback", function (request, response) {
 
 Parse.Cloud.define("addTakeToolForRent", function (request, response) {
     if (request.params.userid != null && request.params.userid != "" && request.params.toolId != null && request.params.toolId != ""
-        && request.params.startDate != null && request.params.startDate != "" && request.params.endDate != null && request.params.endDate != "" ) {
-        //&& request.params.scheduleDate!= null  &&  request.params.scheduleDate!= ""  && request.params.scheduleTime!= null && request.params.scheduleTime != "" 
-        //&& request.params.isRentNowPickUp!= null  && request.params.isRentNowPickUp!= ""  &&  request.params.isSchedulePickUp!= null  &&  request.params.isSchedulePickUp!= ""
-        
+        && request.params.startDate != null && request.params.startDate != "" && request.params.endDate != null && request.params.endDate != ""
+        && request.params.scheduleDate != null && request.params.scheduleDate != "" && request.params.scheduleTime != null && request.params.scheduleTime != ""
+        && request.params.isRentNowPickUp != null && request.params.isRentNowPickUp != "" && request.params.isSchedulePickUp != null && request.params.isSchedulePickUp != "") {
+
         var user = new Parse.User();
         user.id = request.params.userid;
         var query = new Parse.Query("userDetails");
