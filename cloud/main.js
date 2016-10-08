@@ -512,7 +512,7 @@ Parse.Cloud.define("getuserdetails", function (request, response) {
         });
     }
     else {
-        response.error("please userid");
+        response.error("Userid missing in the request");
     }
 });
 
@@ -667,6 +667,9 @@ Parse.Cloud.define("getRentedTools", function (request, response) {
                             response.error(error);
                         }
                     });
+                }
+                else {
+                    response.error("No Tool on Rent");
                 }
             },
             error: function (error) {
@@ -1280,8 +1283,6 @@ Parse.Cloud.define("uploadToolImage", function (request, response) {
     }
 
 });
-
-
 
 Parse.Cloud.define("getTakeToolForRentDetails", function (request, response) {
     if (request.params.userid != null && request.params.userid != "" && request.params.toolTakenForRentId != null && request.params.toolTakenForRentId != "") {
