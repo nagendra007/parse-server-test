@@ -825,7 +825,7 @@ Parse.Cloud.define("addTakeToolForRent", function (request, response) {
                         var sdate = new Date(request.params.startDate);
                         var edate = new Date(request.params.endDate);
 
-                        //var scheduleDate = new date(request.params.scheduleDate);
+                        var scheduleDate = new date(request.params.scheduleDate);
                         if (sdate <= edate) {
 
                             toolTakenForRent.set("user", user);
@@ -839,12 +839,12 @@ Parse.Cloud.define("addTakeToolForRent", function (request, response) {
                             toolTakenForRent.set("isCanceled", "0");
                             toolTakenForRent.set("isPaymentDone", "0");
 
-                            //toolTakenForRent.set("scheduleDate", scheduleDate);
-                            //toolTakenForRent.set("scheduleTime", request.params.scheduleTime);
-                            //toolTakenForRent.set("isRentNowPickUp", request.params.isRentNowPickUp);
-                            //toolTakenForRent.set("isSchedulePickUp", request.params.isSchedulePickUp);
-                            //toolTakenForRent.set("isApproved", "0");
-                            //toolTakenForRent.set("isPicked", "0");
+                            toolTakenForRent.set("scheduleDate", scheduleDate);
+                            toolTakenForRent.set("scheduleTime", request.params.scheduleTime);
+                            toolTakenForRent.set("isRentNowPickUp", request.params.isRentNowPickUp);
+                            toolTakenForRent.set("isSchedulePickUp", request.params.isSchedulePickUp);
+                            toolTakenForRent.set("isApproved", "0");
+                            toolTakenForRent.set("isPicked", "0");
 
 
                             toolTakenForRent.save(null, {
