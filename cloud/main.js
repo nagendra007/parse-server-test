@@ -693,7 +693,7 @@ Parse.Cloud.define("getMyRentedTools", function (request, response) {
         var query = new Parse.Query(ToolTakenForRent);
         query.equalTo("user", user);
         query.include("toolRentId");
-        query.include("userDetailsId");
+        query.include("toolRentId.userDetailsId");
         query.find({
             success: function (toolTakenForRent) {
                 response.success(toolTakenForRent);
