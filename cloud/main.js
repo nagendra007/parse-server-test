@@ -1424,6 +1424,7 @@ Parse.Cloud.define("setDeviceToken", function (request, response) {
         query.find({
             success: function (result) {
                 if (result.length > 0) {
+                    Parse.Cloud.useMasterKey();
                     var query = new Parse.Query(Parse.Installation);
                     query.equalTo('user', user);
                     query.equalTo('deviceToken', request.params.deviceToken);
