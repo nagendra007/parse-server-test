@@ -1418,6 +1418,7 @@ Parse.Cloud.define("setDeviceToken", function (request, response) {
     if (request.params.userid != null && request.params.userid != "" && request.params.deviceToken != null && request.params.deviceToken != "" && request.params.deviceType != null && request.params.deviceType != "") {
         var user = new Parse.User();
         user.id = request.params.userid;
+
         var query = new Parse.Query(Parse.User);
         query.equalTo("objectId", request.params.userid);  // find all the women
         query.find({
@@ -1445,7 +1446,7 @@ Parse.Cloud.define("setDeviceToken", function (request, response) {
                         }
                        
                     }, function (error) {
-                        response.error("user not found");
+                        response.error(error);
                     });
 
                 }
@@ -1454,7 +1455,7 @@ Parse.Cloud.define("setDeviceToken", function (request, response) {
                 }
             },
             error: function (error) {
-                response.error("error occured");
+                response.error(error);
             }
         });
 
