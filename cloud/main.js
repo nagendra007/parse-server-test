@@ -692,6 +692,8 @@ Parse.Cloud.define("getMyRentedTools", function (request, response) {
         var toolTakenForRent = new ToolTakenForRent();
         var query = new Parse.Query(ToolTakenForRent);
         query.equalTo("user", user);
+        query.include("toolRentId");
+        query.include("userDetailsId");
         query.find({
             success: function (toolTakenForRent) {
                 response.success(toolTakenForRent);
@@ -1509,6 +1511,9 @@ Parse.Cloud.define("sendPushMeesage", function (request, response) {
         response.error("userid missing in request");
     }
 });
+
+
+
 
 Parse.Cloud.define("uploadImageBlob", function (request, response) {
     if (request.params.fileName != null && request.params.fileName != "" && request.params.base64 != null && request.params.base64 != "" && request.params.contentType != null && request.params.contentType != "") {
