@@ -165,7 +165,7 @@ Parse.Cloud.define("addCreditCard", function (request, response) {
                             userCreditCardInfo.set("maskedNumber", maskedNumber);
                             userCreditCardInfo.set("ExpirationMonth", request.params.ExpirationMonth);
                             userCreditCardInfo.set("ExpirationYear", request.params.ExpirationYear);
-                            userCreditCardInfo1.set("isPrimary", "0");
+                            userCreditCardInfo.set("isPrimary", "0");
                             userCreditCardInfo.save(null, {
                                 success: function (userCreditCardInfo) {
                                     response.success(userCreditCardInfo);
@@ -268,8 +268,8 @@ Parse.Cloud.define("setPrimaryCreditCard", function (request, response) {
                             query.find().then(function (userCreditCardInfo) {
                                 if (userCreditCardInfo.length > 0) {
                                     for (var i = 0; i < userCreditCardInfo.length; i++) {
-                                        var userCreditCardInfo1 = Parse.Object.extend("userCreditCardInfo");
-                                        var userCreditCardInfo1 = new userCreditCardInfo1();
+                                        var UserCreditCardInfo1 = Parse.Object.extend("userCreditCardInfo");
+                                        var userCreditCardInfo1 = new UserCreditCardInfo1();
 
                                         var cardid = "";
                                         var cardid = userCreditCardInfo[i].id;
@@ -692,6 +692,9 @@ Parse.Cloud.define("getMyRentedTools", function (request, response) {
         var toolTakenForRent = new ToolTakenForRent();
         var query = new Parse.Query(ToolTakenForRent);
         query.equalTo("user", user);
+        //query.equalTo("isReturned", "0");
+        //query.equalTo("isCanceled", "0");
+        //query.equalTo("isPaymentDone", "0");
         query.include("toolRentId");
         query.include("toolRentId.userDetailsId");
         query.find({
