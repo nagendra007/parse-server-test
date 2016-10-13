@@ -2275,7 +2275,7 @@ Parse.Cloud.define("searchnew", function (request, response) {
                         success: function (toolForRent) {
                             if (toolForRent.length > 0)
                             {
-                                var userlat = toolForRent[0].get("userDetailsId");//.get("location").get("latitude");
+                                var userlat = toolForRent[0].get("userDetailsId").get("location");//.get("latitude");
                                 //var userlong = toolForRent[i].get("userDetailsId").get("location").get("longitude");
                                 response.success(userlat);
                                 //for(var i=0;i<toolForRent.length;i++)
