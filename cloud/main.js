@@ -2296,9 +2296,9 @@ Parse.Cloud.define("searchnew", function (request, response) {
                                 {
                                     var userlat = toolForRent[i].get("userDetailsId").get("location").get("latitude");
                                     var userlong = toolForRent[i].get("userDetailsId").get("location").get("longitude");
-
-                                    var dis = distance(userlat, userlong, request.params.latitude, request.params.longitude, "M");
-                                    toolForRent[i].set("distance", dis);
+                                    response.success(userlat);
+                                    //var dis = distance(userlat, userlong, request.params.latitude, request.params.longitude, "M");
+                                    //toolForRent[i].set("distance", dis);
                                 }
                             }
                             response.success(toolForRent);
