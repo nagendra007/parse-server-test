@@ -2326,7 +2326,7 @@ Parse.Cloud.define("searchnew", function (request, response) {
                             else {
                                 response.error("no data found");
                             }
-                            response.success(toolForRent);
+                            response.success(toolForRent.toJSON());
                         },
                         error: function (error) {
                             //response.error("error occured :" + error.message);
