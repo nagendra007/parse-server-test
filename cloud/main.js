@@ -186,7 +186,7 @@ Parse.Cloud.define("addCreditCard", function (request, response) {
 
                                     userCreditCardInfo.save(null, {
                                         success: function (userCreditCardInfo) {
-                                            response.success(userCreditCardInfo);
+                                            response.success("Card added successfuly");
                                         },
                                         error: function (error) {
                                             response.error("Error in adding card");
