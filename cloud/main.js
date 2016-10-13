@@ -77,7 +77,7 @@ Parse.Cloud.define("toolPayment", function (request, response) {
                                             response.success("payment done successfuly");
                                         },
                                         error: function (error) {
-                                            response.error("error in adding card in collection");
+                                            response.error("error in adding card");
                                         }
                                     });
 
@@ -91,7 +91,7 @@ Parse.Cloud.define("toolPayment", function (request, response) {
                             response.error("taken tool not found");
                         }
                     }, function (error) {
-                        response.error("error occured");
+                        response.error("Error: " + error.code + " " + error.message);
                     });
                 }
                 else {
@@ -104,7 +104,7 @@ Parse.Cloud.define("toolPayment", function (request, response) {
         });
     }
     else {
-        response.error("all Params are required");
+        response.error("Missing request parameters");
     }
 });
 
@@ -171,7 +171,7 @@ Parse.Cloud.define("addCreditCard", function (request, response) {
                                     response.success(userCreditCardInfo);
                                 },
                                 error: function (error) {
-                                    response.error("error in adding card in collection");
+                                    response.error("error in adding card");
                                 }
                             });
 
@@ -199,7 +199,7 @@ Parse.Cloud.define("addCreditCard", function (request, response) {
         });
     }
     else {
-        response.error("all Params are required");
+        response.error("Missing request parameters");
     }
 });
 
@@ -225,7 +225,7 @@ Parse.Cloud.define("getCreditCardList", function (request, response) {
                             response.success(userCreditCardInfo);
                         },
                         error: function (error) {
-                            response.error("error occured");
+                            response.error("Error: " + error.code + " " + error.message);
                         }
                     });
                 }
@@ -289,7 +289,7 @@ Parse.Cloud.define("setPrimaryCreditCard", function (request, response) {
                                     response.error("No CC  found in your account");
                                 }
                             }, function (error) {
-                                response.error("error occured");
+                                response.error("Error: " + error.code + " " + error.message);
                             });
 
                         }
@@ -297,7 +297,7 @@ Parse.Cloud.define("setPrimaryCreditCard", function (request, response) {
                             response.error("CC not found in your account");
                         }
                     }, function (error) {
-                        response.error("error occured");
+                        response.error("Error: " + error.code + " " + error.message);
                     });
                 }
                 else {
@@ -310,7 +310,7 @@ Parse.Cloud.define("setPrimaryCreditCard", function (request, response) {
         });
     }
     else {
-        response.error("please pass request params");
+        response.error("Missing request parameters");
     }
 });
 
@@ -662,7 +662,7 @@ Parse.Cloud.define("addUpdateUserdetails", function (request, response) {
                                 response.success(userDetailstest);
                             },
                             error: function (error) {
-                                response.error("error in adding card in collection");
+                                response.error("error in userdetails");
                             }
                         });
                     });
@@ -725,7 +725,8 @@ Parse.Cloud.define("search", function (request, response) {
                             response.success(toolForRent);
                         },
                         error: function (error) {
-                            response.error("error occured :" + errro.message);
+                            //response.error("error occured :" + error.message);
+                            response.error("Error: " + error.code + " " + error.message);
                         }
                     });
 
@@ -734,13 +735,14 @@ Parse.Cloud.define("search", function (request, response) {
                     response.error("no users available in given radius");
                 }
             },
-            error: function (errro) {
-                response.error("error occured :" + errro.message);
+            error: function (error) {
+                //response.error("error occured :" + error.message);
+                response.error("Error: " + error.code + " " + error.message);
             }
         });
     }
     else {
-        response.error("all Params are required");
+        response.error("Missing request parameters");
     }
 });
 
@@ -830,7 +832,7 @@ Parse.Cloud.define("addTool", function (request, response) {
                                                 response.success("Tool added success");
                                             },
                                             error: function (error) {
-                                                response.error(error);
+                                                response.error("Error: " + error.code + " " + error.message);
                                             }
                                         });
                                     }
@@ -838,7 +840,7 @@ Parse.Cloud.define("addTool", function (request, response) {
                                         response.error("categoty or sub category invalid");
                                     }
                                 }, function (error) {
-                                    response.error(error);
+                                    response.error("Error: " + error.code + " " + error.message);
                                 });
                             }
                             else {
@@ -850,7 +852,7 @@ Parse.Cloud.define("addTool", function (request, response) {
                         }
                     }
                     else {
-                        response.error("missing request parameters");
+                        response.error("Missing request parameters");
                     }
 
                 }
@@ -862,7 +864,7 @@ Parse.Cloud.define("addTool", function (request, response) {
                 response.error("user not found");
             }
         }, function (error) {
-            response.error(error);
+            response.error("Error: " + error.code + " " + error.message);
         });
 
     }
@@ -870,6 +872,9 @@ Parse.Cloud.define("addTool", function (request, response) {
         response.error("userid is required");
     }
 });
+
+
+
 
 Parse.Cloud.define("getRentableTools", function (request, response) {
     if (request.params.userid != null && request.params.userid != "") {
@@ -882,10 +887,15 @@ Parse.Cloud.define("getRentableTools", function (request, response) {
         query.equalTo("isDeleted", "0");
         query.find({
             success: function (toolForRent) {
-                response.success(toolForRent);
+                if (toolForRent.length > 0) {
+                    response.success(toolForRent);
+                }
+                else {
+                    response.error("Currently no rentable tools available");
+                }
             },
             error: function (error) {
-                response.error("error occured");
+                response.error("Error: " + error.code + " " + error.message);
             }
         });
     }
@@ -922,11 +932,11 @@ Parse.Cloud.define("getRentedTools", function (request, response) {
                     });
                 }
                 else {
-                    response.error("No Tool on Rent");
+                    response.error("you have no rented tools");
                 }
             },
             error: function (error) {
-                response.error("error occured");
+                response.error("Error: " + error.code + " " + error.message);
             }
         });
     }
@@ -945,17 +955,22 @@ Parse.Cloud.define("getMyRentedTools", function (request, response) {
         var toolTakenForRent = new ToolTakenForRent();
         var query = new Parse.Query(ToolTakenForRent);
         query.equalTo("user", user);
-        //query.equalTo("isReturned", "0");
-        //query.equalTo("isCanceled", "0");
-        //query.equalTo("isPaymentDone", "0");
+        query.equalTo("isReturned", "0");
+        query.equalTo("isCanceled", "0");
+        query.equalTo("isPaymentDone", "0");
         query.include("toolRentId");
         query.include("toolRentId.userDetailsId");
         query.find({
             success: function (toolTakenForRent) {
-                response.success(toolTakenForRent);
+                if (toolTakenForRent.length > 0) {
+                    response.success(toolTakenForRent);
+                }
+                else {
+                    response.error("you have not taken any tool on rent yet");
+                }
             },
             error: function (error) {
-                response.error("error occured");
+                response.error("Error: " + error.code + " " + error.message);
             }
         });
     }
@@ -963,6 +978,9 @@ Parse.Cloud.define("getMyRentedTools", function (request, response) {
         response.error("userid missing in request");
     }
 });
+
+
+
 
 Parse.Cloud.define("feedback", function (request, response) {
     if (request.params.userid != null && request.params.userid != "") {
