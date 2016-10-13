@@ -2311,7 +2311,7 @@ Parse.Cloud.define("searchnew", function (request, response) {
                         success: function (toolForRent) {
                             if (toolForRent.length > 0)
                             {
-                                var userlat = toolForRent[0].get("userDetailsId").get("location").get("latitude");
+                                //var userlat = toolForRent[0].get("userDetailsId").get("location").get("latitude");
                                 //var userlong = toolForRent[i].get("userDetailsId").get("location").get("longitude");
                                 //response.success(userlat);
                                 //for(var i=0;i<toolForRent.length;i++)
@@ -2320,7 +2320,7 @@ Parse.Cloud.define("searchnew", function (request, response) {
                                 //    var userlong = toolForRent[i].get("userDetailsId").get("location").get("longitude");
                                 //    response.success(userlat);
                                 //    //var dis = distance(userlat, userlong, request.params.latitude, request.params.longitude, "M");
-                                toolForRent[i].set("distance", "1");
+                                toolForRent[0].set("distance", "1");
                                 //}
                             }
                             else {
