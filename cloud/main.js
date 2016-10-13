@@ -430,7 +430,6 @@ Parse.Cloud.define("addUpdateUserdetails_old", function (request, response) {
     }
 });
 
-
 Parse.Cloud.define("addUpdateUserdetails", function (request, response) {
     if (request.params.userid != null && request.params.userid != "") {
         var query = new Parse.Query(Parse.User);
@@ -746,9 +745,6 @@ Parse.Cloud.define("search", function (request, response) {
     }
 });
 
-
-
-
 Parse.Cloud.define("getuserdetails", function (request, response) {
     if (request.params.userid != null && request.params.userid != "") {//if (request.params.nonce != null && request.params.nonce != "" ) {
         var user = new Parse.User();
@@ -876,9 +872,6 @@ Parse.Cloud.define("addTool", function (request, response) {
     }
 });
 
-
-
-
 Parse.Cloud.define("getRentableTools", function (request, response) {
     if (request.params.userid != null && request.params.userid != "") {
         var user = new Parse.User();
@@ -981,9 +974,6 @@ Parse.Cloud.define("getMyRentedTools", function (request, response) {
         response.error("Userid missing in request");
     }
 });
-
-
-
 
 Parse.Cloud.define("feedback", function (request, response) {
     if (request.params.userid != null && request.params.userid != "") {
@@ -1496,11 +1486,6 @@ Parse.Cloud.define("removeTool", function (request, response) {
     }
 });
 
-
-
-
-
-
 Parse.Cloud.define("uploadToolImage", function (request, response) {
     if (request.params.userid != null && request.params.userid != "" && request.params.toolId != null && request.params.toolId != "" && request.params.fileName != null && request.params.fileName != "" && request.params.base64 != null && request.params.base64 != "") {
 
@@ -1595,8 +1580,6 @@ Parse.Cloud.define("getTakeToolForRentDetails", function (request, response) {
     }
 
 });
-
-
 
 Parse.Cloud.define("toolApplePayment", function (request, response) {
     if (request.params.userid != null && request.params.userid != "" && request.params.nonce != null && request.params.nonce != ""  && request.params.amount != null && request.params.amount != "" && request.params.toolTakenForRentID != null && request.params.toolTakenForRentID != "") {
@@ -2292,16 +2275,22 @@ Parse.Cloud.define("searchnew", function (request, response) {
                         success: function (toolForRent) {
                             if (toolForRent.length > 0)
                             {
-                                for(var i=0;i<toolForRent.length;i++)
-                                {
-                                    var userlat = toolForRent[i].get("userDetailsId").get("location").get("latitude");
-                                    var userlong = toolForRent[i].get("userDetailsId").get("location").get("longitude");
-                                    response.success(userlat);
-                                    //var dis = distance(userlat, userlong, request.params.latitude, request.params.longitude, "M");
-                                    //toolForRent[i].set("distance", dis);
-                                }
+                                var userlat = toolForRent[0].get("userDetailsId");//.get("location").get("latitude");
+                                //var userlong = toolForRent[i].get("userDetailsId").get("location").get("longitude");
+                                response.success(userlat);
+                                //for(var i=0;i<toolForRent.length;i++)
+                                //{
+                                //    var userlat = toolForRent[i].get("userDetailsId");//.get("location").get("latitude");
+                                //    var userlong = toolForRent[i].get("userDetailsId").get("location").get("longitude");
+                                //    response.success(userlat);
+                                //    //var dis = distance(userlat, userlong, request.params.latitude, request.params.longitude, "M");
+                                //    //toolForRent[i].set("distance", dis);
+                                //}
                             }
-                            response.success(toolForRent);
+                            else {
+                                response.error("no data found");
+                            }
+                            //response.success(toolForRent);
                         },
                         error: function (error) {
                             //response.error("error occured :" + error.message);
