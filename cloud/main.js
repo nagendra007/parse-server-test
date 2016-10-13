@@ -679,7 +679,7 @@ Parse.Cloud.define("addUpdateUserdetails", function (request, response) {
 });
 
 Parse.Cloud.define("search", function (request, response) {
-    if (request.params.latitude != null && request.params.latitude != "" && request.params.longitude != null && request.params.longitude != "" && request.params.miles != null && request.params.miles != "" && request.params.categoryId != null && request.params.categoryId != "" && request.params.subcategoryId != null && request.params.subcategoryId != "") {
+    if (request.params.latitude != null && request.params.latitude != "" && request.params.longitude != null && request.params.longitude != "" && request.params.miles != null && request.params.miles != "") {// && request.params.categoryId != null && request.params.categoryId != "" && request.params.subcategoryId != null && request.params.subcategoryId != ""
 
         var point = new Parse.GeoPoint(parseFloat( request.params.latitude), parseFloat( request.params.longitude));
         //var point = new Parse.GeoPoint(18.2403, 73.1305);
@@ -705,16 +705,23 @@ Parse.Cloud.define("search", function (request, response) {
                     query.equalTo("isAvailable", "1");
                     query.equalTo("isDeleted", "0");
 
-                    var ToolCategory = Parse.Object.extend("toolCategory");
-                    var toolcategory = new ToolCategory();
-                    toolcategory.id = request.params.categoryId;
-                    var ToolSubCategory = Parse.Object.extend("toolSubCategory");
-                    var toolSubCategory = new ToolSubCategory();
-                    toolSubCategory.id = request.params.subcategoryId;
+                    if (request.params.categoryId != null && request.params.categoryId != "") {
+                        var ToolCategory = Parse.Object.extend("toolCategory");
+                        var toolcategory = new ToolCategory();
+                        toolcategory.id = request.params.categoryId;
+                        query.equalTo("categoryId", toolcategory);
+                    }
+
+                    if (request.params.subcategoryId != null && request.params.subcategoryId != "") {
+                        var ToolSubCategory = Parse.Object.extend("toolSubCategory");
+                        var toolSubCategory = new ToolSubCategory();
+                        toolSubCategory.id = request.params.subcategoryId;
+                        query.equalTo("subCategoryId", toolSubCategory);
+                    }
 
 
-                    query.equalTo("categoryId", toolcategory);
-                    query.equalTo("subCategoryId", toolSubCategory);
+                    
+                    
                     query.containedIn("user", myusers);
                     query.include("categoryId");
                     query.include("subCategoryId");
