@@ -171,6 +171,8 @@ Parse.Cloud.define("addCreditCard", function (request, response) {
                                     userCreditCardInfo.set("BTcardid", BTcardid);
                                     userCreditCardInfo.set("cardtype", cardtype);
                                     userCreditCardInfo.set("maskedNumber", maskedNumber);
+                                    userCreditCardInfo.set("CardholderName", request.params.CardholderName);
+                                    
                                     userCreditCardInfo.set("ExpirationMonth", request.params.ExpirationMonth);
                                     userCreditCardInfo.set("ExpirationYear", request.params.ExpirationYear);
 
