@@ -746,6 +746,9 @@ Parse.Cloud.define("search", function (request, response) {
     }
 });
 
+
+
+
 Parse.Cloud.define("getuserdetails", function (request, response) {
     if (request.params.userid != null && request.params.userid != "") {//if (request.params.nonce != null && request.params.nonce != "" ) {
         var user = new Parse.User();
@@ -2243,6 +2246,100 @@ Parse.Cloud.define("addTakeToolForRentBackup", function (request, response) {
         response.error("some missing request parameters");
     }
 });
+
+Parse.Cloud.define("searchnew", function (request, response) {
+    if (request.params.latitude != null && request.params.latitude != "" && request.params.longitude != null && request.params.longitude != "" && request.params.miles != null && request.params.miles != "" && request.params.categoryId != null && request.params.categoryId != "" && request.params.subcategoryId != null && request.params.subcategoryId != "") {
+
+        var point = new Parse.GeoPoint(parseFloat(request.params.latitude), parseFloat(request.params.longitude));
+        //var point = new Parse.GeoPoint(18.2403, 73.1305);
+        var UserDetails = Parse.Object.extend("userDetails");
+        var userDetails = new UserDetails();
+        var query = new Parse.Query(UserDetails);
+
+        query.withinMiles("location", point, request.params.miles);
+        if (request.params.userid != null && request.params.userid != "") {
+            var user = new Parse.User();
+            user.id = request.params.userid;
+            query.notEqualTo("user", user);
+        }
+        query.find({
+            success: function (userDetails) {
+                if (userDetails.length > 0) {
+                    var myusers = [];
+                    for (var j = 0; j < userDetails.length; j++) {
+                        myusers.push(userDetails[j].get("user"));
+                    }
+                    var ToolForRent = Parse.Object.extend("toolForRent");
+                    var query = new Parse.Query(ToolForRent);
+                    query.equalTo("isAvailable", "1");
+                    query.equalTo("isDeleted", "0");
+
+                    var ToolCategory = Parse.Object.extend("toolCategory");
+                    var toolcategory = new ToolCategory();
+                    toolcategory.id = request.params.categoryId;
+                    var ToolSubCategory = Parse.Object.extend("toolSubCategory");
+                    var toolSubCategory = new ToolSubCategory();
+                    toolSubCategory.id = request.params.subcategoryId;
+
+
+                    query.equalTo("categoryId", toolcategory);
+                    query.equalTo("subCategoryId", toolSubCategory);
+                    query.containedIn("user", myusers);
+                    query.include("categoryId");
+                    query.include("subCategoryId");
+                    query.include("userDetailsId");
+                    query.find({
+                        success: function (toolForRent) {
+                            if (toolForRent.length > 0)
+                            {
+                                for(var i=0;i<toolForRent.length;i++)
+                                {
+                                    var userlat = toolForRent[i].get("userDetailsId").get("location").get("latitude");
+                                    var userlong = toolForRent[i].get("userDetailsId").get("location").get("longitude");
+
+                                    var dis = distance(userlat, userlong, request.params.latitude, request.params.longitude, "M");
+                                    toolForRent[i].set("distance", dis);
+                                }
+                            }
+                            response.success(toolForRent);
+                        },
+                        error: function (error) {
+                            //response.error("error occured :" + error.message);
+                            response.error("Error: " + error.code + " " + error.message);
+                        }
+                    });
+
+                }
+                else {
+                    response.error("No users available in given radius");
+                }
+            },
+            error: function (error) {
+                //response.error("error occured :" + error.message);
+                response.error("Error: " + error.code + " " + error.message);
+            }
+        });
+    }
+    else {
+        response.error("Missing request parameters");
+    }
+});
+
+
+function distance(lat1, lon1, lat2, lon2, unit) {
+    var radlat1 = Math.PI * lat1 / 180
+    var radlat2 = Math.PI * lat2 / 180
+    var theta = lon1 - lon2
+    var radtheta = Math.PI * theta / 180
+    var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+    dist = Math.acos(dist)
+    dist = dist * 180 / Math.PI
+    dist = dist * 60 * 1.1515
+    if (unit == "K") { dist = dist * 1.609344 }
+    if (unit == "N") { dist = dist * 0.8684 }
+    return dist
+}
+
 
 //////Job Testing
 
