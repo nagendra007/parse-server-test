@@ -2313,20 +2313,20 @@ Parse.Cloud.define("searchnew", function (request, response) {
                             {
                                 var userlat = toolForRent[0].get("userDetailsId").get("location").get("latitude");
                                 //var userlong = toolForRent[i].get("userDetailsId").get("location").get("longitude");
-                                response.success(userlat);
+                                //response.success(userlat);
                                 //for(var i=0;i<toolForRent.length;i++)
                                 //{
                                 //    var userlat = toolForRent[i].get("userDetailsId");//.get("location").get("latitude");
                                 //    var userlong = toolForRent[i].get("userDetailsId").get("location").get("longitude");
                                 //    response.success(userlat);
                                 //    //var dis = distance(userlat, userlong, request.params.latitude, request.params.longitude, "M");
-                                //    //toolForRent[i].set("distance", dis);
+                                toolForRent[i].set("distance", "1");
                                 //}
                             }
                             else {
                                 response.error("no data found");
                             }
-                            //response.success(toolForRent);
+                            response.success(toolForRent);
                         },
                         error: function (error) {
                             //response.error("error occured :" + error.message);
