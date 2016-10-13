@@ -151,29 +151,56 @@ Parse.Cloud.define("addCreditCard", function (request, response) {
                         }
                     }, function (err, result) {
                         if (result.success == true) {
-                            var BTcustomerid = result.customer.id;
-                            var BTcardid = result.customer.creditCards[0].token;
-                            var cardtype = result.customer.creditCards[0].cardType;
-                            var maskedNumber = result.customer.creditCards[0].maskedNumber;
 
                             var UserCreditCardInfo = Parse.Object.extend("userCreditCardInfo");
-                            var userCreditCardInfo = new UserCreditCardInfo();
-                            userCreditCardInfo.set("user", user);
-                            userCreditCardInfo.set("BTcustomerid", BTcustomerid);
-                            userCreditCardInfo.set("BTcardid", BTcardid);
-                            userCreditCardInfo.set("cardtype", cardtype);
-                            userCreditCardInfo.set("maskedNumber", maskedNumber);
-                            userCreditCardInfo.set("ExpirationMonth", request.params.ExpirationMonth);
-                            userCreditCardInfo.set("ExpirationYear", request.params.ExpirationYear);
-                            userCreditCardInfo.set("isPrimary", "0");
-                            userCreditCardInfo.save(null, {
-                                success: function (userCreditCardInfo) {
-                                    response.success(userCreditCardInfo);
+
+                            var query = new Parse.Query(UserCreditCardInfo);
+                            query.equalTo("user", user);
+                            query.find({
+                                success: function (userCreditCardInfo1) {
+
+                                    var BTcustomerid = result.customer.id;
+                                    var BTcardid = result.customer.creditCards[0].token;
+                                    var cardtype = result.customer.creditCards[0].cardType;
+                                    var maskedNumber = result.customer.creditCards[0].maskedNumber;
+
+                                    var UserCreditCardInfo = Parse.Object.extend("userCreditCardInfo");
+                                    var userCreditCardInfo = new UserCreditCardInfo();
+                                    userCreditCardInfo.set("user", user);
+                                    userCreditCardInfo.set("BTcustomerid", BTcustomerid);
+                                    userCreditCardInfo.set("BTcardid", BTcardid);
+                                    userCreditCardInfo.set("cardtype", cardtype);
+                                    userCreditCardInfo.set("maskedNumber", maskedNumber);
+                                    userCreditCardInfo.set("ExpirationMonth", request.params.ExpirationMonth);
+                                    userCreditCardInfo.set("ExpirationYear", request.params.ExpirationYear);
+
+                                    
+                                    if (userCreditCardInfo1.length > 0) {
+                                        userCreditCardInfo.set("isPrimary", "0");
+                                    }
+                                    else {
+                                        userCreditCardInfo.set("isPrimary", "1");
+                                    }
+
+                                    userCreditCardInfo.save(null, {
+                                        success: function (userCreditCardInfo) {
+                                            response.success(userCreditCardInfo);
+                                        },
+                                        error: function (error) {
+                                            response.error("Error in adding card");
+                                        }
+                                    });
+
+
+                                   
                                 },
                                 error: function (error) {
-                                    response.error("Error in adding card");
+                                    response.error("Error: " + error.code + " " + error.message);
                                 }
                             });
+
+
+                            
 
                         }
                         else {
