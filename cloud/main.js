@@ -1734,7 +1734,7 @@ Parse.Cloud.define("setDeviceToken", function (request, response) {
                                 var installationQuery = Parse.Installation;
                                 var abc = new installationQuery();
                                 abc.set('deviceToken', request.params.deviceToken);
-                                abc.set('deviceType', request.params.deviceType);
+                                abc.set('deviceType', request.params.deviceType.toLowerCase());
 
                                 abc.set('user', user);
                                 abc.save();
