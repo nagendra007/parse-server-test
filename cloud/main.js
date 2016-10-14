@@ -1777,8 +1777,14 @@ Parse.Cloud.define("sendPushMeesage", function (request, response) {
 
                     Parse.Push.send({
                         where: query, // Set our Installation query
-                        data: {
-                            alert: "Hey you tool time is going to out."
+                        //data: {
+                        //    message: "Hey you tool time is going to out."
+                        //}
+                        "data": {
+                            "title": "Toolio Rocks",
+                            "message": "This is the test toolio push",
+                            "key1": "data 1",
+                            "key2": "data 2"
                         }
                     }, {
                         success: function () {
@@ -2307,11 +2313,12 @@ Parse.Cloud.define("searchnew", function (request, response) {
                     query.include("categoryId");
                     query.include("subCategoryId");
                     query.include("userDetailsId");
+                    query.select("userDetailsId.location.latitude");
                     query.find({
                         success: function (toolForRent) {
                             if (toolForRent.length > 0)
                             {
-                                //var userlat = toolForRent[0].get("userDetailsId").get("location").get("latitude");
+                                var userlat = toolForRent[0].get("userDetailsId").get("location").get("latitude");
                                 //var userlong = toolForRent[i].get("userDetailsId").get("location").get("longitude");
                                 //response.success(userlat);
                                 //for(var i=0;i<toolForRent.length;i++)
@@ -2326,7 +2333,7 @@ Parse.Cloud.define("searchnew", function (request, response) {
                             else {
                                 response.error("no data found");
                             }
-                            response.success(toolForRent.toJSON());
+                            response.success(toolForRent);
                         },
                         error: function (error) {
                             //response.error("error occured :" + error.message);
