@@ -1745,24 +1745,34 @@ Parse.Cloud.define("setDeviceToken", function (request, response) {
                         query.equalTo('deviceToken', request.params.deviceToken);
                         query.equalTo('deviceType', request.params.deviceType.toLowerCase());
                         query.find().then(function (result) {
-                            var installationQuery = Parse.Installation;
-                            var abc = new installationQuery();
+                            //var installationQuery = Parse.Installation;
+                            //var abc = new installationQuery();
                             if (result.length > 0) {
-                                abc.id = result[0].id;
-                                //response.success("Device already registered");
+                                var installationQuery1 = Parse.Installation;
+                                var abc1 = new installationQuery1();
+                                abc1.id = result[0].id;
+                                abc1.set('deviceToken', request.params.deviceToken);
+                                abc1.set('deviceType', request.params.deviceType.toLowerCase());
+
+                                abc1.set('user', user);
+                                abc1.set('updated', "1");
+                                abc1.save();
+                                response.success("Device updated successfuly");
                             }
                             else {
-                                //var installationQuery = Parse.Installation;
-                                //var abc = new installationQuery();
-                               
+                                var installationQuery = Parse.Installation;
+                                var abc = new installationQuery();
+                                abc.set('deviceToken', request.params.deviceToken);
+                                abc.set('deviceType', request.params.deviceType.toLowerCase());
+
+                                abc.set('user', user);
+                                abc1.set('updated', "0");
+                                abc.save();
+
+                                response.success("Device added successfuly");
                             }
-                            abc.set('deviceToken', request.params.deviceToken);
-                            abc.set('deviceType', request.params.deviceType.toLowerCase());
-
-                            abc.set('user', user);
-                            abc.save();
-
-                            response.success("Device added success");
+                           
+                           
                         }, function (error) {
                             response.error("Error: " + error.message);
                         });
