@@ -36,15 +36,15 @@ var api = new ParseServer({
       android: {
         senderId: '396448347452',
         apiKey: 'AIzaSyBFOOgUxGnlB0CIwTxDwycw0wHD3jM2RS0'
-      }//,
-      //ios: {
-      //    pfx: '', // The filename of private key and certificate in PFX or PKCS12 format from disk  
-      //    passphrase: '', // optional password to your p12
-      //    cert: '', // If not using the .p12 format, the path to the certificate PEM to load from disk
-      //    key: '', // If not using the .p12 format, the path to the private key PEM to load from disk
-      //    bundleId: 'co.toolio.app', // The bundle identifier associate with your app
-      //    production: false // Specifies which environment to connect to: Production (if true) or Sandbox
-      //}
+      },
+      ios: {
+          pfx: '', // The filename of private key and certificate in PFX or PKCS12 format from disk  
+          passphrase: '', // optional password to your p12
+          cert: '', // If not using the .p12 format, the path to the certificate PEM to load from disk
+          key: 'AIzaSyBFOOgUxGnlB0CIwTxDwycw0wHD3jM2RS0', // If not using the .p12 format, the path to the private key PEM to load from disk
+          bundleId: 'co.toolio.app', // The bundle identifier associate with your app
+          production: false // Specifies which environment to connect to: Production (if true) or Sandbox
+      }
     }
 });
 // Client-keys like the javascript key or the .NET key are not necessary with parse-server
