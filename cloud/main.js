@@ -1723,25 +1723,28 @@ Parse.Cloud.define("setDeviceToken", function (request, response) {
                     if (result.length > 0) {
                         Parse.Cloud.useMasterKey();
                         var query = new Parse.Query(Parse.Installation);
-                        query.equalTo('user', user);
+                        //query.equalTo('user', user);
                         query.equalTo('deviceToken', request.params.deviceToken);
                         query.equalTo('deviceType', request.params.deviceType.toLowerCase());
                         query.find().then(function (result) {
+                            var installationQuery = Parse.Installation;
+                            var abc = new installationQuery();
                             if (result.length > 0) {
-                                response.success("Device already registered");
+                                abc.id = result[0].id;
+                                //response.success("Device already registered");
                             }
                             else {
-                                var installationQuery = Parse.Installation;
-                                var abc = new installationQuery();
-                                abc.set('deviceToken', request.params.deviceToken);
-                                abc.set('deviceType', request.params.deviceType.toLowerCase());
-
-                                abc.set('user', user);
-                                abc.save();
-
-                                response.success("Device added success");
+                                //var installationQuery = Parse.Installation;
+                                //var abc = new installationQuery();
+                               
                             }
+                            abc.set('deviceToken', request.params.deviceToken);
+                            abc.set('deviceType', request.params.deviceType.toLowerCase());
 
+                            abc.set('user', user);
+                            abc.save();
+
+                            response.success("Device added success");
                         }, function (error) {
                             response.error("Error: " + error.message);
                         });
@@ -1813,7 +1816,65 @@ Parse.Cloud.define("sendPushMeesage", function (request, response) {
     }
 });
 
+Parse.Cloud.define("removeDeviceToken", function (request, response) {
+    if (request.params.userid != null && request.params.userid != "" && request.params.deviceToken != null && request.params.deviceToken != "" && request.params.deviceType != null && request.params.deviceType != "") {
+        if (request.params.deviceType.toLowerCase() == "android" || request.params.deviceType.toLowerCase() == "ios") {
+            var user = new Parse.User();
+            user.id = request.params.userid;
 
+            var query = new Parse.Query(Parse.User);
+            query.equalTo("objectId", request.params.userid);  // find all the women
+            query.find({
+                success: function (result) {
+                    if (result.length > 0) {
+                        Parse.Cloud.useMasterKey();
+                        var query = new Parse.Query(Parse.Installation);
+                        query.equalTo('user', user);
+                        query.equalTo('deviceToken', request.params.deviceToken);
+                        query.equalTo('deviceType', request.params.deviceType.toLowerCase());
+                        query.find().then(function (result) {
+                          
+                            if (result.length > 0) {
+                                var installationQuery = Parse.Installation;
+                                var abc = new installationQuery();
+                                abc.id = result[0].id;
+                               
+                                abc.destroy({
+                                    success: function (myObject) {
+                                        response.success("Device unsubscribed successfuly");
+                                    },
+                                    error: function (myObject, error) {
+                                        response.error("Error: " + error.message);
+                                    }
+                                });
+                            }
+                            else {
+                                response.error("No registered device found");
+                            }
+                           
+
+                        }, function (error) {
+                            response.error("Error: " + error.message);
+                        });
+
+                    }
+                    else {
+                        response.error("User not found");
+                    }
+                },
+                error: function (error) {
+                    response.error("Error: " + error.message);
+                }
+            });
+        }
+        else {
+            response.error("Invalid device type specified");
+        }
+    }
+    else {
+        response.error("Missing request parameters");
+    }
+});
 
 
 
