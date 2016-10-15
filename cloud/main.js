@@ -1913,8 +1913,8 @@ Parse.Cloud.define("sendToolRentPushMeesage", function (request, response) {
                         //    message: "Hey you tool time is going to out."
                         //}
                         "data": {
-                            "title": request.params.title,
-                            "message": request.params.message,
+                            //"title": request.params.title,
+                            "alert": request.params.message,
                             "tid": request.params.toolId
                         }
                     }, {
