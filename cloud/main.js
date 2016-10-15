@@ -1915,8 +1915,11 @@ Parse.Cloud.define("sendToolRentPushMeesage", function (request, response) {
                         "data": {
                             //"title": request.params.title,
                             "alert": request.params.message,
-                            "tid": request.params.toolId
-                        }
+                            "tid": request.params.toolId,
+                            "ptype":"1"
+                        },
+                        "priority": "high"
+
                     }, {
                         success: function () {
                             response.success("Push was successful");
