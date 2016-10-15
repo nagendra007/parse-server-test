@@ -1766,7 +1766,7 @@ Parse.Cloud.define("setDeviceToken", function (request, response) {
                                 abc.set('deviceType', request.params.deviceType.toLowerCase());
 
                                 abc.set('user', user);
-                                abc1.set('updated', "0");
+                                abc.set('updated', "0");
                                 abc.save();
 
                                 response.success("Device added successfuly");
