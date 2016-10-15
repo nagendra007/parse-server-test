@@ -1174,7 +1174,8 @@ Parse.Cloud.define("addTakeToolForRent", function (request, response) {
 
                                     if (toolOwnerUserId != null && toolOwnerUserId != "")
                                     {
-                                        Parse.Cloud.run('sendPushMeesage', { userid: toolOwnerUserId }, {
+                                        var msg = "your " + toolName + " is rented";
+                                        Parse.Cloud.run('sendToolRentPushMeesage', { userid: toolOwnerUserId, title: "Tool Rented", message: msg, toolId: request.params.toolId }, {
                                             success: function (result) {
                                                 //alert(result.length);
                                             },
@@ -1893,7 +1894,52 @@ Parse.Cloud.define("removeDeviceToken", function (request, response) {
     }
 });
 
+Parse.Cloud.define("sendToolRentPushMeesage", function (request, response) {
+    if (request.params.userid != null && request.params.userid != "" && request.params.title != null && request.params.title != "" && request.params.message != null && request.params.message != "" && request.params.toolId != null && request.params.toolId != "") {
+        var user = new Parse.User();
+        user.id = request.params.userid;
+        var query = new Parse.Query(Parse.User);
+        query.equalTo("objectId", request.params.userid);  // find all the women
+        query.find({
+            success: function (result) {
+                if (result.length > 0) {
 
+                    var query = new Parse.Query(Parse.Installation);
+                    query.equalTo('user', user);
+
+                    Parse.Push.send({
+                        where: query, // Set our Installation query
+                        //data: {
+                        //    message: "Hey you tool time is going to out."
+                        //}
+                        "data": {
+                            "title": request.params.title,
+                            "message": request.params.message,
+                            "tid": request.params.toolId
+                        }
+                    }, {
+                        success: function () {
+                            response.success("Push was successful");
+                        },
+                        error: function (error) {
+                            response.error("Error: " + error.message);
+                        },
+                        useMasterKey: true
+                    });
+                }
+                else {
+                    response.error("User not found");
+                }
+            },
+            error: function (error) {
+                response.error("Error: " + error.message);
+            }
+        });
+    }
+    else {
+        response.error("Userid missing in request");
+    }
+});
 
 
 
