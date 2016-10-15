@@ -1120,7 +1120,9 @@ Parse.Cloud.define("addTakeToolForRent", function (request, response) {
                 query.find().then(function (toolForRent) {
                     //success: function (toolForRent) {
                     if (toolForRent.length > 0) {
-
+                        var toolOwnerUserId = "";
+                        toolOwnerUserId = toolForRent[0].get("user").id;
+                        
                         var toolName = "";
                         toolName = toolForRent[0].get("toolName");
                         var pricePerDay = "";
@@ -1168,7 +1170,22 @@ Parse.Cloud.define("addTakeToolForRent", function (request, response) {
                                     toolForRent1.set("isAvailable", "0");
                                     toolForRent1.set("isRented", "1");
                                     toolForRent1.save();
+
+
+                                    if (toolOwnerUserId != null && toolOwnerUserId != "")
+                                    {
+                                        Parse.Cloud.run('sendPushMeesage', { userid: toolOwnerUserId }, {
+                                            success: function (result) {
+                                                //alert(result.length);
+                                            },
+                                            error: function (error) {
+                                            }
+                                        });
+                                    }
                                     response.success("Tool rented success");
+
+
+
                                 },
                                 error: function (error) {
                                     response.error("Error: " + error.message);
