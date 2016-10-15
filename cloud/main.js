@@ -1751,10 +1751,10 @@ Parse.Cloud.define("setDeviceToken", function (request, response) {
                                 //var installationQuery1 = Parse.Installation;
                                 //var abc1 = new installationQuery1();
                                 //abc1.id = result[0].id;
-                                //abc1.set('deviceToken', request.params.deviceToken);
-                                //abc1.set('deviceType', request.params.deviceType.toLowerCase());
+                                ////abc1.set('deviceToken', request.params.deviceToken);
+                                ////abc1.set('deviceType', request.params.deviceType.toLowerCase());
 
-                                //abc1.set('user', user);
+                                ////abc1.set('user', user);
                                 //abc1.set('updated', "1");
                                 //abc1.save();
                                 response.success("Device already registered");
