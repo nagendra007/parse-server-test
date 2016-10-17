@@ -38,10 +38,10 @@ var api = new ParseServer({
         apiKey: 'AIzaSyBFOOgUxGnlB0CIwTxDwycw0wHD3jM2RS0'
       },
       ios: {
-          pfx: 'certs/PushCertificates.p12', // The filename of private key and certificate in PFX or PKCS12 format from disk  
-          passphrase: 'p@ssW0rd', // optional password to your p12
-          cert: '', // If not using the .p12 format, the path to the certificate PEM to load from disk
-          key: '', // If not using the .p12 format, the path to the private key PEM to load from disk
+          pfx: 'certs/Certificates.p12', // The filename of private key and certificate in PFX or PKCS12 format from disk  
+          passphrase: 'p@ssW0rd$', // optional password to your p12
+          cert:'',// 'pem/Toolio.pem', // If not using the .p12 format, the path to the certificate PEM to load from disk
+          key: '',//'p@ssW0rd$', // If not using the .p12 format, the path to the private key PEM to load from disk
           bundleId: 'co.toolio.app', // The bundle identifier associate with your app
           production: false // Specifies which environment to connect to: Production (if true) or Sandbox
       }
