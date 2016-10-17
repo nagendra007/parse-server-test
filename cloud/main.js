@@ -1983,6 +1983,7 @@ Parse.Cloud.define("updateTool", function (request, response) {
                                 if (toolForRent1.length > 0) {
 
                                     var ImageObject = { imageURL1: request.params.imageURL, imageURL2: request.params.imageURL, imageURL3: request.params.imageURL, imageURL4: request.params.imageURL, imageURL5: request.params.imageURL };
+                                    var ImageArray = [ request.params.imageURL, request.params.imageURL,request.params.imageURL,  request.params.imageURL,  request.params.imageURL ];
 
 
                                     var toolId = request.params.toolId
@@ -2000,6 +2001,7 @@ Parse.Cloud.define("updateTool", function (request, response) {
                                     //toolForRent.set("isRented", "0");
                                     toolForRent.set("toolImageURL", request.params.imageURL);
                                     toolForRent.set("ImageList", ImageObject);
+                                    toolForRent.set("ImageArray", ImageArray);
                                     //toolForRent.set("toolImageName", "");
                                     toolForRent.set("manufacturer", request.params.make);
                                     toolForRent.set("moreTimeAllowed", request.params.moretimeallowed);
