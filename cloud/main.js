@@ -2050,7 +2050,14 @@ Parse.Cloud.define("updateTool", function (request, response) {
 
 
 
-
+Parse.Cloud.define("testArray", function (request, response) {
+    if (request.params.ImageArray != null && request.params.ImageArray.length >0) {
+        response.success(request.params.ImageArray[1] +"  length: " +request.params.ImageArray.length);
+    }
+    else {
+        response.error("array missing in request");
+    }
+});
 
 
 
