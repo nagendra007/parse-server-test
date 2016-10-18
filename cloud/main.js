@@ -1195,7 +1195,7 @@ Parse.Cloud.define("addTakeToolForRent", function (request, response) {
 
                                     if (toolOwnerUserId != null && toolOwnerUserId != "")
                                     {
-                                        var msg = "your " + toolName + " is rented";
+                                        var msg = "Your " + toolName + " is applied for rent";
                                         Parse.Cloud.run('sendToolRentPushMeesage', { userid: toolOwnerUserId, title: "Tool Rented", message: msg, toolId: request.params.toolId }, {
                                             success: function (result) {
                                                 //alert(result.length);
@@ -2177,7 +2177,7 @@ Parse.Cloud.define("approveToolRequest", function (request, response) {
                                     if (request.params.isApproved == "1") {
                                         //code of send pm for approve
                                         if (toolTakenUserId != null && toolTakenUserId != "") {
-                                            var msg = "your taken tool is approved";
+                                            var msg = "Your taken tool is approved";
                                             Parse.Cloud.run('sendApproveCancelToolRequestPushMeesage', { userid: toolTakenUserId, title: "Toolio", message: msg, toolId: toolId, toolTakenForRentId: request.params.toolTakenForRentId }, {
                                                 success: function (result) {
                                                     //alert(result.length);
@@ -2199,7 +2199,7 @@ Parse.Cloud.define("approveToolRequest", function (request, response) {
 
                                         //code of send pm for reject
                                         if (toolTakenUserId != null && toolTakenUserId != "") {
-                                            var msg = "your taken tool is rejected";
+                                            var msg = "Your taken tool is rejected";
                                             Parse.Cloud.run('sendApproveCancelToolRequestPushMeesage', { userid: toolTakenUserId, title: "Toolio", message: msg, toolId: toolId, toolTakenForRentId: request.params.toolTakenForRentId }, {
                                                 success: function (result) {
                                                     //alert(result.length);
