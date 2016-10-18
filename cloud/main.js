@@ -2247,7 +2247,7 @@ Parse.Cloud.define("sendApproveCancelToolRequestPushMeesage", function (request,
                             "alert": request.params.message,
                             "tid": request.params.toolId,
                             "ttid": request.params.toolTakenForRentId,
-                            "ptype": "1"
+                            "ptype": "2"
                         },
                         "priority": "high"
 
