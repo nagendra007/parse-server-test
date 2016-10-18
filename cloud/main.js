@@ -1634,7 +1634,7 @@ Parse.Cloud.define("getTakeToolForRentDetails", function (request, response) {
 
 
 
-                        response.success(testdata);
+                        response.success(testdata.testDays);
                     }
                     else {
                         response.error("Tool Taken For Rent not found");
