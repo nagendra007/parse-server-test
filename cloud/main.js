@@ -2055,7 +2055,7 @@ Parse.Cloud.define("updateTool", function (request, response) {
                                         //toolForRent.set("isAvailable", "1");
                                         //toolForRent.set("isRented", "0");
                                        // toolForRent.set("toolImageURL", request.params.imageURL);
-                                        toolForRent.set("ImageList", ImageObject);
+                                        //toolForRent.set("ImageList", ImageObject);
                                         toolForRent.set("ImageArray", ImageArray);
                                         //toolForRent.set("toolImageName", "");
                                         toolForRent.set("manufacturer", request.params.make);
