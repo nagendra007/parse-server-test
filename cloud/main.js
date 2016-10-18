@@ -1636,7 +1636,7 @@ Parse.Cloud.define("getTakeToolForRentDetails", function (request, response) {
 
                         var pricePerDay=parseFloat( toolTakenForRent[0].get("pricePerDay"));
                         var TotalAmount=pricePerDay *(diffDays+1);
-                        var Fulldata = { Data: toolTakenForRent[0], extrainfo: { "DaysUsed": diffDays + 1, "totalAmount": TotalAmount } }
+                        var Fulldata = { data: toolTakenForRent[0], extrainfo: { "DaysUsed": diffDays + 1, "totalAmount": TotalAmount } }
 
                         response.success(Fulldata);
                     }
@@ -2111,6 +2111,169 @@ Parse.Cloud.define("updateTool", function (request, response) {
     }
 });
 
+Parse.Cloud.define("approveToolRequest", function (request, response) {
+    if (request.params.userid != null && request.params.userid != "" && request.params.toolTakenForRentId != null && request.params.toolTakenForRentId != "" && request.params.isApproved != null && request.params.isApproved != "") {
+        if (request.params.isApproved != "1" || request.params.isApproved != "0") {
+
+
+            var user = new Parse.User();
+            user.id = request.params.userid;
+            var query = new Parse.Query("userDetails");
+            query.equalTo("user", user);
+            query.find().then(function (results) {
+                if (results.length > 0) {
+                    var ToolTakenForRent = Parse.Object.extend("toolTakenForRent");
+                    var query = new Parse.Query(ToolTakenForRent);
+                    query.equalTo("objectId", request.params.toolTakenForRentId);
+                    query.equalTo("isApproved", "0");
+                    query.include("toolRentId");
+                    query.find().then(function (toolTakenForRent) {
+                        if (toolTakenForRent.length > 0 && toolTakenForRent[0].get("toolRentId").get("user").id == request.params.userid) {
+                            var isapproved="0";
+                            var isCancel = "0";
+                            var toolTakenUserId = toolTakenForRent[0].get("user").id
+                            var toolId = toolTakenForRent[0].get("toolRentId").id;
+                            if (request.params.isApproved != "1")
+                            {
+                                isapproved = "1";
+                                isCancel = "0";
+                            }
+                            else if (request.params.isApproved != "0")
+                            {
+                                isapproved = "0";
+                                isCancel = "1";
+                            }
+                            else {
+                                response.error("Invalid approval passed");
+                            }
+
+                            var toolTakenForRentId = request.params.toolTakenForRentId
+                            var toolTakenForRent = Parse.Object.extend("toolTakenForRent");
+                            var toolTakenForRent = new toolTakenForRent();
+                            toolTakenForRent.id = toolTakenForRentId;
+                            toolTakenForRent.set("isApproved", isapproved);
+                            toolTakenForRent.set("isCanceled", isCancel);
+                            toolTakenForRent.save(null, {
+                                success: function (toolTakenForRent) {
+                                    if (request.params.isApproved != "1") {
+                                        //code of send pm for approve
+                                        if (toolTakenUserId != null && toolTakenUserId != "") {
+                                            var msg = "your taken tool is approved";
+                                            Parse.Cloud.run('sendApproveCancelToolRequestPushMeesage', { userid: toolTakenUserId, title: "Toolio", message: msg, toolId: toolId, toolTakenForRentId: request.params.toolTakenForRentId }, {
+                                                success: function (result) {
+                                                    //alert(result.length);
+                                                },
+                                                error: function (error) {
+                                                }
+                                            });
+                                        }
+                                        response.success("Tool approved success");
+                                    }
+                                    else if (request.params.isApproved != "0") {
+
+                                        var ToolForRent = Parse.Object.extend("toolForRent");
+                                        var toolForRent = new ToolForRent();
+                                        toolForRent.id = toolId;
+                                        toolForRent.set("isAvailable", "1");
+                                        toolForRent.set("isRented", "0");
+                                        toolForRent.save();
+
+                                        //code of send pm for reject
+                                        if (toolTakenUserId != null && toolTakenUserId != "") {
+                                            var msg = "your taken tool is rejected";
+                                            Parse.Cloud.run('sendApproveCancelToolRequestPushMeesage', { userid: toolTakenUserId, title: "Toolio", message: msg, toolId: toolId, toolTakenForRentId: request.params.toolTakenForRentId }, {
+                                                success: function (result) {
+                                                    //alert(result.length);
+                                                },
+                                                error: function (error) {
+                                                }
+                                            });
+                                        }
+                                        response.success("Tool rejected success");
+                                    }
+                                    else {
+                                        response.error("Invalid approval passed");
+                                    }
+                                },
+                                error: function (error) {
+                                    response.error("Error: " + error.message);
+                                }
+                            });
+
+                            response.success(Fulldata);
+                        }
+                        else {
+                            response.error("Tool Taken For Rent not found");
+                        }
+                    });
+                }
+                else {
+                    response.error("User details not found, please update your profile");
+                }
+            }, function (error) {
+                response.error("Error: " + error.code + " " + error.message);
+            });
+        }
+        else {
+            response.error("Invalid approval passed");
+        }
+    }
+    else {
+        response.error("Missing request parameters");
+    }
+
+});
+
+Parse.Cloud.define("sendApproveCancelToolRequestPushMeesage", function (request, response) {
+    if (request.params.userid != null && request.params.userid != "" && request.params.title != null && request.params.title != "" && request.params.message != null && request.params.message != "" && request.params.toolId != null && request.params.toolId != "" && request.params.toolTakenForRentId != null && request.params.toolTakenForRentId != "") {
+        var user = new Parse.User();
+        user.id = request.params.userid;
+        var query = new Parse.Query(Parse.User);
+        query.equalTo("objectId", request.params.userid);  // find all the women
+        query.find({
+            success: function (result) {
+                if (result.length > 0) {
+
+                    var query = new Parse.Query(Parse.Installation);
+                    query.equalTo('user', user);
+
+                    Parse.Push.send({
+                        where: query, // Set our Installation query
+                        //data: {
+                        //    message: "Hey you tool time is going to out."
+                        //}
+                        "data": {
+                            //"title": request.params.title,
+                            "alert": request.params.message,
+                            "tid": request.params.toolId,
+                            "ttid": request.params.toolTakenForRentId,
+                            "ptype": "1"
+                        },
+                        "priority": "high"
+
+                    }, {
+                        success: function () {
+                            response.success("Push was successful");
+                        },
+                        error: function (error) {
+                            response.error("Error: " + error.message);
+                        },
+                        useMasterKey: true
+                    });
+                }
+                else {
+                    response.error("User not found");
+                }
+            },
+            error: function (error) {
+                response.error("Error: " + error.message);
+            }
+        });
+    }
+    else {
+        response.error("Userid missing in request");
+    }
+});
 
 
 Parse.Cloud.define("testArray", function (request, response) {
