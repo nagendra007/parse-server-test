@@ -1626,9 +1626,9 @@ Parse.Cloud.define("getTakeToolForRentDetails", function (request, response) {
 
                         var diffDays = Math.round(Math.abs((firstDate.getTime() - secondDate.getTime()) / (oneDay)));
                         // response.success(diffDays+1);
-                        toolTakenForRent[0].set("DaysUsed", diffDays + 1);
+                        //toolTakenForRent[0].set("DaysUsed", diffDays + 1);
 
-                        response.success(toolTakenForRent);
+                        response.success(toolTakenForRent, data = diffDays + 1);
                     }
                     else {
                         response.error("Tool Taken For Rent not found");
