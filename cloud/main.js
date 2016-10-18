@@ -821,6 +821,8 @@ Parse.Cloud.define("addTool", function (request, response) {
                             var sdate = new Date(request.params.startDate);
                             var edate = new Date(request.params.endDate);
                             if (sdate <= edate) {
+                                var ImageArray = [request.params.imageURL];// request.params.ImageArray;//
+
                                 var userdetailsId = "";
                                 var userdetailsId = results[0].id;
                                 var Userdetails = Parse.Object.extend("userDetails");
@@ -857,6 +859,7 @@ Parse.Cloud.define("addTool", function (request, response) {
                                         toolForRent.set("isRented", "0");
                                         toolForRent.set("toolImageURL", request.params.imageURL);
                                         //toolForRent.set("toolImageName", "");
+                                        toolForRent.set("ImageArray", ImageArray);
                                         toolForRent.set("manufacturer", request.params.make);
                                         toolForRent.set("moreTimeAllowed", request.params.moretimeallowed);
                                         toolForRent.set("startDate", sdate);
