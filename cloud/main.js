@@ -2017,7 +2017,7 @@ Parse.Cloud.define("updateTool", function (request, response) {
         query.equalTo("user", user);
         query.find().then(function (results) {
             if (results.length > 0) {
-                if (request.params.toolId != null && request.params.toolId != "" && request.params.amount != null && request.params.amount != "" && request.params.desc != null && request.params.desc != "" && request.params.make != null && request.params.make != "" && request.params.moretimeallowed != null && request.params.moretimeallowed != "" && request.params.imageURL != null && request.params.imageURL != "" && request.params.toolName != null && request.params.toolName != "" && request.params.startDate != null && request.params.startDate != "" && request.params.endDate != null && request.params.endDate != "") {
+                if (request.params.toolId != null && request.params.toolId != "" && request.params.amount != null && request.params.amount != "" && request.params.desc != null && request.params.desc != "" && request.params.make != null && request.params.make != "" && request.params.moretimeallowed != null && request.params.moretimeallowed != "" && request.params.toolName != null && request.params.toolName != "" && request.params.startDate != null && request.params.startDate != "" && request.params.endDate != null && request.params.endDate != "") { // && request.params.imageURL != null && request.params.imageURL != "" 
                     if (!isNaN(request.params.amount)) {
                         if (request.params.ImageArray != null && request.params.ImageArray.length > 0) {
                             var newamount = parseFloat(request.params.amount);
@@ -2054,7 +2054,7 @@ Parse.Cloud.define("updateTool", function (request, response) {
                                         toolForRent.set("pricePerDay", decimalAmount);
                                         //toolForRent.set("isAvailable", "1");
                                         //toolForRent.set("isRented", "0");
-                                        toolForRent.set("toolImageURL", request.params.imageURL);
+                                       // toolForRent.set("toolImageURL", request.params.imageURL);
                                         toolForRent.set("ImageList", ImageObject);
                                         toolForRent.set("ImageArray", ImageArray);
                                         //toolForRent.set("toolImageName", "");
