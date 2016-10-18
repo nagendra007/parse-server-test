@@ -1175,6 +1175,23 @@ Parse.Cloud.define("addTakeToolForRent", function (request, response) {
                                     toolForRent1.save();
 
 
+                                    //var ToolTakenForRent = Parse.Object.extend("toolTakenForRent");
+                                    //var toolTakenForRent1 = new ToolTakenForRent();
+                                    //toolTakenForRent1.id = toolTakenForRent.id;
+
+                                    //var user1 = new Parse.User();
+                                    //user1.id = toolOwnerUserId;
+
+
+                                    //var ToolTrackingLog = Parse.Object.extend("toolTrackingLog");
+                                    //var toolTrackingLog = new ToolTrackingLog();
+                                    //toolTrackingLog.set("toolTakenForRent", toolTakenForRent1);
+                                    //toolTrackingLog.set("toolForRent", toolForRent1);
+                                    //toolTrackingLog.set("toolOwnUser", user1);
+                                    //toolTrackingLog.set("toolRenterUser", user);
+                                    //toolTrackingLog.set("condition", "Initail tool taken for rent by use");
+                                    //toolTrackingLog.save();
+
                                     if (toolOwnerUserId != null && toolOwnerUserId != "")
                                     {
                                         var msg = "your " + toolName + " is rented";
@@ -1543,7 +1560,7 @@ Parse.Cloud.define("removeTool", function (request, response) {
     }
 });
 
-Parse.Cloud.define("uploadToolImage", function (request, response) {
+Parse.Cloud.define("uploadToolImageold", function (request, response) {
     if (request.params.userid != null && request.params.userid != "" && request.params.toolId != null && request.params.toolId != "" && request.params.fileName != null && request.params.fileName != "" && request.params.base64 != null && request.params.base64 != "") {
 
 
@@ -2289,7 +2306,82 @@ Parse.Cloud.define("testArray", function (request, response) {
 });
 
 
+Parse.Cloud.define("uploadToolImage", function (request, response) {
+    //if (request.params.fileName != null && request.params.fileName != "" && request.params.base64 != null && request.params.base64 != "") {
 
+    //    var parseFile = new Parse.File(request.params.fileName, { base64: request.params.base64 });
+    //    parseFile.save().then(function (result) {
+    //        var url = result.url();
+    //        response.success(url);
+    //    }, function (error) {
+    //        response.error("Error: " + error.message);
+    //    });
+    //}
+    //else {
+    //    response.error("Missing file parameters");
+    //}
+    if (request.params.userid != null && request.params.userid != "" && request.params.toolId != null && request.params.toolId != "" && request.params.fileName != null && request.params.fileName != "" && request.params.base64 != null && request.params.base64 != "") {
+
+
+        var user = new Parse.User();
+        user.id = request.params.userid;
+        var query = new Parse.Query("userDetails");
+        query.equalTo("user", user);
+        query.find().then(function (results) {
+            if (results.length > 0) {
+
+                var ToolForRent1 = Parse.Object.extend("toolForRent");
+                var query = new Parse.Query(ToolForRent1);
+                query.equalTo("isAvailable", "1");
+                query.equalTo("isDeleted", "0");
+                query.equalTo("objectId", request.params.toolId);
+                query.equalTo("user", user);
+                query.find().then(function (toolForRent1) {
+                    if (toolForRent1.length > 0) {
+                        var toolImageArray = [];
+                        if (toolForRent1[0].get("ImageArray") != null && toolForRent1[0].get("ImageArray") != "undefined") {
+
+                            toolImageArray = toolForRent1[0].get("ImageArray");
+                        }
+                        var parseFile = new Parse.File(request.params.fileName, { base64: request.params.base64 });
+                        parseFile.save().then(function (result) {
+                            var url = result.url();
+                            toolImageArray.push(url);
+                            var toolId = request.params.toolId
+                            var ToolForRent = Parse.Object.extend("toolForRent");
+                            var toolForRent = new ToolForRent();
+                            toolForRent.id = toolId;
+                            toolForRent.set("ImageArray", toolImageArray);
+                            toolForRent.save(null, {
+                                success: function (toolForRent) {
+                                    response.success(url);
+                                },
+                                error: function (error) {
+                                    response.error("Error: " + error.message);
+                                }
+                            });
+                        }, function (error) {
+                            response.error("Error: " + error.message);
+                        });
+                    }
+                    else {
+                        response.error("Tool deleted or not available ");
+                    }
+                }, function (error) {
+                    response.error("Error: " + error.message);
+                });
+            }
+            else {
+                response.error("User not found");
+            }
+        }, function (error) {
+            response.error(error);
+        });
+    }
+    else {
+        response.error("Missing file parameters");
+    }
+});
 
 
 
