@@ -2134,9 +2134,7 @@ Parse.Cloud.define("updateTool", function (request, response) {
 
 Parse.Cloud.define("approveToolRequest", function (request, response) {
     if (request.params.userid != null && request.params.userid != "" && request.params.toolTakenForRentId != null && request.params.toolTakenForRentId != "" && request.params.isApproved != null && request.params.isApproved != "") {
-        if (request.params.isApproved != "1" || request.params.isApproved != "0") {
-
-
+        if (request.params.isApproved == "1" || request.params.isApproved == "0") {
             var user = new Parse.User();
             user.id = request.params.userid;
             var query = new Parse.Query("userDetails");
@@ -2154,12 +2152,12 @@ Parse.Cloud.define("approveToolRequest", function (request, response) {
                             var isCancel = "0";
                             var toolTakenUserId = toolTakenForRent[0].get("user").id
                             var toolId = toolTakenForRent[0].get("toolRentId").id;
-                            if (request.params.isApproved != "1")
+                            if (request.params.isApproved == "1")
                             {
                                 isapproved = "1";
                                 isCancel = "0";
                             }
-                            else if (request.params.isApproved != "0")
+                            else if (request.params.isApproved == "0")
                             {
                                 isapproved = "0";
                                 isCancel = "1";
@@ -2176,7 +2174,7 @@ Parse.Cloud.define("approveToolRequest", function (request, response) {
                             toolTakenForRent.set("isCanceled", isCancel);
                             toolTakenForRent.save(null, {
                                 success: function (toolTakenForRent) {
-                                    if (request.params.isApproved != "1") {
+                                    if (request.params.isApproved == "1") {
                                         //code of send pm for approve
                                         if (toolTakenUserId != null && toolTakenUserId != "") {
                                             var msg = "your taken tool is approved";
@@ -2190,7 +2188,7 @@ Parse.Cloud.define("approveToolRequest", function (request, response) {
                                         }
                                         response.success("Tool approved success");
                                     }
-                                    else if (request.params.isApproved != "0") {
+                                    else if (request.params.isApproved == "0") {
 
                                         var ToolForRent = Parse.Object.extend("toolForRent");
                                         var toolForRent = new ToolForRent();
