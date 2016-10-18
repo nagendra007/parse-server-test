@@ -955,6 +955,7 @@ Parse.Cloud.define("getRentedTools", function (request, response) {
                     var query = new Parse.Query(ToolTakenForRent);
                     query.containedIn("toolRentId", toolForRent);
                     query.equalTo("isPaymentDone", "0");
+                    query.equalTo("isCanceled", "0");
                     query.include("toolRentId");
                     query.include("userDetailsId");
                     query.find({
