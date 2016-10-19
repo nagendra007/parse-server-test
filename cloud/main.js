@@ -13,9 +13,6 @@ Parse.Cloud.define('hello', function (req, res) {
 });
 
 
-
-
-
 Parse.Cloud.define("toolPayment", function (request, response) {
     if (request.params.userid != null && request.params.userid != "" && request.params.BTcustomerid != null && request.params.BTcustomerid != "" && request.params.BTcardid != null && request.params.BTcardid != "" && request.params.amount != null && request.params.amount != "" && request.params.toolTakenForRentID != null && request.params.toolTakenForRentID != "") {
 
@@ -106,6 +103,52 @@ Parse.Cloud.define("toolPayment", function (request, response) {
     else {
         response.error("Missing request parameters");
     }
+});
+
+Parse.Cloud.define("preAuthTool", function (request, response) {
+    if (request.params.userid != null && request.params.userid != "") {
+        var user = new Parse.User();
+        user.id = request.params.userid;
+
+
+        var UserCreditCardInfo = Parse.Object.extend("userCreditCardInfo");
+        var query = new Parse.Query(UserCreditCardInfo);
+        query.equalTo("user", user);
+        query.equalTo("isPrimary", "1");
+        query.find().then(function (userCreditCardInfo) {
+            if (userCreditCardInfo.length > 0) {
+                var BTcustomerid = ""
+                var BTcardid = ""
+
+                gateway.transaction.sale({
+                    amount: 1.00,
+                    //paymentMethodNonce: request.params.nonce,
+                    CustomerId: request.params.BTcustomerid,// balcustomerid,
+                    PaymentMethodToken: request.params.BTcardid,
+                    options: {
+                        submitForSettlement: false
+                    }
+                }, function (err, result) {
+                    if (result.success == true) {
+                        var txnId = result.transaction.id;
+                        var amount = result.transaction.amount;
+                    }
+                    else {
+                        response.error(err);
+                    }
+                });
+            }
+            else {
+                response.error("Please setup your primary credit card");
+            }
+        }, function (error) {
+            response.error("Error: " + error.code + " " + error.message);
+        });
+    }
+    else {
+        response.error("Missing request parameters");
+    }
+
 });
 
 Parse.Cloud.define("addCreditCard", function (request, response) {
@@ -460,6 +503,14 @@ Parse.Cloud.define("addUpdateUserdetails_old", function (request, response) {
 });
 
 Parse.Cloud.define("addUpdateUserdetails", function (request, response) {
+
+    var RequestTrackingLog = Parse.Object.extend("requestTrackingLog");
+    var requestTrackingLog = new RequestTrackingLog();
+    requestTrackingLog.set("apiName","addUpdateUserdetails");
+    requestTrackingLog.set("request", request.params);
+    requestTrackingLog.save();
+
+
     if (request.params.userid != null && request.params.userid != "") {
         var query = new Parse.Query(Parse.User);
         query.equalTo("objectId", request.params.userid);
@@ -1146,6 +1197,10 @@ Parse.Cloud.define("addTakeToolForRent", function (request, response) {
 
                         var scheduleDate = new Date(request.params.scheduleDate);
                         if (sdate <= edate) {
+
+
+                            //Pre-Auth code here
+
 
                             toolTakenForRent.set("user", user);
                             toolTakenForRent.set("userDetailsId", userdetails);
@@ -2294,17 +2349,6 @@ Parse.Cloud.define("sendApproveCancelToolRequestPushMeesage", function (request,
     }
 });
 
-
-Parse.Cloud.define("testArray", function (request, response) {
-    if (request.params.ImageArray != null && request.params.ImageArray.length >0) {
-        response.success(request.params.ImageArray[1] +"  length: " +request.params.ImageArray.length);
-    }
-    else {
-        response.error("array missing in request");
-    }
-});
-
-
 Parse.Cloud.define("uploadToolImage", function (request, response) {
     //if (request.params.fileName != null && request.params.fileName != "" && request.params.base64 != null && request.params.base64 != "") {
 
@@ -2385,6 +2429,18 @@ Parse.Cloud.define("uploadToolImage", function (request, response) {
 
 
 
+
+
+
+
+Parse.Cloud.define("testArray", function (request, response) {
+    if (request.params.ImageArray != null && request.params.ImageArray.length > 0) {
+        response.success(request.params.ImageArray[1] + "  length: " + request.params.ImageArray.length);
+    }
+    else {
+        response.error("array missing in request");
+    }
+});
 
 Parse.Cloud.define("uploadImageBlob", function (request, response) {
     if (request.params.fileName != null && request.params.fileName != "" && request.params.base64 != null && request.params.base64 != "" && request.params.contentType != null && request.params.contentType != "") {
