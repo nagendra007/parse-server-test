@@ -2590,8 +2590,8 @@ Parse.Cloud.define("approveToolRequest", function (request, response) {
                                                         toolTakenForRent.id = toolTakenForRentId;
                                                         toolTakenForRent.set("isApproved", isapproved);
                                                         toolTakenForRent.set("isCanceled", isCancel);
-                                                        toolTakenForRent1.set("isPaymentDone", "1");
-                                                        toolTakenForRent1.set("userPaymentId", userPayment);
+                                                        toolTakenForRent.set("isPaymentDone", "1");
+                                                        toolTakenForRent.set("userPaymentId", userPayment);
                                                         toolTakenForRent.save(null, {
                                                             success: function (toolTakenForRent) {
                                                                 if (request.params.isApproved == "1") {
