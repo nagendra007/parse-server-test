@@ -117,14 +117,14 @@ Parse.Cloud.define("preAuthTool", function (request, response) {
         query.equalTo("isPrimary", "1");
         query.find().then(function (userCreditCardInfo) {
             if (userCreditCardInfo.length > 0) {
-                var BTcustomerid = ""
-                var BTcardid = ""
+                var BTcustomerid = userCreditCardInfo[0].get("BTcustomerid");
+                var BTcardid = userCreditCardInfo[0].get("BTcardid");
 
                 gateway.transaction.sale({
                     amount: 1.00,
                     //paymentMethodNonce: request.params.nonce,
-                    CustomerId: request.params.BTcustomerid,// balcustomerid,
-                    PaymentMethodToken: request.params.BTcardid,
+                    CustomerId: BTcustomerid,// balcustomerid,
+                    PaymentMethodToken: BTcardid,
                     options: {
                         submitForSettlement: false
                     }
@@ -132,6 +132,7 @@ Parse.Cloud.define("preAuthTool", function (request, response) {
                     if (result.success == true) {
                         var txnId = result.transaction.id;
                         var amount = result.transaction.amount;
+                        response.success(txnId);
                     }
                     else {
                         response.error(err);
@@ -147,6 +148,24 @@ Parse.Cloud.define("preAuthTool", function (request, response) {
     }
     else {
         response.error("Missing request parameters");
+    }
+
+});
+
+Parse.Cloud.define("settlePreAuthTool", function (request, response) {
+    if (request.params.userid != null && request.params.userid != "" && request.params.txnId != null && request.params.txnId != "" && request.params.totalAmount != null && request.params.totalAmount != "") {
+
+        gateway.transaction.submitForSettlement(request.params.txnId, parseFloat( request.params.totalAmount), function (err, result) {
+            if (result.success) {
+                var settledTransaction = result.transaction;
+                response.success(settledTransaction);
+            } else {
+                response.error(result.errors);
+            }
+        });
+    }
+    else {
+        response.error("Missing parameters");
     }
 
 });
@@ -1267,6 +1286,191 @@ Parse.Cloud.define("addTakeToolForRent", function (request, response) {
                                 error: function (error) {
                                     response.error("Error: " + error.message);
                                 }
+                            });
+                        }
+                        else {
+                            response.error("Invalid dates passed");
+                        }
+                    }
+                    else {
+                        response.error("Tool not available");
+                    }
+                });
+            }
+            else {
+                response.error("User details not found, please update your profile");
+            }
+        }, function (error) {
+            response.error("Error: " + error.code + " " + error.message);
+        });
+    }
+    else {
+        response.error("Missing request parameters");
+    }
+
+});
+
+Parse.Cloud.define("addTakeToolForRent_WithPreAuth", function (request, response) {
+
+
+    if (request.params.userid != null && request.params.userid != "" && request.params.toolId != null && request.params.toolId != ""
+        && request.params.startDate != null && request.params.startDate != "" && request.params.endDate != null && request.params.endDate != ""
+        && request.params.scheduleDate != null && request.params.scheduleDate != "" && request.params.scheduleTime != null && request.params.scheduleTime != ""
+        && request.params.isRentNowPickUp != null && request.params.isRentNowPickUp != "" && request.params.isSchedulePickUp != null && request.params.isSchedulePickUp != "") {
+
+        var scheduleTime = request.params.scheduleTime;
+        var isRentNowPickUp = request.params.isRentNowPickUp;
+        var isSchedulePickUp = request.params.isSchedulePickUp;
+        var user = new Parse.User();
+        user.id = request.params.userid;
+        var query = new Parse.Query("userDetails");
+        query.equalTo("user", user);
+        query.find().then(function (results) {
+            //success: function (results) {
+            if (results.length > 0) {
+
+                var userdetailsId = "";
+                var userdetailsId = results[0].id;
+                var Userdetails = Parse.Object.extend("userDetails");
+                var userdetails = new Userdetails();
+                userdetails.id = userdetailsId;
+
+                var ToolForRent = Parse.Object.extend("toolForRent");
+                var query = new Parse.Query(ToolForRent);
+                query.equalTo("objectId", request.params.toolId);
+                query.equalTo("isAvailable", "1");
+                query.equalTo("isDeleted", "0");
+                query.find().then(function (toolForRent) {
+                    //success: function (toolForRent) {
+                    if (toolForRent.length > 0) {
+                        var toolOwnerUserId = "";
+                        toolOwnerUserId = toolForRent[0].get("user").id;
+
+                        var toolName = "";
+                        toolName = toolForRent[0].get("toolName");
+                        var pricePerDay = "";
+                        pricePerDay = toolForRent[0].get("pricePerDay");
+
+
+                        var ToolForRent = Parse.Object.extend("toolForRent");
+
+                        var toolForRent1 = new ToolForRent();
+                        toolForRent1.id = request.params.toolId;
+
+                        var ToolTakenForRent = Parse.Object.extend("toolTakenForRent");
+                        var toolTakenForRent = new ToolTakenForRent();
+
+                        var sdate = new Date(request.params.startDate);
+                        var edate = new Date(request.params.endDate);
+
+                        var scheduleDate = new Date(request.params.scheduleDate);
+                        if (sdate <= edate) {
+
+
+                            //Pre-Auth code here
+                            var UserCreditCardInfo = Parse.Object.extend("userCreditCardInfo");
+                            var query = new Parse.Query(UserCreditCardInfo);
+                            query.equalTo("user", user);
+                            query.equalTo("isPrimary", "1");
+                            query.find().then(function (userCreditCardInfo) {
+                                if (userCreditCardInfo.length > 0) {
+                                    var BTcustomerid = userCreditCardInfo[0].get("BTcustomerid");
+                                    var BTcardid = userCreditCardInfo[0].get("BTcardid");
+
+                                    gateway.transaction.sale({
+                                        amount: 1.00,
+                                        //paymentMethodNonce: request.params.nonce,
+                                        CustomerId: BTcustomerid,// balcustomerid,
+                                        PaymentMethodToken: BTcardid,
+                                        options: {
+                                            submitForSettlement: false,
+                                            StoreInVault : true
+                                        }
+                                    }, function (err, result) {
+                                        if (result.success == true) {
+                                            var txnId = result.transaction.id;
+                                            var amount = result.transaction.amount;
+
+
+                                            toolTakenForRent.set("user", user);
+                                            toolTakenForRent.set("userDetailsId", userdetails);
+                                            toolTakenForRent.set("toolRentId", toolForRent1);
+                                            toolTakenForRent.set("toolName", toolName);
+                                            toolTakenForRent.set("starteDateTime", sdate);
+                                            toolTakenForRent.set("endeDateTime", edate);
+                                            toolTakenForRent.set("pricePerDay", pricePerDay);
+                                            toolTakenForRent.set("isReturned", "0");
+                                            toolTakenForRent.set("isCanceled", "0");
+                                            toolTakenForRent.set("isPaymentDone", "0");
+
+                                            toolTakenForRent.set("scheduleDate", scheduleDate);
+                                            toolTakenForRent.set("scheduleTime", scheduleTime);
+                                            toolTakenForRent.set("isRentNowPickUp", isRentNowPickUp);
+                                            toolTakenForRent.set("isSchedulePickUp", isSchedulePickUp);
+                                            toolTakenForRent.set("isApproved", "0");
+                                            toolTakenForRent.set("isPicked", "0");
+                                            toolTakenForRent.set("isPreAuth", "1");
+                                            toolTakenForRent.set("txnId", txnId);
+                                            toolTakenForRent.set("preAuth", amount);
+
+
+                                            toolTakenForRent.save(null, {
+                                                success: function (toolTakenForRent) {
+                                                    var ToolForRent = Parse.Object.extend("toolForRent");
+                                                    var toolForRent1 = new ToolForRent();
+                                                    toolForRent1.id = request.params.toolId;
+                                                    toolForRent1.set("isAvailable", "0");
+                                                    toolForRent1.set("isRented", "1");
+                                                    toolForRent1.save();
+
+
+                                                    //var ToolTakenForRent = Parse.Object.extend("toolTakenForRent");
+                                                    //var toolTakenForRent1 = new ToolTakenForRent();
+                                                    //toolTakenForRent1.id = toolTakenForRent.id;
+
+                                                    //var user1 = new Parse.User();
+                                                    //user1.id = toolOwnerUserId;
+
+
+                                                    //var ToolTrackingLog = Parse.Object.extend("toolTrackingLog");
+                                                    //var toolTrackingLog = new ToolTrackingLog();
+                                                    //toolTrackingLog.set("toolTakenForRent", toolTakenForRent1);
+                                                    //toolTrackingLog.set("toolForRent", toolForRent1);
+                                                    //toolTrackingLog.set("toolOwnUser", user1);
+                                                    //toolTrackingLog.set("toolRenterUser", user);
+                                                    //toolTrackingLog.set("condition", "Initail tool taken for rent by use");
+                                                    //toolTrackingLog.save();
+
+                                                    if (toolOwnerUserId != null && toolOwnerUserId != "") {
+                                                        var msg = "Your " + toolName + " is applied for rent";
+                                                        Parse.Cloud.run('sendToolRentPushMeesage', { userid: toolOwnerUserId, title: "Tool Rented", message: msg, toolId: request.params.toolId }, {
+                                                            success: function (result) {
+                                                                //alert(result.length);
+                                                            },
+                                                            error: function (error) {
+                                                            }
+                                                        });
+                                                    }
+                                                    response.success("Tool rented success");
+
+
+
+                                                },
+                                                error: function (error) {
+                                                    response.error("Error: " + error.message);
+                                                }
+                                            });
+                                        }
+                                        else {
+                                            response.error(err);
+                                        }
+                                    });
+                                }
+                                else {
+                                    response.error("Please setup your primary credit card");
+                                }
+                            }, function (error) {
+                                response.error("Error: " + error.code + " " + error.message);
                             });
                         }
                         else {
