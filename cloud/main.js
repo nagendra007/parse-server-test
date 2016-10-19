@@ -795,6 +795,9 @@ Parse.Cloud.define("search", function (request, response) {
         query.find({
             success: function (userDetails) {
                 if (userDetails.length > 0) {
+                    var today = new Date();
+                    today.setDate(today.getDate() -1);
+
                     var myusers = [];
                     for (var j = 0; j < userDetails.length; j++) {
                         myusers.push(userDetails[j].get("user"));
@@ -803,6 +806,7 @@ Parse.Cloud.define("search", function (request, response) {
                     var query = new Parse.Query(ToolForRent);
                     query.equalTo("isAvailable", "1");
                     query.equalTo("isDeleted", "0");
+                    query.greaterThan("endDate", today);
 
                     if (request.params.categoryId != null && request.params.categoryId != "") {
                         var ToolCategory = Parse.Object.extend("toolCategory");
@@ -1162,7 +1166,7 @@ Parse.Cloud.define("feedback", function (request, response) {
     }
 });
 
-Parse.Cloud.define("addTakeToolForRent", function (request, response) {
+Parse.Cloud.define("addTakeToolForRent_WithOutPreAuth", function (request, response) {
 
 
     if (request.params.userid != null && request.params.userid != "" && request.params.toolId != null && request.params.toolId != ""
@@ -1311,7 +1315,7 @@ Parse.Cloud.define("addTakeToolForRent", function (request, response) {
 
 });
 
-Parse.Cloud.define("addTakeToolForRent_WithPreAuth", function (request, response) {
+Parse.Cloud.define("addTakeToolForRent", function (request, response) {
 
 
     if (request.params.userid != null && request.params.userid != "" && request.params.toolId != null && request.params.toolId != ""
@@ -2392,7 +2396,7 @@ Parse.Cloud.define("updateTool", function (request, response) {
     }
 });
 
-Parse.Cloud.define("approveToolRequest", function (request, response) {
+Parse.Cloud.define("approveToolRequest_WithOutAmountSettle", function (request, response) {
     if (request.params.userid != null && request.params.userid != "" && request.params.toolTakenForRentId != null && request.params.toolTakenForRentId != "" && request.params.isApproved != null && request.params.isApproved != "") {
         if (request.params.isApproved == "1" || request.params.isApproved == "0") {
             var user = new Parse.User();
@@ -2480,6 +2484,245 @@ Parse.Cloud.define("approveToolRequest", function (request, response) {
                             });
 
                             response.success(Fulldata);
+                        }
+                        else {
+                            response.error("Tool Taken For Rent not found");
+                        }
+                    });
+                }
+                else {
+                    response.error("User details not found, please update your profile");
+                }
+            }, function (error) {
+                response.error("Error: " + error.code + " " + error.message);
+            });
+        }
+        else {
+            response.error("Invalid approval passed");
+        }
+    }
+    else {
+        response.error("Missing request parameters");
+    }
+
+});
+
+Parse.Cloud.define("approveToolRequest", function (request, response) {
+    if (request.params.userid != null && request.params.userid != "" && request.params.toolTakenForRentId != null && request.params.toolTakenForRentId != "" && request.params.isApproved != null && request.params.isApproved != "") {
+        if (request.params.isApproved == "1" || request.params.isApproved == "0") {
+            var user = new Parse.User();
+            user.id = request.params.userid;
+            var query = new Parse.Query("userDetails");
+            query.equalTo("user", user);
+            query.find().then(function (results) {
+                if (results.length > 0) {
+                    var ToolTakenForRent = Parse.Object.extend("toolTakenForRent");
+                    var query = new Parse.Query(ToolTakenForRent);
+                    query.equalTo("objectId", request.params.toolTakenForRentId);
+                    query.equalTo("isApproved", "0");
+                    query.include("toolRentId");
+                    query.find().then(function (toolTakenForRent) {
+                        if (toolTakenForRent.length > 0 && toolTakenForRent[0].get("toolRentId").get("user").id == request.params.userid) {
+                            var isapproved = "0";
+                            var isCancel = "0";
+                            var toolTakenUserId = toolTakenForRent[0].get("user").id
+                            var toolId = toolTakenForRent[0].get("toolRentId").id;
+                            if (request.params.isApproved == "1") {
+                                isapproved = "1";
+                                isCancel = "0";
+
+                                var oneDay = 24 * 60 * 60 * 1000; // hours*minutes*seconds*milliseconds
+                                var firstDate = toolTakenForRent[0].get("starteDateTime"); //new Date(2008, 01, 12);
+                                var secondDate = toolTakenForRent[0].get("endeDateTime"); //new Date(2008, 01, 22);
+
+                                var diffDays = Math.round(Math.abs((firstDate.getTime() - secondDate.getTime()) / (oneDay)));
+
+                                var pricePerDay = parseFloat(toolTakenForRent[0].get("pricePerDay"));
+                                var TotalAmount = parseFloat(pricePerDay * (diffDays + 1));
+
+
+
+                                var UserCreditCardInfo = Parse.Object.extend("userCreditCardInfo");
+                                var query = new Parse.Query(UserCreditCardInfo);
+                                query.equalTo("user", user);
+                                query.equalTo("isPrimary", "1");
+                                query.find().then(function (userCreditCardInfo) {
+                                    if (userCreditCardInfo.length > 0) {
+                                        var BTcustomerid = userCreditCardInfo[0].get("BTcustomerid");
+                                        var BTcardid = userCreditCardInfo[0].get("BTcardid");
+
+                                        gateway.transaction.sale({
+                                            amount: TotalAmount,
+                                            //paymentMethodNonce: request.params.nonce,
+                                            CustomerId: BTcustomerid,// balcustomerid,
+                                            PaymentMethodToken: BTcardid,
+                                            options: {
+                                                submitForSettlement: true,
+                                                StoreInVault: true
+                                            }
+                                        }, function (err, result) {
+                                            if (result.success == true) {
+                                                var txnId = result.transaction.id;
+                                                var amount = result.transaction.amount;
+
+                                                var toolTakenForRentIdpay = request.params.toolTakenForRentId
+                                                var toolTakenForRent1 = Parse.Object.extend("toolTakenForRent");
+                                                var toolTakenForRent1 = new toolTakenForRent1();
+                                                toolTakenForRent1.id = toolTakenForRentIdpay;
+
+
+                                                var userToolRenter = new Parse.User();
+                                                userToolRenter.id = toolTakenUserId;
+
+
+                                                var UserPayment = Parse.Object.extend("userPayment");
+                                                var userPayment = new UserPayment();
+                                                userPayment.set("user", userToolRenter);
+                                                userPayment.set("toolTakenForRentId", toolTakenForRentIdpay);
+                                                userPayment.set("txnId", txnId);
+                                                userPayment.set("amount", amount);
+                                                userPayment.save(null, {
+                                                    success: function (userPayment) {
+
+                                                        var toolTakenForRentId = request.params.toolTakenForRentId
+                                                        var toolTakenForRent = Parse.Object.extend("toolTakenForRent");
+                                                        var toolTakenForRent = new toolTakenForRent();
+                                                        toolTakenForRent.id = toolTakenForRentId;
+                                                        toolTakenForRent.set("isApproved", isapproved);
+                                                        toolTakenForRent.set("isCanceled", isCancel);
+                                                        toolTakenForRent1.set("isPaymentDone", "1");
+                                                        toolTakenForRent1.set("userPaymentId", userPayment);
+                                                        toolTakenForRent.save(null, {
+                                                            success: function (toolTakenForRent) {
+                                                                if (request.params.isApproved == "1") {
+                                                                    //code of send pm for approve
+                                                                    if (toolTakenUserId != null && toolTakenUserId != "") {
+                                                                        var msg = "Your taken tool is approved";
+                                                                        Parse.Cloud.run('sendApproveCancelToolRequestPushMeesage', { userid: toolTakenUserId, title: "Toolio", message: msg, toolId: toolId, toolTakenForRentId: request.params.toolTakenForRentId }, {
+                                                                            success: function (result) {
+                                                                                //alert(result.length);
+                                                                            },
+                                                                            error: function (error) {
+                                                                            }
+                                                                        });
+                                                                    }
+                                                                    response.success("Tool approved success");
+                                                                }
+                                                                else if (request.params.isApproved == "0") {
+
+                                                                    var ToolForRent = Parse.Object.extend("toolForRent");
+                                                                    var toolForRent = new ToolForRent();
+                                                                    toolForRent.id = toolId;
+                                                                    toolForRent.set("isAvailable", "1");
+                                                                    toolForRent.set("isRented", "0");
+                                                                    toolForRent.save();
+
+                                                                    //code of send pm for reject
+                                                                    if (toolTakenUserId != null && toolTakenUserId != "") {
+                                                                        var msg = "Your taken tool is rejected";
+                                                                        Parse.Cloud.run('sendApproveCancelToolRequestPushMeesage', { userid: toolTakenUserId, title: "Toolio", message: msg, toolId: toolId, toolTakenForRentId: request.params.toolTakenForRentId }, {
+                                                                            success: function (result) {
+                                                                                //alert(result.length);
+                                                                            },
+                                                                            error: function (error) {
+                                                                            }
+                                                                        });
+                                                                    }
+                                                                    response.success("Tool rejected success");
+                                                                }
+                                                                else {
+                                                                    response.error("Invalid approval passed");
+                                                                }
+                                                            },
+                                                            error: function (error) {
+                                                                response.error("Error: " + error.message);
+                                                            }
+                                                        });
+                                                    }, error: function (error) {
+                                                        response.error("Error: " + error.message);
+                                                    }
+                                                });
+
+                                            }
+                                            else {
+                                                response.error(err);
+                                            }
+                                        });
+                                    }
+                                    else {
+                                        response.error("Please setup your primary credit card");
+                                    }
+                                }, function (error) {
+                                    response.error("Error: " + error.code + " " + error.message);
+                                });
+
+                            }
+                            else if (request.params.isApproved == "0") {
+                                isapproved = "0";
+                                isCancel = "1";
+                                var toolTakenForRentId = request.params.toolTakenForRentId
+                                var toolTakenForRent = Parse.Object.extend("toolTakenForRent");
+                                var toolTakenForRent = new toolTakenForRent();
+                                toolTakenForRent.id = toolTakenForRentId;
+                                toolTakenForRent.set("isApproved", isapproved);
+                                toolTakenForRent.set("isCanceled", isCancel);
+                                toolTakenForRent.save(null, {
+                                    success: function (toolTakenForRent) {
+                                        if (request.params.isApproved == "1") {
+                                            //code of send pm for approve
+                                            if (toolTakenUserId != null && toolTakenUserId != "") {
+                                                var msg = "Your taken tool is approved";
+                                                Parse.Cloud.run('sendApproveCancelToolRequestPushMeesage', { userid: toolTakenUserId, title: "Toolio", message: msg, toolId: toolId, toolTakenForRentId: request.params.toolTakenForRentId }, {
+                                                    success: function (result) {
+                                                        //alert(result.length);
+                                                    },
+                                                    error: function (error) {
+                                                    }
+                                                });
+                                            }
+                                            response.success("Tool approved success");
+                                        }
+                                        else if (request.params.isApproved == "0") {
+
+                                            var ToolForRent = Parse.Object.extend("toolForRent");
+                                            var toolForRent = new ToolForRent();
+                                            toolForRent.id = toolId;
+                                            toolForRent.set("isAvailable", "1");
+                                            toolForRent.set("isRented", "0");
+                                            toolForRent.save();
+
+                                            //code of send pm for reject
+                                            if (toolTakenUserId != null && toolTakenUserId != "") {
+                                                var msg = "Your taken tool is rejected";
+                                                Parse.Cloud.run('sendApproveCancelToolRequestPushMeesage', { userid: toolTakenUserId, title: "Toolio", message: msg, toolId: toolId, toolTakenForRentId: request.params.toolTakenForRentId }, {
+                                                    success: function (result) {
+                                                        //alert(result.length);
+                                                    },
+                                                    error: function (error) {
+                                                    }
+                                                });
+                                            }
+                                            response.success("Tool rejected success");
+                                        }
+                                        else {
+                                            response.error("Invalid approval passed");
+                                        }
+                                    },
+                                    error: function (error) {
+                                        response.error("Error: " + error.message);
+                                    }
+                                });
+
+                            }
+                            else {
+                                response.error("Invalid approval passed");
+                            }
+
+
+
+
+
+                            //response.success(Fulldata);
                         }
                         else {
                             response.error("Tool Taken For Rent not found");
@@ -2631,156 +2874,7 @@ Parse.Cloud.define("uploadToolImage", function (request, response) {
     }
 });
 
-Parse.Cloud.define("approveToolRequest_WithAmountSettle", function (request, response) {
-    if (request.params.userid != null && request.params.userid != "" && request.params.toolTakenForRentId != null && request.params.toolTakenForRentId != "" && request.params.isApproved != null && request.params.isApproved != "") {
-        if (request.params.isApproved == "1" || request.params.isApproved == "0") {
-            var user = new Parse.User();
-            user.id = request.params.userid;
-            var query = new Parse.Query("userDetails");
-            query.equalTo("user", user);
-            query.find().then(function (results) {
-                if (results.length > 0) {
-                    var ToolTakenForRent = Parse.Object.extend("toolTakenForRent");
-                    var query = new Parse.Query(ToolTakenForRent);
-                    query.equalTo("objectId", request.params.toolTakenForRentId);
-                    query.equalTo("isApproved", "0");
-                    query.include("toolRentId");
-                    query.find().then(function (toolTakenForRent) {
-                        if (toolTakenForRent.length > 0 && toolTakenForRent[0].get("toolRentId").get("user").id == request.params.userid) {
-                            var isapproved = "0";
-                            var isCancel = "0";
-                            var toolTakenUserId = toolTakenForRent[0].get("user").id
-                            var toolId = toolTakenForRent[0].get("toolRentId").id;
-                            if (request.params.isApproved == "1") {
-                                isapproved = "1";
-                                isCancel = "0";
 
-
-                                var UserCreditCardInfo = Parse.Object.extend("userCreditCardInfo");
-                                var query = new Parse.Query(UserCreditCardInfo);
-                                query.equalTo("user", user);
-                                query.equalTo("isPrimary", "1");
-                                query.find().then(function (userCreditCardInfo) {
-                                    if (userCreditCardInfo.length > 0) {
-                                        var BTcustomerid = userCreditCardInfo[0].get("BTcustomerid");
-                                        var BTcardid = userCreditCardInfo[0].get("BTcardid");
-
-                                        gateway.transaction.sale({
-                                            amount: 1.00,
-                                            //paymentMethodNonce: request.params.nonce,
-                                            CustomerId: BTcustomerid,// balcustomerid,
-                                            PaymentMethodToken: BTcardid,
-                                            options: {
-                                                submitForSettlement: false,
-                                                StoreInVault : true
-                                            }
-                                        }, function (err, result) {
-                                            if (result.success == true) {
-                                                var txnId = result.transaction.id;
-                                                var amount = result.transaction.amount;
-
-
-                                            }
-                                            else {
-                                                response.error(err);
-                                            }
-                                        });
-                                    }
-                                    else {
-                                        response.error("Please setup your primary credit card");
-                                    }
-                                }, function (error) {
-                                    response.error("Error: " + error.code + " " + error.message);
-                                });
-                                            
-                            }
-                            else if (request.params.isApproved == "0") {
-                                isapproved = "0";
-                                isCancel = "1";
-                            }
-                            else {
-                                response.error("Invalid approval passed");
-                            }
-
-
-
-
-                            var toolTakenForRentId = request.params.toolTakenForRentId
-                            var toolTakenForRent = Parse.Object.extend("toolTakenForRent");
-                            var toolTakenForRent = new toolTakenForRent();
-                            toolTakenForRent.id = toolTakenForRentId;
-                            toolTakenForRent.set("isApproved", isapproved);
-                            toolTakenForRent.set("isCanceled", isCancel);
-                            toolTakenForRent.save(null, {
-                                success: function (toolTakenForRent) {
-                                    if (request.params.isApproved == "1") {
-                                        //code of send pm for approve
-                                        if (toolTakenUserId != null && toolTakenUserId != "") {
-                                            var msg = "Your taken tool is approved";
-                                            Parse.Cloud.run('sendApproveCancelToolRequestPushMeesage', { userid: toolTakenUserId, title: "Toolio", message: msg, toolId: toolId, toolTakenForRentId: request.params.toolTakenForRentId }, {
-                                                success: function (result) {
-                                                    //alert(result.length);
-                                                },
-                                                error: function (error) {
-                                                }
-                                            });
-                                        }
-                                        response.success("Tool approved success");
-                                    }
-                                    else if (request.params.isApproved == "0") {
-
-                                        var ToolForRent = Parse.Object.extend("toolForRent");
-                                        var toolForRent = new ToolForRent();
-                                        toolForRent.id = toolId;
-                                        toolForRent.set("isAvailable", "1");
-                                        toolForRent.set("isRented", "0");
-                                        toolForRent.save();
-
-                                        //code of send pm for reject
-                                        if (toolTakenUserId != null && toolTakenUserId != "") {
-                                            var msg = "Your taken tool is rejected";
-                                            Parse.Cloud.run('sendApproveCancelToolRequestPushMeesage', { userid: toolTakenUserId, title: "Toolio", message: msg, toolId: toolId, toolTakenForRentId: request.params.toolTakenForRentId }, {
-                                                success: function (result) {
-                                                    //alert(result.length);
-                                                },
-                                                error: function (error) {
-                                                }
-                                            });
-                                        }
-                                        response.success("Tool rejected success");
-                                    }
-                                    else {
-                                        response.error("Invalid approval passed");
-                                    }
-                                },
-                                error: function (error) {
-                                    response.error("Error: " + error.message);
-                                }
-                            });
-
-                            response.success(Fulldata);
-                        }
-                        else {
-                            response.error("Tool Taken For Rent not found");
-                        }
-                    });
-                }
-                else {
-                    response.error("User details not found, please update your profile");
-                }
-            }, function (error) {
-                response.error("Error: " + error.code + " " + error.message);
-            });
-        }
-        else {
-            response.error("Invalid approval passed");
-        }
-    }
-    else {
-        response.error("Missing request parameters");
-    }
-
-});
 
 
 
