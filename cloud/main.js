@@ -877,6 +877,13 @@ Parse.Cloud.define("getuserdetails", function (request, response) {
 });
 
 Parse.Cloud.define("addTool", function (request, response) {
+
+    var RequestTrackingLog = Parse.Object.extend("requestTrackingLog");
+    var requestTrackingLog = new RequestTrackingLog();
+    requestTrackingLog.set("apiName", "addTool");
+    requestTrackingLog.set("request", request.params);
+    requestTrackingLog.save();
+
     if (request.params.userid != null && request.params.userid != "") {
         var user = new Parse.User();
         user.id = request.params.userid;
@@ -2300,6 +2307,11 @@ Parse.Cloud.define("sendToolRentPushMeesage", function (request, response) {
 });
 
 Parse.Cloud.define("updateTool", function (request, response) {
+    var RequestTrackingLog = Parse.Object.extend("requestTrackingLog");
+    var requestTrackingLog = new RequestTrackingLog();
+    requestTrackingLog.set("apiName", "updateTool");
+    requestTrackingLog.set("request", request.params);
+    requestTrackingLog.save();
     if (request.params.userid != null && request.params.userid != "") {
         var user = new Parse.User();
         user.id = request.params.userid;
