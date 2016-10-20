@@ -2545,7 +2545,16 @@ Parse.Cloud.define("approveToolRequest", function (request, response) {
                         if (toolTakenForRent.length > 0 && toolTakenForRent[0].get("toolRentId").get("user").id == request.params.userid) {
                             var isapproved = "0";
                             var isCancel = "0";
-                            var toolTakenUserId = toolTakenForRent[0].get("user").id
+
+                            
+
+
+                            var toolTakenUserId = toolTakenForRent[0].get("user").id;
+
+                            var renteeUuser = new Parse.User();
+                            renteeUuser.id = toolTakenUserId;
+
+
                             var toolId = toolTakenForRent[0].get("toolRentId").id;
                             if (request.params.isApproved == "1") {
                                 isapproved = "1";
@@ -2564,7 +2573,7 @@ Parse.Cloud.define("approveToolRequest", function (request, response) {
 
                                 var UserCreditCardInfo = Parse.Object.extend("userCreditCardInfo");
                                 var query = new Parse.Query(UserCreditCardInfo);
-                                query.equalTo("user", user);
+                                query.equalTo("user", renteeUuser);
                                 query.equalTo("isPrimary", "1");
                                 query.find().then(function (userCreditCardInfo) {
                                     if (userCreditCardInfo.length > 0) {
