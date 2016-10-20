@@ -2612,7 +2612,7 @@ Parse.Cloud.define("approveToolRequest", function (request, response) {
                                                 var UserPayment = Parse.Object.extend("userPayment");
                                                 var userPayment = new UserPayment();
                                                 userPayment.set("user", userToolRenter);
-                                                userPayment.set("toolTakenForRentId", toolTakenForRentIdpay);
+                                                userPayment.set("toolTakenForRent", toolTakenForRent1);
                                                 userPayment.set("txnId", txnId);
                                                 userPayment.set("amount", amount);
                                                 userPayment.set("userCreditCardInfoId", userCreditCardInfo1);
