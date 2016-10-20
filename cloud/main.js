@@ -1387,6 +1387,12 @@ Parse.Cloud.define("addTakeToolForRent", function (request, response) {
                             query.equalTo("isPrimary", "1");
                             query.find().then(function (userCreditCardInfo) {
                                 if (userCreditCardInfo.length > 0) {
+
+                                    var userCreditCardInfoId = userCreditCardInfo[0].id;
+                                    var userCreditCardInfo1 = new UserCreditCardInfo();
+                                    userCreditCardInfo1.id = userCreditCardInfoId;
+
+
                                     var BTcustomerid = userCreditCardInfo[0].get("BTcustomerid");
                                     var BTcardid = userCreditCardInfo[0].get("BTcardid");
 
@@ -1425,6 +1431,7 @@ Parse.Cloud.define("addTakeToolForRent", function (request, response) {
                                             toolTakenForRent.set("isPreAuth", "1");
                                             toolTakenForRent.set("txnId", txnId);
                                             toolTakenForRent.set("preAuth", amount);
+                                            toolTakenForRent.set("userCreditCardInfoId", userCreditCardInfo1);
 
 
                                             toolTakenForRent.save(null, {
@@ -2561,6 +2568,11 @@ Parse.Cloud.define("approveToolRequest", function (request, response) {
                                 query.equalTo("isPrimary", "1");
                                 query.find().then(function (userCreditCardInfo) {
                                     if (userCreditCardInfo.length > 0) {
+
+                                        var userCreditCardInfoId = userCreditCardInfo[0].id;
+                                        var userCreditCardInfo1 = new UserCreditCardInfo();
+                                        userCreditCardInfo1.id = userCreditCardInfoId;
+
                                         var BTcustomerid = userCreditCardInfo[0].get("BTcustomerid");
                                         var BTcardid = userCreditCardInfo[0].get("BTcardid");
 
@@ -2594,6 +2606,7 @@ Parse.Cloud.define("approveToolRequest", function (request, response) {
                                                 userPayment.set("toolTakenForRentId", toolTakenForRentIdpay);
                                                 userPayment.set("txnId", txnId);
                                                 userPayment.set("amount", amount);
+                                                userPayment.set("userCreditCardInfoId", userCreditCardInfo1);
                                                 userPayment.save(null, {
                                                     success: function (userPayment) {
 
