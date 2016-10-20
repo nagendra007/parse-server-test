@@ -886,7 +886,7 @@ Parse.Cloud.define("addTool", function (request, response) {
         query.find().then(function (results) {
             if (results.length > 0) {
                 if (request.params.ImageArray != null && request.params.ImageArray.length > 0) {//if (request.params.imageURL != null && request.params.imageURL != "") {
-                    if (request.params.categoryId != null && request.params.categoryId != "" && request.params.subcategoryId != null && request.params.subcategoryId != "" && request.params.amount != null && request.params.amount != "" && request.params.desc != null && request.params.desc != "" && request.params.make != null && request.params.make != "" && request.params.moretimeallowed != null && request.params.moretimeallowed != "" && request.params.imageURL != null && request.params.imageURL != "" && request.params.toolName != null && request.params.toolName != "" && request.params.startDate != null && request.params.startDate != "" && request.params.endDate != null && request.params.endDate != "") {
+                    if (request.params.categoryId != null && request.params.categoryId != "" && request.params.subcategoryId != null && request.params.subcategoryId != "" && request.params.amount != null && request.params.amount != "" && request.params.desc != null && request.params.desc != "" && request.params.make != null && request.params.make != "" && request.params.moretimeallowed != null && request.params.moretimeallowed != "" && request.params.toolName != null && request.params.toolName != "" && request.params.startDate != null && request.params.startDate != "" && request.params.endDate != null && request.params.endDate != "") { // && request.params.imageURL != null && request.params.imageURL != ""
                         if (!isNaN(request.params.amount)) {
                             var newamount = parseFloat(request.params.amount);
                             var decimalAmount = "";
@@ -1029,7 +1029,8 @@ Parse.Cloud.define("getRentedTools", function (request, response) {
                     var ToolTakenForRent = Parse.Object.extend("toolTakenForRent");
                     var query = new Parse.Query(ToolTakenForRent);
                     query.containedIn("toolRentId", toolForRent);
-                    query.equalTo("isPaymentDone", "0");
+                    //query.equalTo("isPaymentDone", "0");
+                    query.equalTo("isReturned", "0");
                     query.equalTo("isCanceled", "0");
                     query.include("toolRentId");
                     query.include("userDetailsId");
@@ -1068,7 +1069,7 @@ Parse.Cloud.define("getMyRentedTools", function (request, response) {
         query.equalTo("user", user);
         query.equalTo("isReturned", "0");
         query.equalTo("isCanceled", "0");
-        query.equalTo("isPaymentDone", "0");
+        //query.equalTo("isPaymentDone", "0");
         query.include("toolRentId");
         query.include("toolRentId.userDetailsId");
         query.find({
@@ -2594,7 +2595,7 @@ Parse.Cloud.define("approveToolRequest", function (request, response) {
                                                         toolTakenForRent.set("userPaymentId", userPayment);
                                                         toolTakenForRent.save(null, {
                                                             success: function (toolTakenForRent) {
-                                                                if (request.params.isApproved == "1") {
+                                                               
                                                                     //code of send pm for approve
                                                                     if (toolTakenUserId != null && toolTakenUserId != "") {
                                                                         var msg = "Your taken tool is approved";
@@ -2607,32 +2608,6 @@ Parse.Cloud.define("approveToolRequest", function (request, response) {
                                                                         });
                                                                     }
                                                                     response.success("Tool approved success");
-                                                                }
-                                                                else if (request.params.isApproved == "0") {
-
-                                                                    var ToolForRent = Parse.Object.extend("toolForRent");
-                                                                    var toolForRent = new ToolForRent();
-                                                                    toolForRent.id = toolId;
-                                                                    toolForRent.set("isAvailable", "1");
-                                                                    toolForRent.set("isRented", "0");
-                                                                    toolForRent.save();
-
-                                                                    //code of send pm for reject
-                                                                    if (toolTakenUserId != null && toolTakenUserId != "") {
-                                                                        var msg = "Your taken tool is rejected";
-                                                                        Parse.Cloud.run('sendApproveCancelToolRequestPushMeesage', { userid: toolTakenUserId, title: "Toolio", message: msg, toolId: toolId, toolTakenForRentId: request.params.toolTakenForRentId }, {
-                                                                            success: function (result) {
-                                                                                //alert(result.length);
-                                                                            },
-                                                                            error: function (error) {
-                                                                            }
-                                                                        });
-                                                                    }
-                                                                    response.success("Tool rejected success");
-                                                                }
-                                                                else {
-                                                                    response.error("Invalid approval passed");
-                                                                }
                                                             },
                                                             error: function (error) {
                                                                 response.error("Error: " + error.message);
@@ -2650,7 +2625,7 @@ Parse.Cloud.define("approveToolRequest", function (request, response) {
                                         });
                                     }
                                     else {
-                                        response.error("Please setup your primary credit card");
+                                        response.error("Can't charge rentees credit card, so can't approve");
                                     }
                                 }, function (error) {
                                     response.error("Error: " + error.code + " " + error.message);
