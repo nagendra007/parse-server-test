@@ -237,6 +237,7 @@ Parse.Cloud.define("addCreditCard", function (request, response) {
                                     
                                     userCreditCardInfo.set("ExpirationMonth", request.params.ExpirationMonth);
                                     userCreditCardInfo.set("ExpirationYear", request.params.ExpirationYear);
+                                    userCreditCardInfo.set("isDeleted", "0");
 
                                     
                                     if (userCreditCardInfo1.length > 0) {
@@ -2889,6 +2890,76 @@ Parse.Cloud.define("uploadToolImage", function (request, response) {
 
 
 
+Parse.Cloud.define("deleteCreditCard", function (request, response) {
+    if (request.params.userid != null && request.params.userid != "" && request.params.userCreditCardid != null && request.params.userCreditCardid != "") {
+        var query = new Parse.Query(Parse.User);
+        query.equalTo("objectId", request.params.userid);
+        query.find({
+            success: function (result) {
+                if (result.length > 0) {
+
+                    var user = new Parse.User();
+                    user.id = request.params.userid;
+
+                    var UserCreditCardInfo = Parse.Object.extend("userCreditCardInfo");
+
+                    var query = new Parse.Query(UserCreditCardInfo);
+                    query.equalTo("user", user);
+                    query.equalTo("objectId", request.params.userCreditCardid);
+
+                    query.find().then(function (userCreditCardInfo) {
+                        //response.success(userCreditCardInfo);
+
+                        if (userCreditCardInfo.length > 0) {
+                            var query = new Parse.Query(UserCreditCardInfo);
+                            query.equalTo("user", user);
+                            query.find().then(function (userCreditCardInfo) {
+                                if (userCreditCardInfo.length > 0) {
+                                    if (userCreditCardInfo[0].get("isPrimary") == "1") {
+                                        response.error("Can not delete your primary credit card");
+                                    }
+                                    else {
+                                        var UserCreditCardInfo1 = Parse.Object.extend("userCreditCardInfo");
+                                        var userCreditCardInfo1 = new UserCreditCardInfo1();
+
+                                        var cardid = "";
+                                        var cardid = userCreditCardInfo[0].id;
+
+                                        userCreditCardInfo1.id = cardid;
+                                        userCreditCardInfo1.set("isDeleted", "1");
+                                        userCreditCardInfo1.save();
+
+                                        response.success("Credit card deleted successfuly");
+                                    }
+                                }
+                                else {
+                                    response.error("No CC  found in your account");
+                                }
+                            }, function (error) {
+                                response.error("Error: " + error.code + " " + error.message);
+                            });
+
+                        }
+                        else {
+                            response.error("CC not found in your account");
+                        }
+                    }, function (error) {
+                        response.error("Error: " + error.code + " " + error.message);
+                    });
+                }
+                else {
+                    response.error("User not found");
+                }
+            },
+            error: function (error) {
+                response.error("Error: " + error.code + " " + error.message);
+            }
+        });
+    }
+    else {
+        response.error("Missing request parameters");
+    }
+});
 
 Parse.Cloud.define("testArray", function (request, response) {
     if (request.params.ImageArray != null && request.params.ImageArray.length > 0) {
